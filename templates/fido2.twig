@@ -9,9 +9,9 @@
 {% endblock %}
 
 {% block content %}
+    <h1>Second-Factor Authentication</h1>
 <p>Your username is: {{ UserID }}</p>
 {{ regForm|raw }}
 <p>Here are all the tokens we have on file for you: {{ FIDO2Tokens|raw }}</p>
 {{ authForm|raw }}
-<!--<p>The state is: {{ State }}</p>-->
 {% endblock %}

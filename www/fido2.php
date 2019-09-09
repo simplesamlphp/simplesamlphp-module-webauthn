@@ -68,7 +68,7 @@ $t->data['State'] = "<pre>".print_r($state, true)."</pre>";
 $t->data['UserID'] = $state['FIDO2Username'];
 $t->data['FIDO2Tokens'] = "<table>";
 foreach ($state['FIDO2Tokens'] as $oneToken) {
-	$t->data['FIDO2Tokens'] .= "<tr><td>".$oneToken[3]."</td><td>$oneToken[0]</td></tr>";
+	$t->data['FIDO2Tokens'] .= "<tr><td>".$oneToken[3]."</td></tr>";
 //print_r($oneToken);
 }
 $t->data['FIDO2Tokens'] .= "</table>";
