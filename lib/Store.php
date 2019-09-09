@@ -69,7 +69,7 @@ abstract class Store
      *
      * @return void
      */
-    abstract public function storeTokenData($userId, $credentialId, $credential, $signCounter, $firendlyName);
+    abstract public function storeTokenData($userId, $credentialId, $credential, $signCounter, $friendlyName);
 
     /**
      * increment the signature counter after a successful authentication

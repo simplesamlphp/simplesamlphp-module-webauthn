@@ -3,23 +3,22 @@
 namespace SimpleSAML\Module\fido2SecondFactor\FIDO2SecondFactor\Store;
 
 /**
- * Store consent in database.
+ * Store FIDO2 information in database.
  *
- * This class implements a consent store which stores the consent information in a database. It is tested, and should
- * work against MySQL, PostgreSQL and SQLite.
+ * This class implements a store which stores the FIDO2 information in a 
+ * database. It is tested with MySQL, others might work, too.
  *
  * It has the following options:
- * - dsn: The DSN which should be used to connect to the database server. See the PHP Manual for supported drivers and
- *   DSN formats.
+ * - dsn: The DSN which should be used to connect to the database server. See 
+ *   the PHP Manual for supported drivers and DSN formats.
  * - username: The username used for database connection.
  * - password: The password used for database connection.
  *
- * @author Olav Morken <olav.morken@uninett.no>
+ * @author Stefan Winter <stefan.winter@restena.lu>
  * @package SimpleSAMLphp
  */
+class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
 
-class Database extends \SimpleSAML\Module\fido2SecondFactor\Store
-{
     /**
      * DSN for the database.
      */
@@ -59,7 +58,6 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store
      */
     private $db;
 
-
     /**
      * Parse configuration.
      *
@@ -69,8 +67,7 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store
      *
      * @throws \Exception in case of a configuration error.
      */
-    public function __construct($config)
-    {
+    public function __construct($config) {
         parent::__construct($config);
 
         if (!array_key_exists('dsn', $config)) {
@@ -118,14 +115,12 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store
         }
     }
 
-
     /**
      * Called before serialization.
      *
      * @return array The variables which should be serialized.
      */
-    public function __sleep()
-    {
+    public function __sleep() {
         return [
             'dsn',
             'dateTime',
@@ -144,8 +139,7 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store
      *
      * @return bool True if the user is enabled for 2FA, false if not
      */
-    public function is2FAEnabled($userId)
-    {
+    public function is2FAEnabled($userId) {
         assert(is_string($userId));
 
         $query = 'SELECT fido2Status FROM fido2UserStatus WHERE user_id = ?';
@@ -161,17 +155,16 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store
             \SimpleSAML\Logger::debug('User does not exist in DB, default to 2FA DISABLED.');
             return false;
         } else {
-                $query2 = 'SELECT fido2Status FROM fido2UserStatus WHERE user_id = ? AND fido2Status = "FIDO2Disabled"';
-                $st2 = $this->execute($query2, [$userId]);
-                $rowCount2 = $st2->rowCount();
-                if ($rowCount2 === 1 /* explicitly disabled user in DB */) {
-                        return false;
-                }
+            $query2 = 'SELECT fido2Status FROM fido2UserStatus WHERE user_id = ? AND fido2Status = "FIDO2Disabled"';
+            $st2 = $this->execute($query2, [$userId]);
+            $rowCount2 = $st2->rowCount();
+            if ($rowCount2 === 1 /* explicitly disabled user in DB */) {
+                return false;
+            }
             \SimpleSAML\Logger::debug('User exists and is not disabled -> enabled.');
             return true;
         }
     }
-
 
     /**
      * enrolling a new FIDO2 token allowed?
@@ -183,11 +176,10 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store
      *
      * @return bool True if the user is allowed to enroll, false if not
      */
-    public function enrollAllowed($userId)
-    {
+    public function enrollAllowed($userId) {
         assert(is_string($userId));
 
-	$query = 'SELECT fido2Status FROM fido2UserStatus WHERE user_id = ? AND fido2Status = "FIDO2EnrollEnabled"';
+        $query = 'SELECT fido2Status FROM fido2UserStatus WHERE user_id = ? AND fido2Status = "FIDO2EnrollEnabled"';
 
         $st = $this->execute($query, [$userId]);
 
@@ -200,15 +192,15 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store
             \SimpleSAML\Logger::debug('User is allowed to enroll.');
             return true;
         } else {
-		$query2 = 'SELECT * from fido2SecondFactor WHERE user_id = ?';
-		$st2 = $this->execute($query2, [$userId]);
-		$rowCount2 = $st2->rowCount();
-		$query3 = 'SELECT fido2Status FROM fido2UserStatus WHERE user_id = ? AND fido2Status = "FIDO2Enabled"';
-		$st3 = $this->execute($query3, [$userId]);
-		$rowCount3 = $st3->rowCount();
-		if ($rowCount3 === 1 /* FIDO2 enabled */ && $rowCount2 === 0 /* no credentials yet */) {
-			return true;
-		}
+            $query2 = 'SELECT * from fido2SecondFactor WHERE user_id = ?';
+            $st2 = $this->execute($query2, [$userId]);
+            $rowCount2 = $st2->rowCount();
+            $query3 = 'SELECT fido2Status FROM fido2UserStatus WHERE user_id = ? AND fido2Status = "FIDO2Enabled"';
+            $st3 = $this->execute($query3, [$userId]);
+            $rowCount3 = $st3->rowCount();
+            if ($rowCount3 === 1 /* FIDO2 enabled */ && $rowCount2 === 0 /* no credentials yet */) {
+                return true;
+            }
             \SimpleSAML\Logger::debug('User is not allowed to enroll a new FIDO2 token.');
             return false;
         }
@@ -223,12 +215,11 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store
      *
      * @return bool True if the credential exists, false if not
      */
-    public function doesCredentialExist($credIdHex)
-    {
+    public function doesCredentialExist($credIdHex) {
         assert(is_string($userId));
 
-        $query = 'SELECT credentialId FROM fido2SecondFactor '.
-            'WHERE credentialId = ?';
+        $query = 'SELECT credentialId FROM fido2SecondFactor ' .
+                'WHERE credentialId = ?';
 
         $st = $this->execute($query, [$credIdHex]);
 
@@ -257,14 +248,13 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store
      *
      * @return true
      */
-    public function storeTokenData($userId, $credentialId, $credential, $signCounter, $friendlyName)
-    {
+    public function storeTokenData($userId, $credentialId, $credential, $signCounter, $friendlyName) {
         assert(is_string($userId));
 
         $st = $this->execute(
-            'INSERT INTO fido2SecondFactor '.
-            '(user_id, credentialId, credential, signCounter, friendlyName) VALUES (?,?,?,'.$signCounter.',?)',
-            [$userId, $credentialId, $credential, $friendlyName]
+                'INSERT INTO fido2SecondFactor ' .
+                '(user_id, credentialId, credential, signCounter, friendlyName) VALUES (?,?,?,' . $signCounter . ',?)',
+                [$userId, $credentialId, $credential, $friendlyName]
         );
 
         if ($st !== false) {
@@ -272,9 +262,9 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store
         }
 
         $st2 = $this->execute(
-            'UPDATE fido2UserStatus  '.
-            'SET fido2Status = ? WHERE user_id = ?',
-            ["FIDO2Enabled", $userId]
+                'UPDATE fido2UserStatus  ' .
+                'SET fido2Status = ? WHERE user_id = ?',
+                ["FIDO2Enabled", $userId]
         );
 
         if ($st !== false) {
@@ -291,17 +281,17 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store
      * @return true
      */
     public function updateSignCount($credentialId, $signCounter) {
-	$st = $this->execute(
-            'UPDATE fido2SecondFactor SET signCounter = ? WHERE credentialId = ?',
-            [$signCounter, $credentialId]
+        $st = $this->execute(
+                'UPDATE fido2SecondFactor SET signCounter = ? WHERE credentialId = ?',
+                [$signCounter, $credentialId]
         );
 
         if ($st !== false) {
             \SimpleSAML\Logger::debug('fido2SecondFactor:Database - UPDATED signature counter.');
         } else {
-		throw new Exception("Database execution did not work.");
-	}
-	return true;
+            throw new Exception("Database execution did not work.");
+        }
+        return true;
     }
 
     /**
@@ -310,15 +300,14 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store
      * @param string $userId the username
      * @return array Array of all crypto data we have on file.
      */
-    public function getTokenData($userId)
-    {
+    public function getTokenData($userId) {
         assert(is_string($userId));
 
         $ret = [];
 
         $st = $this->execute(
-            'SELECT credentialId, credential, signCounter, friendlyName FROM fido2SecondFactor WHERE user_id = ?',
-            [$userId]
+                'SELECT credentialId, credential, signCounter, friendlyName FROM fido2SecondFactor WHERE user_id = ?',
+                [$userId]
         );
 
         if ($st === false) {
@@ -332,8 +321,6 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store
         return $ret;
     }
 
-
-
     /**
      * Prepare and execute statement.
      *
@@ -345,8 +332,7 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store
      *
      * @return \PDOStatement|bool  The statement, or false if execution failed.
      */
-    private function execute($statement, $parameters)
-    {
+    private function execute($statement, $parameters) {
         assert(is_string($statement));
         assert(is_array($parameters));
 
@@ -358,16 +344,16 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store
         $st = $db->prepare($statement);
         if ($st === false) {
             \SimpleSAML\Logger::error(
-                'consent:Database - Error preparing statement \''.
-                $statement.'\': '.self::formatError($db->errorInfo())
+                    'consent:Database - Error preparing statement \'' .
+                    $statement . '\': ' . self::formatError($db->errorInfo())
             );
             return false;
         }
 
         if ($st->execute($parameters) !== true) {
             \SimpleSAML\Logger::error(
-                'consent:Database - Error executing statement \''.
-                $statement.'\': '.self::formatError($st->errorInfo())
+                    'consent:Database - Error executing statement \'' .
+                    $statement . '\': ' . self::formatError($st->errorInfo())
             );
             return false;
         }
@@ -375,14 +361,12 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store
         return $st;
     }
 
-
     /**
      * Get database handle.
      *
      * @return \PDO|false Database handle, or false if we fail to connect.
      */
-    private function getDB()
-    {
+    private function getDB() {
         if ($this->db !== null) {
             return $this->db;
         }
@@ -402,7 +386,6 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store
         return $this->db;
     }
 
-
     /**
      * Format PDO error.
      *
@@ -412,12 +395,11 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store
      *
      * @return string Error text.
      */
-    private static function formatError($error)
-    {
+    private static function formatError($error) {
         assert(is_array($error));
         assert(count($error) >= 3);
 
-        return $error[0].' - '.$error[2].' ('.$error[1].')';
+        return $error[0] . ' - ' . $error[2] . ' (' . $error[1] . ')';
     }
 
 }
