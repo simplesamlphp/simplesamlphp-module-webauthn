@@ -267,7 +267,7 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
                 ["FIDO2Enabled", $userId]
         );
 
-        if ($st !== false) {
+        if ($st2 !== false) {
             \SimpleSAML\Logger::debug('fido2SecondFactor:Database - downgraded user status to usage only, now that enrollment is complete.');
         }
         return true;
