@@ -1,0 +1,23 @@
+{
+    "name": "simplesamlphp/fido2SecondFactor",
+    "description": "A PHP implementation of a FIDO2 / WebAuthn authentication agent",
+    "type": "project",
+    "keywords": [ "idp", "fido2", "webauthn", "2fa" ],
+    "license": "LGPL-2.1-or-later",
+    "authors": [
+        {
+            "name": "Stefan Winter",
+            "email": "stefan.winter@restena.lu"
+        },
+    ],
+    "autoload": {
+        "psr-4": {
+            "SimpleSAML\\": "lib/SimpleSAML"
+        },
+        "files": ["lib/_autoload_modules.php"]
+    },
+    "require": {
+        "Spomky-labs/cbor-php": "*",
+	"web-auth/cose-lib": "*"
+    },
+}

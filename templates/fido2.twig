@@ -1,0 +1,17 @@
+{% set pagetitle = '{fido2SecondFactor:fido2SecondFactor:consent_header}'|trans %}
+{% extends "base.twig" %}
+
+{% block preload %}
+<link rel="stylesheet" type="text/css" href="{{ asset }}assets/css/fido2SecondFactor.css" />
+<script>
+{{ JSCode|raw }}
+</script>
+{% endblock %}
+
+{% block content %}
+<p>Your username is: {{ UserID }}</p>
+{{ regForm|raw }}
+<p>Here are all the tokens we have on file for you: {{ FIDO2Tokens|raw }}</p>
+{{ authForm|raw }}
+<!--<p>The state is: {{ State }}</p>-->
+{% endblock %}
