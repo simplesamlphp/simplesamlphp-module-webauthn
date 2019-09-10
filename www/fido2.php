@@ -74,7 +74,7 @@ foreach ($state['FIDO2Tokens'] as $oneToken) {
 $t->data['FIDO2Tokens'] .= "</table>";
 $t->data['regForm'] = "";
 if ($state['FIDO2EnrollmentAllowed'] === true) {
-$t->data['regForm'] = "<form id='regform' method='POST' action='".\SimpleSAML\Module::getModuleURL('fido2SecondFactor/regprocess.php?StateId='.urlencode($id))."'>
+$t->data['regForm'] = "<form id='regform' method='POST' action='".\SimpleSAML\Module::getModuleURL('fido2SecondFactor/regprocess1.php?StateId='.urlencode($id))."'>
 <input type='hidden' id='resp' name='response_id' value='0'/>
 <input type='hidden' id='data' name='attestation_client_data_json' value='nix'/>
 <input type='hidden' id='attobj' name='attestation_object' value='mehrnix'/>
@@ -103,7 +103,7 @@ Name for the new token: <input type='text' id='tokenname' name='tokenname' size=
 $t->data['authForm'] = "";
 if (count($state['FIDO2Tokens']) > 0) {
 $t->data['authForm'] = "
-<form id='authform' method='POST' action='".\SimpleSAML\Module::getModuleURL('fido2SecondFactor/authprocess.php?StateId='.urlencode($id))."'>
+<form id='authform' method='POST' action='".\SimpleSAML\Module::getModuleURL('fido2SecondFactor/authprocess1.php?StateId='.urlencode($id))."'>
 <input type='hidden' id='resp' name='response_id' value='0'/>
 <input type='hidden' id='data' name='attestation_client_data_json' value='nix'/>
 <input type='hidden' id='authdata' name='authenticator_data' value='mehrnix'/>
