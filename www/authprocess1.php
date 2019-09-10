@@ -16,7 +16,7 @@ if (!array_key_exists('StateId', $_REQUEST)) {
 global $debugbuffer;
 global $validatebuffer;
 global $debugEnabled;
-$debugEnabled = TRUE;
+$debugEnabled = FALSE;
 
 $validatebuffer = "";
 $debugbuffer = "";

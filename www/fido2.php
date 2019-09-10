@@ -31,45 +31,13 @@ if (!array_key_exists('StateId', $_REQUEST)) {
 $id = $_REQUEST['StateId'];
 $state = \SimpleSAML\Auth\State::loadState($id, 'fido2SecondFactor:request');
 
-if (array_key_exists('core:SP', $state)) {
-    $spentityid = $state['core:SP'];
-} elseif (array_key_exists('saml:sp:State', $state)) {
-    $spentityid = $state['saml:sp:State']['core:SP'];
-} else {
-    $spentityid = 'UNKNOWN';
-}
-
-// Parse parameters
-if (array_key_exists('name', $state['Source'])) {
-    $srcName = $state['Source']['name'];
-} elseif (array_key_exists('OrganizationDisplayName', $state['Source'])) {
-    $srcName = $state['Source']['OrganizationDisplayName'];
-} else {
-    $srcName = $state['Source']['entityid'];
-}
-
-if (array_key_exists('name', $state['Destination'])) {
-    $dstName = $state['Destination']['name'];
-} elseif (array_key_exists('OrganizationDisplayName', $state['Destination'])) {
-    $dstName = $state['Destination']['OrganizationDisplayName'];
-} else {
-    $dstName = $state['Destination']['entityid'];
-}
-
 // Make, populate and layout consent form
 $t = new \SimpleSAML\XHTML\Template($globalConfig, 'fido2SecondFactor:fido2.php');
 $translator = $t->getTranslator();
-$t->data['srcMetadata'] = $state['Source'];
-$t->data['dstMetadata'] = $state['Destination'];
-$t->data['yesData'] = ['StateId' => $id];
-$t->data['noData'] = ['StateId' => $id];
-$t->data['stateId'] = $id;
-$t->data['State'] = "<pre>".print_r($state, true)."</pre>";
 $t->data['UserID'] = $state['FIDO2Username'];
 $t->data['FIDO2Tokens'] = "<table>";
 foreach ($state['FIDO2Tokens'] as $oneToken) {
 	$t->data['FIDO2Tokens'] .= "<tr><td>".$oneToken[3]."</td></tr>";
-//print_r($oneToken);
 }
 $t->data['FIDO2Tokens'] .= "</table>";
 $t->data['regForm'] = "";
@@ -214,12 +182,6 @@ $t->data['JSCode'] .="
 }
 ";
 }
-
-$srcName = htmlspecialchars(is_array($srcName) ? $translator->t($srcName) : $srcName);
-$dstName = htmlspecialchars(is_array($dstName) ? $translator->t($dstName) : $dstName);
-
-$t->data['srcName'] = $srcName;
-$t->data['dstName'] = $dstName;
 
 $t->show();
 
