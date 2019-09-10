@@ -2,6 +2,7 @@
 
 namespace SimpleSAML\Module\fido2SecondFactor\FIDO2SecondFactor;
 
+use Cose\Key;
 /**
  * FIDO2/WebAuthn Authentication Processing filter
  *
@@ -34,9 +35,11 @@ class FIDO2AuthenticationEvent extends FIDO2AbstractEvent {
     }
     
     private function validateSignature($sigData, $signature, $publicKey) {
-        $sigcheck = openssl_verify($sigData, $signature, KEY_UNFINISHED, OPENSSL_ALGO_SHA256);
-        if ($sigcheck == 1 || true) {
-            $this->ignore("NOT IMPLEMENTED YET - validation trivially succeeds!");
+        $keyArray = $this->cborDecode(hex2bin($publicKey));
+        $keyObject = new Cose\Key\Ec2Key($keyArray);
+        $sigcheck = openssl_verify($sigData, $signature, $keyObject->asPEM(), OPENSSL_ALGO_SHA256);
+        if ($sigcheck == 1) {
+            $this->pass("Signature validation succeeded!");
         } else {
             $this->fail("Signature validation failed!");
         }
