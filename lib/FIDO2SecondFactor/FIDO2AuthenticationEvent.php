@@ -62,12 +62,9 @@ class FIDO2AuthenticationEvent extends FIDO2AbstractEvent {
     }
     
     private function validateSignature($sigData, $signature, $publicKey) {
-        file_put_contents("/export/hosting/restena/clueless_private/sigdata", $sigData);
-        file_put_contents("/export/hosting/restena/clueless_private/signature", $signature);
         $keyArray = $this->cborDecode(hex2bin($publicKey));
         $keyObject = new Ec2Key($keyArray);
         $keyResource = openssl_pkey_get_public($keyObject->asPEM());
-        file_put_contents("/export/hosting/restena/clueless_private/pubkey", $keyObject->asPEM());
         if ($keyResource === FALSE) {
             fail("Unable to construct public key resource from PEM.");
         }
