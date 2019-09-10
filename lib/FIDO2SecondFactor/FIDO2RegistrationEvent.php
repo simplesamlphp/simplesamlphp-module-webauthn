@@ -2,49 +2,6 @@
 
 namespace SimpleSAML\Module\fido2SecondFactor\FIDO2SecondFactor;
 
-use CBOR\Decoder;
-use CBOR\OtherObject;
-use CBOR\Tag;
-use CBOR\StringStream;
-
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Stream.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "StringStream.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "CBORObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "AbstractCBORObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "OtherObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "TagObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "MapObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "LengthCalculator.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "TextStringObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "MapItem.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "ByteStringObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "ByteStringWithChunkObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "ListObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "UnsignedIntegerObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "SignedIntegerObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "OtherObject/SimpleObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "OtherObject/FalseObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "OtherObject/TrueObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "OtherObject/NullObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "OtherObject/UndefinedObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "OtherObject/HalfPrecisionFloatObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "OtherObject/SinglePrecisionFloatObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "OtherObject/DoublePrecisionFloatObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "OtherObject/OtherObjectManager.php";
-
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Tag/EpochTag.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Tag/TimestampTag.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Tag/PositiveBigIntegerTag.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Tag/NegativeBigIntegerTag.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Tag/DecimalFractionTag.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Tag/BigFloatTag.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Tag/Base64UrlEncodingTag.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Tag/Base64EncodingTag.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Tag/Base16EncodingTag.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Tag/TagObjectManager.php";
-
-include dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Decoder.php";
-
 /**
  * FIDO2/WebAuthn Authentication Processing filter
  *
@@ -60,40 +17,6 @@ class FIDO2RegistrationEvent extends FIDO2AbstractEvent {
      * Public key algorithm supported. This is -7 - ECDSA with curve P-256
      */
     const PK_ALGORITHM = -7;
-
-    /**
-     * this function takes a binary CBOR blob and decodes it into an associative PHP array.
-     *
-     * @param string $rawData the binary CBOR blob
-     * @return array the decoded CBOR data
-     */
-    private function cborDecode($rawData) {
-        $otherObjectManager = new OtherObject\OtherObjectManager();
-        $otherObjectManager->add(OtherObject\SimpleObject::class);
-        $otherObjectManager->add(OtherObject\FalseObject::class);
-        $otherObjectManager->add(OtherObject\TrueObject::class);
-        $otherObjectManager->add(OtherObject\NullObject::class);
-        $otherObjectManager->add(OtherObject\UndefinedObject::class);
-        $otherObjectManager->add(OtherObject\HalfPrecisionFloatObject::class);
-        $otherObjectManager->add(OtherObject\SinglePrecisionFloatObject::class);
-        $otherObjectManager->add(OtherObject\DoublePrecisionFloatObject::class);
-
-        $tagManager = new Tag\TagObjectManager();
-        $tagManager->add(Tag\EpochTag::class);
-        $tagManager->add(Tag\TimestampTag::class);
-        $tagManager->add(Tag\PositiveBigIntegerTag::class);
-        $tagManager->add(Tag\NegativeBigIntegerTag::class);
-        $tagManager->add(Tag\DecimalFractionTag::class);
-        $tagManager->add(Tag\BigFloatTag::class);
-        $tagManager->add(Tag\Base64UrlEncodingTag::class);
-        $tagManager->add(Tag\Base64EncodingTag::class);
-        $tagManager->add(Tag\Base16EncodingTag::class);
-
-        $decoder = new Decoder($tagManager, $otherObjectManager);
-        $stream = new StringStream($rawData);
-        $object = $decoder->decode($stream);
-        return $object->getNormalizedData(true);
-    }
 
     /**
      * Initialize the event object.
