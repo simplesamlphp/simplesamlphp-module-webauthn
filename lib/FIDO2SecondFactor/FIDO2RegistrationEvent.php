@@ -67,7 +67,7 @@ class FIDO2RegistrationEvent extends FIDO2AbstractEvent {
      * @param string $rawData the binary CBOR blob
      * @return array the decoded CBOR data
      */
-    function cborDecode($rawData) {
+    private function cborDecode($rawData) {
         $otherObjectManager = new OtherObject\OtherObjectManager();
         $otherObjectManager->add(OtherObject\SimpleObject::class);
         $otherObjectManager->add(OtherObject\FalseObject::class);
