@@ -2,7 +2,34 @@
 
 namespace SimpleSAML\Module\fido2SecondFactor\FIDO2SecondFactor;
 
-use Cose\Key;
+use Cose\Key\Ec2Key;
+
+use FG\ASN1\ExplicitlyTaggedObject;
+use FG\ASN1\Universal\BitString;
+use FG\ASN1\Universal\Integer;
+use FG\ASN1\Universal\ObjectIdentifier;
+use FG\ASN1\Universal\OctetString;
+use FG\ASN1\Universal\Sequence;
+
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/Utility/" . "BigInteger.php";
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/Utility/" . "BigIntegerGmp.php";
+
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/" . "Parsable.php";
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/" . "ASNObject.php";
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/" . "ExplicitlyTaggedObject.php";
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/" . "Construct.php";
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/" . "Identifier.php";
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/" . "Base128.php";
+
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/Universal/" . "OctetString.php";
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/Universal/" . "BitString.php";
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/Universal/" . "Integer.php";
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/Universal/" . "ObjectIdentifier.php";
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/Universal/" . "Sequence.php";
+
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/web-auth/cose-lib/src/Key/" . "Key.php";
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/web-auth/cose-lib/src/Key/" . "Ec2Key.php";
+
 /**
  * FIDO2/WebAuthn Authentication Processing filter
  *
@@ -35,13 +62,25 @@ class FIDO2AuthenticationEvent extends FIDO2AbstractEvent {
     }
     
     private function validateSignature($sigData, $signature, $publicKey) {
+        file_put_contents("/export/hosting/restena/clueless_private/sigdata", $sigData);
+        file_put_contents("/export/hosting/restena/clueless_private/signature", $signature);
         $keyArray = $this->cborDecode(hex2bin($publicKey));
-        $keyObject = new Cose\Key\Ec2Key($keyArray);
-        $sigcheck = openssl_verify($sigData, $signature, $keyObject->asPEM(), OPENSSL_ALGO_SHA256);
-        if ($sigcheck == 1) {
+        $keyObject = new Ec2Key($keyArray);
+        $keyResource = openssl_pkey_get_public($keyObject->asPEM());
+        file_put_contents("/export/hosting/restena/clueless_private/pubkey", $keyObject->asPEM());
+        if ($keyResource === FALSE) {
+            fail("Unable to construct public key resource from PEM.");
+        }
+        $sigcheck = openssl_verify($sigData, $signature, $keyResource, OPENSSL_ALGO_SHA256);
+        switch ($sigcheck) {
+        case 1: 
             $this->pass("Signature validation succeeded!");
-        } else {
-            $this->fail("Signature validation failed!");
+            break;
+        case 0:
+            $this->fail("Signature validation failed (sigdata = $sigData) (signature = $signature) !");
+            break;
+        default:
+            $this->fail("There was an error executing the signature check.");
         }
     }
 }

@@ -164,10 +164,7 @@ abstract class FIDO2AbstractEvent {
      *     - the validation steps 6 through 11 of the validation
      *     - the parts of step 15 that relate to clientDataJSON
      * 
-     * @param string $challenge      the challenge which was used to trigger this event
-     * @param string $idpEntityId    the entity ID of our IdP
-     * @param string $clientDataJSON     the incoming data
-     * @param string $requestedOperation are we validating a "REG" or an "AUTH?
+     * @param string $clientDataJSON the incoming data
      *
      * @return string
      */
@@ -177,7 +174,9 @@ abstract class FIDO2AbstractEvent {
          * §7.1 STEP 2 + 3 : convert to JSON and dissect JSON into PHP associative array
          * §7.2 STEP 6 + 7 : convert to JSON and dissect JSON into PHP associative array
          */
+        $this->debugBuffer .= "ClientDataJSON hash: " . hash("sha256",$clientDataJSON)."<br/>";
         $clientData = json_decode($clientDataJSON, true);
+        $this->debugBuffer .= "<pre>".print_r(json_decode($clientDataJSON, true),true)."</pre>";
         switch ($this->eventType) {
             case "REG":
                 if ($clientData['type'] == "webauthn.create") {
@@ -241,7 +240,7 @@ abstract class FIDO2AbstractEvent {
         /**
          * §7.1 STEP 8 : SHA-256 hashing the clientData
          */
-        return hash("sha256", $_POST['attestation_client_data_json']);
+        return hash("sha256", $clientDataJSON, true);
     }
 
     /**

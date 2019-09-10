@@ -62,7 +62,7 @@ foreach ($state['FIDO2Tokens'] as $oneToken) {
 if ($publicKey === FALSE) {
     fail("User attempted to authenticate with an unknown credential ID. This should already have been prevented by the browser!");
 }
-$authObject = new SimpleSAML\Module\fido2SecondFactor\FIDO2SecondFactor\FIDO2AuthenticationEvent($state['FIDO2Scope'], $state['FIDO2SignupChallenge'], $state['IdPMetadata']['entityid'], base64_decode($_POST['authenticator_data']), $_POST['attestation_client_data_json'], $oneToken[1], $_POST['sig'], $debugEnabled);
+$authObject = new SimpleSAML\Module\fido2SecondFactor\FIDO2SecondFactor\FIDO2AuthenticationEvent($state['FIDO2Scope'], $state['FIDO2SignupChallenge'], $state['IdPMetadata']['entityid'], base64_decode($_POST['authenticator_data']), base64_decode($_POST['client_data_raw']), $oneToken[1], base64_decode($_POST['signature']), $debugEnabled);
 /**
  * §7.2 STEP 18 : detect physical object cloning on the token
  */

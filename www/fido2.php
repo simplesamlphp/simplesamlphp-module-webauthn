@@ -73,6 +73,7 @@ if (count($state['FIDO2Tokens']) > 0) {
 $t->data['authForm'] = "
 <form id='authform' method='POST' action='".\SimpleSAML\Module::getModuleURL('fido2SecondFactor/authprocess1.php?StateId='.urlencode($id))."'>
 <input type='hidden' id='resp' name='response_id' value='0'/>
+<input type='hidden' id='data_raw_b64' name='client_data_raw' value='garnix'/>
 <input type='hidden' id='data' name='attestation_client_data_json' value='nix'/>
 <input type='hidden' id='authdata' name='authenticator_data' value='mehrnix'/>
 <input type='hidden' id='sigdata' name='signature' value='evenmorenix'/>
@@ -84,6 +85,7 @@ $t->data['authForm'] = "
         console.log('NEW CREDENTIAL', cred);
         document.getElementById('resp').value = cred.id;
         var enc = new TextDecoder('utf-8');
+        document.getElementById('data_raw_b64').value = btoa(ArrayBufferToString(cred.response.clientDataJSON));
         document.getElementById('data').value = enc.decode(cred.response.clientDataJSON);
         document.getElementById('authdata').value = btoa(ArrayBufferToString(cred.response.authenticatorData));
 	document.getElementById('sigdata').value = btoa(ArrayBufferToString(cred.response.signature));
