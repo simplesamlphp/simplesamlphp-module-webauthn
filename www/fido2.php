@@ -1,23 +1,11 @@
 <?php
 
 /**
- * Consent script
- *
- * This script displays a page to the user, which requests that the user
- * authorizes the release of attributes.
+ * construct relevant page variables for FIDO registration, authentication and
+ * token management
  *
  * @package SimpleSAMLphp
- *
- * Explicit instruct consent page to send no-cache header to browsers to make
- * sure the users attribute information are not store on client disk.
- *
- * In an vanilla apache-php installation is the php variables set to:
- *
- * session.cache_limiter = nocache
- *
- * so this is just to make sure.
  */
-session_cache_limiter('nocache');
 
 $globalConfig = \SimpleSAML\Configuration::getInstance();
 
