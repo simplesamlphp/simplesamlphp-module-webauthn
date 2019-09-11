@@ -2,28 +2,60 @@
 {% extends "base.twig" %}
 
 {% block preload %}
-<link rel="stylesheet" type="text/css" href="{{ asset }}assets/css/fido2SecondFactor.css" />
-<script>
-{{ JSCode|raw }}
-</script>
+    <link rel="stylesheet" type="text/css" href="{{ asset }}assets/css/fido2SecondFactor.css" />
+    <script>
+        {{ JSCode|raw }}
+    </script>
 {% endblock %}
 
 {% block content %}
     <h1>Second-Factor Authentication</h1>
-<h2>Authentication with a FIDO2/WebAuthn token is required for your account, {{ UserID }}.</h2>
-{% if FIDO2Tokens|length > 0 %}
-<div id="currentTokens"><span id='tokencaption'>The following tokens are associated with your account:</span>
-    <ul>
-        {% for token in FIDO2Tokens %}
-            <li>{{ token.3|e }}</li>
-        {% endfor %}
-    </ul>
-</div>
-{% endif %}
-{{ regForm|raw }}
-<div class='space'></div>
-{{ deleteForms|raw }}
-<div class='space'></div>
-{{ nevermind|raw }}
-{{ authForm|raw }}
+    <h2>Authentication with a FIDO2/WebAuthn token is required for your account, {{ UserID }}.</h2>
+    {% if FIDO2Tokens|length > 0 %}
+        <div id="currentTokens"><span id='tokencaption'>The following tokens are associated with your account:</span>
+            <ul>
+                {% for token in FIDO2Tokens %}
+                    <li>{{ token.3|e }}</li>
+                    {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    {%  if regForm|length > 0 %}
+        <form id='regform' method='POST' action='{{ regURL|raw }}'>
+            <input type='hidden' id='resp' name='response_id' value='0'/>
+            <input type='hidden' id='data' name='attestation_client_data_json' value='nix'/>
+            <input type='hidden' id='attobj' name='attestation_object' value='mehrnix'/>
+            <input type='hidden' id='type' name='type' value='something'/>
+            <input type='hidden' id='operation' name='operation' value='REG'/>
+            <button type='button' onClick="{{ regForm|raw }}" onsubmit='false' >Enroll new Token</button>
+            Name for the new token: <input type='text' id='tokenname' name='tokenname' size='40' value='Token registered at {{ "now"|date('Y-m-d', timezone="Europe/Luxembourg") }}'/>
+        </form>
+        <div class='space'></div>
+        {%  if FIDO2Tokens|length > 0 %}
+            {% for token in FIDO2Tokens %}
+                <form class='deleteform' id='delete-{{ loop.index }}' method='POST' action='{{ delURL|raw }}'>
+                    <input type='hidden' id='credId-{{ loop.index }}' name='credId' value='{{ token.0 }}'/>
+                    <button type='submit' id='submit-{{ loop.index }}' name='submit' value='DELETE'>Remove &quot;{{ token.3 }}&quot;</button>
+                </form>
+            {%  endfor %}
+            <div class='space'></div>
+            <form id='nevermind' method='POST' action='{{ delURL|raw }}'>
+                <button type='submit' id='submit-nevermind' name='submit' value='NEVERMIND'>Do not change anything.</button>
+            </form>
+        {%  endif %}
+    {% endif %}
+    {% if authForm|length > 0 %}
+        <form id='authform' method='POST' action='{{ authURL|raw }}'>
+            <input type='hidden' id='resp' name='response_id' value='0'/>
+            <input type='hidden' id='data_raw_b64' name='client_data_raw' value='garnix'/>
+            <input type='hidden' id='data' name='attestation_client_data_json' value='nix'/>
+            <input type='hidden' id='authdata' name='authenticator_data' value='mehrnix'/>
+            <input type='hidden' id='sigdata' name='signature' value='evenmorenix'/>
+            <!-- ignoring <input type='hidden' id='userhandle' name='userhandle' value='someuser'/> -->
+            <input type='hidden' id='type' name='type' value='something'/>
+            <input type='hidden' id='operation' name='operation' value='AUTH'/>
+            <input type='checkbox' id='credentialChange' name='credentialChange'>After authenticating, I want to register a new token or delete an existing one.</input><br/>
+            <button type='button' onClick="{{ authForm|raw }}" onsubmit='false' >Authenticate with existing Token</button>
+        </form>
+    {% endif %}
 {% endblock %}
