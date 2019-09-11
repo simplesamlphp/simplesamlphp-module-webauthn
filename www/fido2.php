@@ -41,7 +41,7 @@ $t->data['regForm'] = "";
 $t->data['deleteForms'] = "";
 $t->data['nevermind'] = "";
 if (count($state['FIDO2Tokens']) == 0 || ($state['FIDO2WantsRegister'] === true && $state['FIDO2AuthSuccessful'] === true)) {
-    $t->data['regForm'] = "<form id='regform' method='POST' action='" . \SimpleSAML\Module::getModuleURL('fido2SecondFactor/regprocess1.php?StateId=' . urlencode($id)) . "'>
+    $t->data['regForm'] = "<form id='regform' method='POST' action='" . \SimpleSAML\Module::getModuleURL('fido2SecondFactor/regprocess.php?StateId=' . urlencode($id)) . "'>
 <input type='hidden' id='resp' name='response_id' value='0'/>
 <input type='hidden' id='data' name='attestation_client_data_json' value='nix'/>
 <input type='hidden' id='attobj' name='attestation_object' value='mehrnix'/>
@@ -81,7 +81,7 @@ if (count($state['FIDO2Tokens']) == 0 || ($state['FIDO2WantsRegister'] === true 
 $t->data['authForm'] = "";
 if (count($state['FIDO2Tokens']) > 0 && ($state['FIDO2WantsRegister'] !== true || $state['FIDO2AuthSuccessful'] !== true )) {
     $t->data['authForm'] = "
-<form id='authform' method='POST' action='" . \SimpleSAML\Module::getModuleURL('fido2SecondFactor/authprocess1.php?StateId=' . urlencode($id)) . "'>
+<form id='authform' method='POST' action='" . \SimpleSAML\Module::getModuleURL('fido2SecondFactor/authprocess.php?StateId=' . urlencode($id)) . "'>
 <input type='hidden' id='resp' name='response_id' value='0'/>
 <input type='hidden' id='data_raw_b64' name='client_data_raw' value='garnix'/>
 <input type='hidden' id='data' name='attestation_client_data_json' value='nix'/>

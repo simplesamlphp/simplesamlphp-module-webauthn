@@ -1,6 +1,6 @@
 <?php
 
-include 'common1.php';
+include 'common.php';
 
 session_cache_limiter('nocache');
 $globalConfig = \SimpleSAML\Configuration::getInstance();
