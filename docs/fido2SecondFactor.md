@@ -33,7 +33,7 @@ Here is the initialization SQL script:
 
 	CREATE TABLE fido2UserStatus (
                 user_id VARCHAR(80) NOT NULL,
-		fido2Status ENUM("FIDO2Disabled","FIDO2Enabled","FIDO2EnrollEnabled") NOT NULL DEFAULT "FIDO2Disabled",
+		fido2Status ENUM("FIDO2Disabled","FIDO2Enabled") NOT NULL DEFAULT "FIDO2Disabled",
 		fido2PendingChallenge VARCHAR(128) DEFAULT NULL,
 		UNIQUE (user_id)
 	);

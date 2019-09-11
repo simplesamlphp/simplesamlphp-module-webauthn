@@ -74,13 +74,26 @@ if (($previousCounter != 0 || $counter != 0) && $authObject->counter > $previous
     fail("Signature counter less or equal to a previous authentication! Token cloning likely.");
 }
 // THAT'S IT. The user authenticated successfully.
+$state['FIDO2AuthSuccessful'] = TRUE;
+// See if he wants to hang around for token management operations
+if (isset($_POST['credentialChange']) && $_POST['credentialChange'] == "on") {
+    $state['FIDO2WantsRegister'] = TRUE;
+} else {
+    $state['FIDO2WantsRegister'] = FALSE;
+}
+\SimpleSAML\Auth\State::saveState($state, 'fido2SecondFactor:request');
+
 if ($debugEnabled) {
     echo $debugbuffer;
     echo $authObject->debugBuffer;
     echo $validatebuffer;
     echo $authObject->validateBuffer;
-    echo "Debug mode, not continuing to destination.";
+    echo "Debug mode, not continuing to ". ($state['FIDO2WantsRegister'] ? "credential registration page." : "destination.");
 } else {
-    \SimpleSAML\Auth\ProcessingChain::resumeProcessing($state);
+    if ($state['FIDO2WantsRegister']) {
+        header("Location: ".\SimpleSAML\Module::getModuleURL('fido2SecondFactor/fido2.php?StateId=' . urlencode($id)));
+    } else {
+        \SimpleSAML\Auth\ProcessingChain::resumeProcessing($state);
+    }
 }
 

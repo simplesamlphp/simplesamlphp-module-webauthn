@@ -10,8 +10,20 @@
 
 {% block content %}
     <h1>Second-Factor Authentication</h1>
-<p>Your username is: {{ UserID }}</p>
+<h2>Authentication with a FIDO2/WebAuthn token is required for your account, {{ UserID }}.</h2>
+{% if FIDO2Tokens|length > 0 %}
+<div id="currentTokens"><span id='tokencaption'>The following tokens are associated with your account:</span>
+    <ul>
+        {% for token in FIDO2Tokens %}
+            <li>{{ token.3|e }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
 {{ regForm|raw }}
-<p>Here are all the tokens we have on file for you: {{ FIDO2Tokens|raw }}</p>
+<div class='space'></div>
+{{ deleteForms|raw }}
+<div class='space'></div>
+{{ nevermind|raw }}
 {{ authForm|raw }}
 {% endblock %}

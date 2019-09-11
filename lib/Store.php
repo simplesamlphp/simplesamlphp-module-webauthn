@@ -36,18 +36,6 @@ abstract class Store
     abstract public function is2FAEnabled($userId);
 
     /**
-     * enrolling a new FIDO2 token allowed?
-     *
-     * This function checks whether a given user has authorized the release of
-     * the attributes identified by $attributeSet from $source to $destination.
-     *
-     * @param string $userId        The hash identifying the user at an IdP.
-     *
-     * @return bool True if the user is allowed to enroll, false if not
-     */
-    abstract public function enrollAllowed($userId);
-
-    /**
      * does a given credentialID already exist?
      *
      * This function checks whether a given credential ID already exists in the database
@@ -71,6 +59,14 @@ abstract class Store
      */
     abstract public function storeTokenData($userId, $credentialId, $credential, $signCounter, $friendlyName);
 
+        /**
+     * remove an existing credential from the database
+     *
+     * @param string $credentialId the credential
+     * @return true
+     */
+    abstract public function deleteTokenData($credentialId);
+            
     /**
      * increment the signature counter after a successful authentication
      *

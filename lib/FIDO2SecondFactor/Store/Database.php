@@ -167,46 +167,6 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
     }
 
     /**
-     * enrolling a new FIDO2 token allowed?
-     *
-     * This function checks whether a given user has authorized the release of
-     * the attributes identified by $attributeSet from $source to $destination.
-     *
-     * @param string $userId        The hash identifying the user at an IdP.
-     *
-     * @return bool True if the user is allowed to enroll, false if not
-     */
-    public function enrollAllowed($userId) {
-        assert(is_string($userId));
-
-        $query = 'SELECT fido2Status FROM fido2UserStatus WHERE user_id = ? AND fido2Status = "FIDO2EnrollEnabled"';
-
-        $st = $this->execute($query, [$userId]);
-
-        if ($st === false) {
-            return false;
-        }
-
-        $rowCount = $st->rowCount();
-        if ($rowCount === 1) {
-            \SimpleSAML\Logger::debug('User is allowed to enroll.');
-            return true;
-        } else {
-            $query2 = 'SELECT * from fido2SecondFactor WHERE user_id = ?';
-            $st2 = $this->execute($query2, [$userId]);
-            $rowCount2 = $st2->rowCount();
-            $query3 = 'SELECT fido2Status FROM fido2UserStatus WHERE user_id = ? AND fido2Status = "FIDO2Enabled"';
-            $st3 = $this->execute($query3, [$userId]);
-            $rowCount3 = $st3->rowCount();
-            if ($rowCount3 === 1 /* FIDO2 enabled */ && $rowCount2 === 0 /* no credentials yet */) {
-                return true;
-            }
-            \SimpleSAML\Logger::debug('User is not allowed to enroll a new FIDO2 token.');
-            return false;
-        }
-    }
-
-    /**
      * does a given credentialID already exist?
      *
      * This function checks whether a given credential ID already exists in the database
@@ -269,6 +229,26 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
 
         if ($st2 !== false) {
             \SimpleSAML\Logger::debug('fido2SecondFactor:Database - downgraded user status to usage only, now that enrollment is complete.');
+        }
+        return true;
+    }
+
+    /**
+     * remove an existing credential from the database
+     *
+     * @param string $credentialId the credential
+     * @return true
+     */
+    public function deleteTokenData($credentialId) {
+        $st = $this->execute(
+                'DELETE FROM fido2SecondFactor WHERE credentialId = ?',
+                [$credentialId]
+        );
+
+        if ($st !== false) {
+            \SimpleSAML\Logger::debug('fido2SecondFactor:Database - DELETED credential.');
+        } else {
+            throw new Exception("Database execution did not work.");
         }
         return true;
     }

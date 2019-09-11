@@ -21,6 +21,11 @@ $validatebuffer = "";
 $id = $_REQUEST['StateId'];
 $state = \SimpleSAML\Auth\State::loadState($id, 'fido2SecondFactor:request');
 
+// registering a credential is only allowed for new users or after being authenticated
+if (count($state['FIDO2Tokens']) > 0 && $state['FIDO2AuthSuccessful'] !== TRUE) {
+    throw new Exception("Attempt to register new token in unacceptable context.");
+}
+
 $debugbuffer .= "Incoming parameters:<hr/>
 Requested operation: " . $_POST['operation'] . "
 <hr/>
@@ -76,6 +81,6 @@ if ($debugEnabled) {
     echo "<form id='regform' method='POST' action='" . \SimpleSAML\Module::getModuleURL('fido2SecondFactor/fido2.php?StateId=' . urlencode($id)) . "'>";
     echo "<button type='submit'>Return to previous page.</button>";
 } else {
-    header("Location: " . \SimpleSAML\Module::getModuleURL('fido2SecondFactor/fido2.php?StateId=' . urlencode($id)));
+    \SimpleSAML\Auth\ProcessingChain::resumeProcessing($state);
 }
 
