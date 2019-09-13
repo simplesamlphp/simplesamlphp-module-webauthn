@@ -8,16 +8,19 @@
         {
             "name": "Stefan Winter",
             "email": "stefan.winter@restena.lu"
-        },
+        }
     ],
     "autoload": {
         "psr-4": {
             "SimpleSAML\\": "lib/SimpleSAML"
-        },
-        "files": ["lib/_autoload_modules.php"]
+        }
     },
     "require": {
         "Spomky-labs/cbor-php": "*",
 	"web-auth/cose-lib": "*"
     },
+    "require-dev": {
+        "web-token/jwt-framework": "^2.0",
+        "lcobucci/jwt": "^3.3"
+    }
 }
