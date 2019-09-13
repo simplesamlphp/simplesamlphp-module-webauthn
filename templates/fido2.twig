@@ -28,7 +28,7 @@
             <input type='hidden' id='type' name='type' value='something'/>
             <input type='hidden' id='operation' name='operation' value='REG'/>
             <button type='button' onClick="{{ regForm|raw }}" onsubmit='false' >Enroll new Token</button>
-            Name for the new token: <input type='text' id='tokenname' name='tokenname' size='40' value='Token registered at {{ "now"|date('Y-m-d', timezone="Europe/Luxembourg") }}'/>
+            Name for the new token: <input type='text' id='tokenname' name='tokenname' size='40' value='Token registered at {{ "now"|date('Y-m-d', timezone="Europe/Luxembourg") }}' onkeydown="if (event.keyCode == 13) return false;"/>
         </form>
         <div class='space'></div>
         {%  if FIDO2Tokens|length > 0 %}
