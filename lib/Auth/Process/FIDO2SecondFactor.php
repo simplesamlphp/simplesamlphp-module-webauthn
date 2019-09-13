@@ -46,6 +46,11 @@ class FIDO2SecondFactor extends \SimpleSAML\Auth\ProcessingFilter {
     private $displaynameAttrib;
 
     /**
+     * @var boolean
+     */
+    private $requestTokenModel;
+    
+    /**
      * Initialize filter.
      *
      * Validates and parses the configuration.
@@ -86,6 +91,12 @@ class FIDO2SecondFactor extends \SimpleSAML\Auth\ProcessingFilter {
         } else {
             Logger::error('fido2SecondFactor: it is required to set attrib_displayname in config.');
         }
+        
+        if (array_key_exists('request_tokenmodel', $config)) {
+            $this->requestTokenModel = $config['request_tokenmodel'];
+        } else {
+            $this->requestTokenModel = false;
+        }
     }
 
     /**
@@ -114,6 +125,7 @@ class FIDO2SecondFactor extends \SimpleSAML\Auth\ProcessingFilter {
             $this->scope = $hostname;
         }
 
+        $state['requestTokenModel'] = $this->requestTokenModel;
         $state['fido2SecondFactor:store'] = $this->store;
         Logger::debug('fido2SecondFactor: userid: ' . $state['Attributes'][$this->usernameAttrib][0]);
 

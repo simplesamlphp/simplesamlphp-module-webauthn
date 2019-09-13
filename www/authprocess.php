@@ -44,6 +44,7 @@ $authObject = new SimpleSAML\Module\fido2SecondFactor\FIDO2SecondFactor\FIDO2Aut
         $state['IdPMetadata']['entityid'], 
         base64_decode($_POST['authenticator_data']), 
         base64_decode($_POST['client_data_raw']), 
+        $oneToken[0],
         $oneToken[1], 
         base64_decode($_POST['signature']), 
         $debugEnabled);

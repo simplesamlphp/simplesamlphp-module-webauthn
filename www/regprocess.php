@@ -25,12 +25,12 @@ if (count($state['FIDO2Tokens']) > 0 && $state['FIDO2AuthSuccessful'] !== TRUE) 
 
 $regObject = new SimpleSAML\Module\fido2SecondFactor\FIDO2SecondFactor\FIDO2RegistrationEvent(
         $_POST['type'],
-        $state['FIDO2Scope'], 
-        $state['FIDO2SignupChallenge'], 
-        $state['IdPMetadata']['entityid'], 
-        base64_decode($_POST['attestation_object']), 
-        $_POST['response_id'], 
-        $_POST['attestation_client_data_json'], 
+        $state['FIDO2Scope'],
+        $state['FIDO2SignupChallenge'],
+        $state['IdPMetadata']['entityid'],
+        base64_decode($_POST['attestation_object']),
+        $_POST['response_id'],
+        $_POST['attestation_client_data_json'],
         $debugEnabled);
 
 // at this point, we need to talk to the DB
@@ -41,16 +41,19 @@ $store = $state['fido2SecondFactor:store'];
 if ($store->doesCredentialExist(bin2hex($regObject->credentialId)) === false) {
     // credential does not exist yet in database, good.
 } else {
-    throw new Exception("The credential with ID ".$regObject->credentialId."already exists.");
+    throw new Exception("The credential with ID " . $regObject->credentialId . "already exists.");
 }
 // THAT'S IT. This is a valid credential and can be enrolled to the user.
-$model = SimpleSAML\Module\fido2SecondFactor\FIDO2SecondFactor\FIDO2RegistrationEvent::AAGUID_DICTIONARY[$regObject->AAGUID]["model"] ?? "unknown model";
-$vendor = SimpleSAML\Module\fido2SecondFactor\FIDO2SecondFactor\FIDO2RegistrationEvent::AAGUID_DICTIONARY[$regObject->AAGUID]["O"] ?? "unknown vendor";
-$friendlyName .= " ($model [$vendor])";
+$friendlyName = $_POST['tokenname'];
+// if we have requested the token model, add it to the name
+if ($state['requestTokenModel']) {
+    $model = SimpleSAML\Module\fido2SecondFactor\FIDO2SecondFactor\FIDO2RegistrationEvent::AAGUID_DICTIONARY[$regObject->AAGUID]["model"] ?? "unknown model";
+    $vendor = SimpleSAML\Module\fido2SecondFactor\FIDO2SecondFactor\FIDO2RegistrationEvent::AAGUID_DICTIONARY[$regObject->AAGUID]["O"] ?? "unknown vendor";
+    $friendlyName .= " ($model [$vendor])";
+}
 $store->storeTokenData($state['FIDO2Username'], $regObject->credentialId, $regObject->credential, $regObject->counter, $friendlyName);
 // make sure $state gets the news, the token is to be displayed to the user on the next page
 $state['FIDO2Tokens'][] = [0 => $regObject->credentialId, 1 => $regObject->credential, 2 => $regObject->counter, 3 => $friendlyName];
-$state['FIDO2EnrollmentAllowed'] = false;
 \SimpleSAML\Auth\State::saveState($state, 'fido2SecondFactor:request');
 if ($debugEnabled) {
     echo $regObject->debugBuffer;

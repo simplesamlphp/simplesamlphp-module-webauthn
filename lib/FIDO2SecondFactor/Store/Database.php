@@ -217,8 +217,8 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
                 [$userId, $credentialId, $credential, $friendlyName]
         );
 
-        if ($st !== false) {
-            \SimpleSAML\Logger::debug('fido2SecondFactor:Database - Saved enrollment data.');
+        if ($st === false) {
+            throw new Exception("Unable to save new token in database!");
         }
 
         $st2 = $this->execute(
@@ -227,8 +227,8 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
                 ["FIDO2Enabled", $userId]
         );
 
-        if ($st2 !== false) {
-            \SimpleSAML\Logger::debug('fido2SecondFactor:Database - downgraded user status to usage only, now that enrollment is complete.');
+        if ($st2 === false) {
+            throw new Exception("Unable to set user status to Enabled.");
         }
         return true;
     }
