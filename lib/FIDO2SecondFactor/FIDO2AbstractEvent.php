@@ -45,6 +45,32 @@ include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/
 
 include dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Decoder.php";
 
+use FG\ASN1\ExplicitlyTaggedObject;
+use FG\ASN1\Universal\BitString;
+use FG\ASN1\Universal\Integer;
+use FG\ASN1\Universal\ObjectIdentifier;
+use FG\ASN1\Universal\OctetString;
+use FG\ASN1\Universal\Sequence;
+
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/Utility/" . "BigInteger.php";
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/Utility/" . "BigIntegerGmp.php";
+
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/" . "Parsable.php";
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/" . "ASNObject.php";
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/" . "ExplicitlyTaggedObject.php";
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/" . "Construct.php";
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/" . "Identifier.php";
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/" . "Base128.php";
+
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/Universal/" . "OctetString.php";
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/Universal/" . "BitString.php";
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/Universal/" . "Integer.php";
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/Universal/" . "ObjectIdentifier.php";
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/Universal/" . "Sequence.php";
+
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/web-auth/cose-lib/src/Key/" . "Key.php";
+include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/web-auth/cose-lib/src/Key/" . "Ec2Key.php";
+
 /**
  * FIDO2/WebAuthn Authentication Processing filter
  *
@@ -125,6 +151,7 @@ abstract class FIDO2AbstractEvent {
      *
      * Validates and parses the configuration.
      *
+     * @param string $pubkeyCredType  PublicKeyCredential.type
      * @param string $scope           the scope of the event
      * @param string $challenge       the challenge which was used to trigger this event
      * @param string $idpEntityId     the entity ID of our IdP
@@ -132,11 +159,24 @@ abstract class FIDO2AbstractEvent {
      * @param string $clientDataJSON  the client data JSON string which is present in all types of events
      * @param bool   $debugMode       shall we collect and output some extensive debugging information along the way?
      */
-    public function __construct($scope, $challenge, $idpEntityId, $authData, $clientDataJSON, $debugMode = false) {
+    public function __construct($pubkeyCredType, $scope, $challenge, $idpEntityId, $authData, $clientDataJSON, $debugMode = false) {
         $this->scope = $scope;
         $this->challenge = $challenge;
         $this->idpEntityId = $idpEntityId;
         $this->debugMode = $debugMode;
+        $this->debugBuffer .= "PublicKeyCredential.type: $pubkeyCredType<br/>";
+        /**
+         * This is not a required validation as per spec. Still odd that Firefox returns
+         * "undefined" even though its own API spec says it will send "public-key".
+         */
+        switch ($pubkeyCredType) {
+            case "public-key": $this->pass("Key Type OK");
+                break;
+            case "undefined": $this->warn("Key Type 'undefined' - Firefox or Yubikey issue?");
+                break;
+            default: $this->fail("Unknown Key Type: " . $_POST['type']);
+        }
+
         /* eventType is already set by child constructor, otherwise the function will fail because of the missing type) */
         $this->clientDataHash = $this->verifyClientDataJSON($clientDataJSON);
         $this->counter = $this->validateAuthData($authData);
@@ -174,9 +214,9 @@ abstract class FIDO2AbstractEvent {
          * §7.1 STEP 2 + 3 : convert to JSON and dissect JSON into PHP associative array
          * §7.2 STEP 6 + 7 : convert to JSON and dissect JSON into PHP associative array
          */
-        $this->debugBuffer .= "ClientDataJSON hash: " . hash("sha256",$clientDataJSON)."<br/>";
+        $this->debugBuffer .= "ClientDataJSON hash: " . hash("sha256", $clientDataJSON) . "<br/>";
         $clientData = json_decode($clientDataJSON, true);
-        $this->debugBuffer .= "<pre>".print_r(json_decode($clientDataJSON, true),true)."</pre>";
+        $this->debugBuffer .= "<pre>" . print_r($clientData, true) . "</pre>";
         switch ($this->eventType) {
             case "REG":
                 if ($clientData['type'] == "webauthn.create") {
@@ -259,6 +299,9 @@ abstract class FIDO2AbstractEvent {
      * @return int the current counter value of the authenticator
      */
     private function validateAuthData($authData) {
+        $this->debugBuffer .= "AuthData: <pre>";
+        $this->debugBuffer .= print_r($authData, true);
+        $this->debugBuffer .= "</pre>";
         /**
          * §7.1 STEP 10: compare incoming RpId hash with expected value
          * §7.2 STEP 12: compare incoming RpId hash with expected value
@@ -306,19 +349,19 @@ abstract class FIDO2AbstractEvent {
             $this->fail("Neither UV nor UP asserted: user is possibly not present at computer.");
         }
         $counterBin = substr($authData, 33, 4);
-        
+
         $counterDec = intval(bin2hex($counterBin), 16);
-        $this->debugBuffer .= "Signature Counter: $counterDec";
+        $this->debugBuffer .= "Signature Counter: $counterDec<br/>";
         return $counterDec;
     }
 
-        /**
+    /**
      * this function takes a binary CBOR blob and decodes it into an associative PHP array.
      *
      * @param string $rawData the binary CBOR blob
      * @return array the decoded CBOR data
      */
-    protected function cborDecode($rawData) {
+    protected function cborDecode(string $rawData) {
         $otherObjectManager = new OtherObject\OtherObjectManager();
         $otherObjectManager->add(OtherObject\SimpleObject::class);
         $otherObjectManager->add(OtherObject\FalseObject::class);
@@ -352,7 +395,7 @@ abstract class FIDO2AbstractEvent {
 
     protected function fail($text) {
         $this->validateBuffer .= "<span style='background-color:red;'>FAIL: $text</span><br/>";
-        if ($this->debugMode) {
+        if ($this->debugMode === TRUE) {
             echo $this->debugBuffer;
             echo $this->validateBuffer;
         }

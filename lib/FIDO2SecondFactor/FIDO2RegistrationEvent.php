@@ -2,6 +2,8 @@
 
 namespace SimpleSAML\Module\fido2SecondFactor\FIDO2SecondFactor;
 
+use Cose\Key\Ec2Key;
+
 /**
  * FIDO2/WebAuthn Authentication Processing filter
  *
@@ -19,10 +21,45 @@ class FIDO2RegistrationEvent extends FIDO2AbstractEvent {
     const PK_ALGORITHM = -7;
 
     /**
+     * a registry of AAGUID values observed in the wild, e.g. to textually
+     * identify an authenticator's make and model.
+     * 
+     * Keys in LOWERCASE!
+     * 
+     * 
+     * Yubico values from: https://support.yubico.com/support/solutions/articles/15000014219-yubikey-5-series-technical-manual#AAGUID_Valuesbu3ryn
+     * Microsoft values from: https://docs.microsoft.com/en-us/microsoft-edge/dev-guide/windows-integration/web-authentication
+     * 
+     */
+    const AAGUID_DICTIONARY = [
+        "fa2b99dc9e3942578f924a30d23c4118" => ["C" => "SE", "O" => "Yubico AB", "model" => "YubiKey 5 NFC", "multi" => TRUE],
+        "cb69481e8ff7403993ec0a2729a154a8" => ["C" => "SE", "O" => "Yubico AB", "model" => "YubiKey 5C/5C Nano/5 Nano", "multi" => TRUE],
+        "c5ef55ffad9a4b9fb580adebafe026d0" => ["C" => "SE", "O" => "Yubico AB", "model" => "YubiKey 5Ci", "multi" => TRUE],
+        "6028b017b1d44c02b4b3afcdafc96bb2" => ["C" => "US", "O" => "Microsoft Corporation", "model" => "Windows Hello software authenticator", "multi" => NULL],
+        "6e96969ea5cf4aad9b56305fe6c82795" => ["C" => "US", "O" => "Microsoft Corporation", "model" => "Windows Hello VBS software authenticator", "multi" => NULL],
+        "08987058cadc4b81b6e130de50dcbe96" => ["C" => "US", "O" => "Microsoft Corporation", "model" => "Windows Hello hardware authenticator", "multi" => NULL],
+        "9ddd1817af5a4672a2b93e3dd95000a9" => ["C" => "US", "O" => "Microsoft Corporation", "model" => "Windows Hello VBS hardware authenticator", "multi" => NULL],
+    ];
+
+    const AAGUID_ASSURANCE_LEVEL_NONE = 0;
+    const AAGUID_ASSURANCE_LEVEL_SELF = 1;
+    const AAGUID_ASSURANCE_LEVEL_BASIC = 2;
+    const AAGUID_ASSURANCE_LEVEL_ATTCA = 3;
+    /**
+     * the AAGUID of the newly registered authenticator
+     */
+    public $AAGUID;
+
+    /**
+     * how sure are we about the AAGUID?
+     */
+    public $AAGUIDAssurance;
+    /**
      * Initialize the event object.
      *
      * Validates and parses the configuration.
      *
+     * @param string $pubkeyCredType  PublicKeyCredential.type
      * @param string $scope           the scope of the event
      * @param string $challenge       the challenge which was used to trigger this event
      * @param string $idpEntityId     the entity ID of our IdP
@@ -31,18 +68,24 @@ class FIDO2RegistrationEvent extends FIDO2AbstractEvent {
      * @param string $clientDataJSON  the client data JSON string which is present in all types of events
      * @param string $debugMode       print debugging statements?
      */
-    public function __construct($scope, $challenge, $idpEntityId, $attestationData, $responseId, $clientDataJSON, $debugMode = false) {
+    public function __construct($pubkeyCredType, $scope, $challenge, $idpEntityId, $attestationData, $responseId, $clientDataJSON, $debugMode = false) {
+        $this->debugBuffer .= "attestationData raw: " . $attestationData . "<br/>";
+        $attestationArray = $this->cborDecode($attestationData);
+        $authData = $attestationArray['authData'];
         $this->eventType = "REG";
-        $authData = $this->validateAttestationData($attestationData);
-        parent::__construct($scope, $challenge, $idpEntityId, $authData, $clientDataJSON, $debugMode);
-        // the following function sets the credential properties
+        parent::__construct($pubkeyCredType, $scope, $challenge, $idpEntityId, $authData, $clientDataJSON, $debugMode);
+        // this function extracts the public key
         $this->validateAttestedCredentialData(substr($authData, 37), $responseId);
+        // this function may need the public key to have been previously extracted
+        $this->validateAttestationData($attestationData, $clientDataJSON);
+        // the following function sets the credential properties
+        $this->debugBuffer .= "Attestation Data (bin2hex): " . bin2hex(substr($authData, 37)) . "<br/>";
     }
 
     /**
      * validate the incoming attestation data CBOR blob and return the embedded authData
      */
-    private function validateAttestationData($attestationData) {
+    private function validateAttestationData($attestationData, $clientDataJSON) {
         /**
          * STEP 9 of the validation procedure in § 7.1 of the spec: CBOR-decode the attestationObject
          */
@@ -64,11 +107,83 @@ class FIDO2RegistrationEvent extends FIDO2AbstractEvent {
                  */
                 if (count($attestationArray['attStmt']) == 0) {
                     $this->pass("Attestation format and statement as expected, and no attestation authorities to retrieve.");
+                    $this->AAGUIDAssurance = FIDO2RegistrationEvent::AAGUID_ASSURANCE_LEVEL_NONE;
                 } else {
                     $this->fail("Non-empty attestation authorities not implemented, can't go on.");
                 }
                 break;
             case "packed":
+                $stmtDecoded = $attestationArray['attStmt'];
+                $this->debugBuffer .= "AttStmt: " . print_r($stmtDecoded, true) . "<br/>";
+                if (isset($stmtDecoded['x5c'])) {
+                    $sigdata = $attestationArray['authData'] . hash("sha256", $clientDataJSON, true);                    
+                    $keyResource = openssl_pkey_get_public($this->der2pem($stmtDecoded['x5c'][0]));
+                    if ($keyResource === FALSE) {
+                        $this->fail("Unable to construct public key resource from PEM.");
+                    }
+                    if (openssl_verify($sigdata, $stmtDecoded['sig'], $keyResource, OPENSSL_ALGO_SHA256) == 1) {
+                        $this->pass("x5c sig check passed.");
+                        // still need to perform sanity checks on the attestation certificate
+                        $certProps = openssl_x509_parse($this->der2pem($stmtDecoded['x5c'][0]));
+                        $this->debugBuffer .= "Attestation Certificate:".print_r($certProps,true)."<br/>";
+                        if ( $certProps['version'] != 2 ||
+                             $certProps['subject']['OU'] != "Authenticator Attestation" ||
+                             !isset($certProps['subject']['CN']) ||
+                             !isset($certProps['extensions']['basicConstraints']) ||
+                             strstr("CA:FALSE",$certProps['extensions']['basicConstraints']) === FALSE
+                                ) {
+                            $this->fail("Attestation certificate properties are no good.");
+                        }
+                        if (isset(FIDO2RegistrationEvent::AAGUID_DICTIONARY[strtolower($this->AAGUID)])) {
+                            if ($certProps['subject']['O'] != FIDO2RegistrationEvent::AAGUID_DICTIONARY[strtolower($this->AAGUID)]['O'] ||
+                                $certProps['subject']['C'] != FIDO2RegistrationEvent::AAGUID_DICTIONARY[strtolower($this->AAGUID)]['C']) {
+                                $this->fail("AAGUID does not match vendor data.");
+                            }
+                            if (FIDO2RegistrationEvent::AAGUID_DICTIONARY[strtolower($this->AAGUID)]['multi'] === TRUE) { // need to check the OID
+                                if (!isset($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4'])) {
+                                    fail("This vendor uses one cert for multiple authenticator model attestations, but lacks the AAGUID OID.");
+                                }
+                                $AAGUIDFromOid = substr(bin2hex($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4']),4);
+                                $this->debugBuffer .= "AAGUID from OID = $AAGUIDFromOid<br/>";
+                                if (strtolower($AAGUIDFromOid) != strtolower($this->AAGUID)) {
+                                    $this->fail("AAGUID mismatch between attestation certificate and attestation statement.");
+                                }
+                            }
+                            // we would need to verify the attestation certificate against a known-good root CA certificate to get more than basic
+                            $this->AAGUIDAssurance = FIDO2RegistrationEvent::AAGUID_ASSURANCE_LEVEL_BASIC;
+                        } else {
+                            $this->warn("Unknown authenticator model found: ".$this->AAGUID.".");
+                            // unable to verify all cert properties, so this is not enough for BASIC.
+                            // but it's our own fault, we should add the device to our DB.
+                            $this->AAGUIDAssurance = FIDO2RegistrationEvent::AAGUID_ASSURANCE_LEVEL_SELF;
+                        }
+                        $this->pass("x5c attestation passed.");
+                    } else {
+                        $this->fail("x5c attestation failed.");
+                    }
+                    break;
+                }
+                if (isset($stmtDecoded['ecdaa'])) {
+                    $this->fail("ecdaa attestation not supported right now.");
+                    break;
+                }
+                // if we are still here, we are in the "self" type.
+                if ($stmtDecoded['alg'] != FIDO2RegistrationEvent::PK_ALGORITHM) {
+                    $this->fail("Unexpected algorithm type in packed basic attestation: " . $stmtDecoded['alg'] . ".");
+                }
+                $keyObject = new Ec2Key($this->cborDecode(hex2bin($this->credential)));
+                $keyResource = openssl_pkey_get_public($keyObject->asPEM());
+                if ($keyResource === FALSE) {
+                    $this->fail("Unable to construct public key resource from PEM.");
+                }
+                $sigdata = $attestationArray['authData'] . $this->clientDataHash;
+                if (openssl_verify($sigdata, $stmtDecoded['sig'], $keyResource) == 1) {
+                    $this->pass("Self-Attestation veried.");
+                    $this->AAGUIDAssurance = FIDO2RegistrationEvent::AAGUID_ASSURANCE_LEVEL_SELF;
+                } else {
+                    $this->fail("Self-Attestation failed.");
+                }
+                break;
             case "tpm":
             case "android-key":
             case "android-safetynet":
@@ -78,7 +193,6 @@ class FIDO2RegistrationEvent extends FIDO2AbstractEvent {
             default:
                 $this->fail("Unknown attestation format.");
         }
-        return $attestationArray['authData'];
     }
 
     /**
@@ -92,13 +206,14 @@ class FIDO2RegistrationEvent extends FIDO2AbstractEvent {
         $credIdLen = intval(bin2hex($credIdLenBytes), 16);
         $credId = substr($attData, 18, $credIdLen);
         $this->debugBuffer .= "AAGUID (hex) = " . bin2hex($aaguid) . "</br/>";
+        $this->AAGUID = bin2hex($aaguid);
         $this->debugBuffer .= "Length Raw = " . bin2hex($credIdLenBytes) . "<br/>";
         $this->debugBuffer .= "Credential ID Length (decimal) = " . $credIdLen . "<br/>";
         $this->debugBuffer .= "Credential ID (hex) = " . bin2hex($credId) . "<br/>";
         if (bin2hex(FIDO2AbstractEvent::base64url_decode($responseId)) == bin2hex($credId)) {
             $this->pass("Credential IDs in authenticator response and in attestation data match.");
         } else {
-            $this->fail("Mismatch of credentialId vs. response ID.");
+            $this->fail("Mismatch of credentialId (".bin2hex($credId).") vs. response ID (".bin2hex(FIDO2AbstractEvent::base64url_decode($responseId)).").");
         }
         // so far so good. Now extract the actual public key from its COSE 
         // encoding.
@@ -122,4 +237,15 @@ class FIDO2RegistrationEvent extends FIDO2AbstractEvent {
         $this->credential = bin2hex($pubKeyCBOR);
     }
 
+    /**
+     * transform DER formatted certificate to PEM format
+     * 
+     * @param string $derData blob of DER data
+     * @return string the PEM representation of the certificate
+     */
+    private function der2pem($derData) {
+        $pem = chunk_split(base64_encode($derData), 64, "\n");
+        $pem = "-----BEGIN CERTIFICATE-----\n" . $pem . "-----END CERTIFICATE-----\n";
+        return $pem;
+    }
 }
