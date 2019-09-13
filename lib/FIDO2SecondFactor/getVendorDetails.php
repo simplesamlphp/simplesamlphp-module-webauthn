@@ -18,7 +18,7 @@ foreach ($token->getClaim('entries') as $oneEntryObject) {
     $mdB64 = file_get_contents($thisUrl);
     $mdArray = json_decode(base64_decode($mdB64), true);
     if (isset($mdArray['aaguid']) && isset($mdArray['attestationRootCertificates'][0])) {
-        $compressedAaguid = str_replace('-', '', $mdArray['aaguid']);
+        $compressedAaguid = strtolower(str_replace('-', '', $mdArray['aaguid']));
         // we need C and O values for the attestation certificates. Extract those from the first root
         $x509 = openssl_x509_parse("-----BEGIN CERTIFICATE-----\n" . $mdArray['attestationRootCertificates'][0] . "\n-----END CERTIFICATE-----");
         // print_r($x509);

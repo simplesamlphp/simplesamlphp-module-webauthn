@@ -4,6 +4,8 @@ namespace SimpleSAML\Module\fido2SecondFactor\FIDO2SecondFactor;
 
 use Cose\Key\Ec2Key;
 
+include_once 'AAGUID.php';
+    
 /**
  * FIDO2/WebAuthn Authentication Processing filter
  *
@@ -19,28 +21,7 @@ class FIDO2RegistrationEvent extends FIDO2AbstractEvent {
      * Public key algorithm supported. This is -7 - ECDSA with curve P-256
      */
     const PK_ALGORITHM = -7;
-
-    /**
-     * a registry of AAGUID values observed in the wild, e.g. to textually
-     * identify an authenticator's make and model.
-     * 
-     * Keys in LOWERCASE!
-     * 
-     * 
-     * Yubico values from: https://support.yubico.com/support/solutions/articles/15000014219-yubikey-5-series-technical-manual#AAGUID_Valuesbu3ryn
-     * Microsoft values from: https://docs.microsoft.com/en-us/microsoft-edge/dev-guide/windows-integration/web-authentication
-     * 
-     */
-    const AAGUID_DICTIONARY = [
-        "fa2b99dc9e3942578f924a30d23c4118" => ["C" => "SE", "O" => "Yubico AB", "model" => "YubiKey 5 NFC", "multi" => TRUE],
-        "cb69481e8ff7403993ec0a2729a154a8" => ["C" => "SE", "O" => "Yubico AB", "model" => "YubiKey 5C/5C Nano/5 Nano", "multi" => TRUE],
-        "c5ef55ffad9a4b9fb580adebafe026d0" => ["C" => "SE", "O" => "Yubico AB", "model" => "YubiKey 5Ci", "multi" => TRUE],
-        "6028b017b1d44c02b4b3afcdafc96bb2" => ["C" => "US", "O" => "Microsoft Corporation", "model" => "Windows Hello software authenticator", "multi" => NULL],
-        "6e96969ea5cf4aad9b56305fe6c82795" => ["C" => "US", "O" => "Microsoft Corporation", "model" => "Windows Hello VBS software authenticator", "multi" => NULL],
-        "08987058cadc4b81b6e130de50dcbe96" => ["C" => "US", "O" => "Microsoft Corporation", "model" => "Windows Hello hardware authenticator", "multi" => NULL],
-        "9ddd1817af5a4672a2b93e3dd95000a9" => ["C" => "US", "O" => "Microsoft Corporation", "model" => "Windows Hello VBS hardware authenticator", "multi" => NULL],
-    ];
-
+    
     const AAGUID_ASSURANCE_LEVEL_NONE = 0;
     const AAGUID_ASSURANCE_LEVEL_SELF = 1;
     const AAGUID_ASSURANCE_LEVEL_BASIC = 2;
@@ -134,12 +115,12 @@ class FIDO2RegistrationEvent extends FIDO2AbstractEvent {
                                 ) {
                             $this->fail("Attestation certificate properties are no good.");
                         }
-                        if (isset(FIDO2RegistrationEvent::AAGUID_DICTIONARY[strtolower($this->AAGUID)])) {
-                            if ($certProps['subject']['O'] != FIDO2RegistrationEvent::AAGUID_DICTIONARY[strtolower($this->AAGUID)]['O'] ||
-                                $certProps['subject']['C'] != FIDO2RegistrationEvent::AAGUID_DICTIONARY[strtolower($this->AAGUID)]['C']) {
+                        if (isset(AAGUID_DICTIONARY[strtolower($this->AAGUID)])) {
+                            if ($certProps['subject']['O'] != AAGUID_DICTIONARY[strtolower($this->AAGUID)]['O'] ||
+                                $certProps['subject']['C'] != AAGUID_DICTIONARY[strtolower($this->AAGUID)]['C']) {
                                 $this->fail("AAGUID does not match vendor data.");
                             }
-                            if (FIDO2RegistrationEvent::AAGUID_DICTIONARY[strtolower($this->AAGUID)]['multi'] === TRUE) { // need to check the OID
+                            if (AAGUID_DICTIONARY[strtolower($this->AAGUID)]['multi'] === TRUE) { // need to check the OID
                                 if (!isset($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4'])) {
                                     fail("This vendor uses one cert for multiple authenticator model attestations, but lacks the AAGUID OID.");
                                 }
