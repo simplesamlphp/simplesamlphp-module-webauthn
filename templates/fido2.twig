@@ -1,4 +1,4 @@
-{% set pagetitle = '{fido2SecondFactor:fido2SecondFactor:consent_header}'|trans %}
+{% set pagetitle = '{fido2SecondFactor:fido2SecondFactor:page_title}'|trans %}
 {% extends "base.twig" %}
 
 {% block preload %}
@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block content %}
-    <h1>Second-Factor Authentication</h1>
+    <h1>{{ '{fido2SecondFactor:fido2SecondFactor:heading1}'|trans }}</h1>
     <h2>Authentication with a FIDO2/WebAuthn token is required for your account, {{ UserID }}.</h2>
     {% if FIDO2Tokens|length > 0 %}
         <div id="currentTokens"><span id='tokencaption'>The following tokens are associated with your account:</span>
