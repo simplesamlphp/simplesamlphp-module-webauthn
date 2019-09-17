@@ -10,9 +10,9 @@
 
 {% block content %}
     <h1>{{ '{fido2SecondFactor:fido2SecondFactor:heading1}'|trans }}</h1>
-    <h2>Authentication with a FIDO2/WebAuthn token is required for your account, {{ UserID }}.</h2>
+    <h2>{{ '{fido2SecondFactor:fido2SecondFactor:accountEnabled}'|trans }}</h2>
     {% if FIDO2Tokens|length > 0 %}
-        <div id="currentTokens"><span id='tokencaption'>The following tokens are associated with your account:</span>
+        <div id="currentTokens"><span id='tokencaption'>{{ '{fido2SecondFactor:fido2SecondFactor:tokenList}'|trans }}</span>
             <ul>
                 {% for token in FIDO2Tokens %}
                     <li>{{ token.3|e }}</li>
@@ -27,20 +27,25 @@
             <input type='hidden' id='attobj' name='attestation_object' value='mehrnix'/>
             <input type='hidden' id='type' name='type' value='something'/>
             <input type='hidden' id='operation' name='operation' value='REG'/>
-            <button type='button' onClick="{{ regForm|raw }}" onsubmit='false' >Enroll new Token</button>
-            Name for the new token: <input type='text' id='tokenname' name='tokenname' size='40' value='Token registered at {{ "now"|date('Y-m-d', timezone="Europe/Luxembourg") }}' onkeydown="if (event.keyCode == 13) return false;"/>
+            <button type='button' onClick="{{ regForm|raw }}" onsubmit='false' >{{ '{fido2SecondFactor:fido2SecondFactor:newTokenButton}'|trans }}</button>
+            {{ '{fido2SecondFactor:fido2SecondFactor:newTokenName}'|trans }} <input 
+                type='text' 
+                id='tokenname' 
+                name='tokenname' 
+                size='40' 
+                value='{{ '{fido2SecondFactor:fido2SecondFactor:newTokenDefaultName}'|trans }} {{ "now"|date('Y-m-d', timezone="Europe/Luxembourg") }}' onkeydown="if (event.keyCode == 13) return false;"/>
         </form>
         <div class='space'></div>
         {%  if FIDO2Tokens|length > 0 %}
             {% for token in FIDO2Tokens %}
                 <form class='deleteform' id='delete-{{ loop.index }}' method='POST' action='{{ delURL|raw }}'>
                     <input type='hidden' id='credId-{{ loop.index }}' name='credId' value='{{ token.0 }}'/>
-                    <button type='submit' id='submit-{{ loop.index }}' name='submit' value='DELETE'>Remove &quot;{{ token.3 }}&quot;</button>
+                    <button type='submit' id='submit-{{ loop.index }}' name='submit' value='DELETE'>{{ '{fido2SecondFactor:fido2SecondFactor:removePrefix}'|trans }} &quot;{{ token.3 }}&quot;</button>
                 </form>
             {%  endfor %}
             <div class='space'></div>
             <form id='nevermind' method='POST' action='{{ delURL|raw }}'>
-                <button type='submit' id='submit-nevermind' name='submit' value='NEVERMIND'>Do not change anything.</button>
+                <button type='submit' id='submit-nevermind' name='submit' value='NEVERMIND'>{{ '{fido2SecondFactor:fido2SecondFactor:noChange}'|trans }}</button>
             </form>
         {%  endif %}
     {% endif %}
@@ -54,8 +59,8 @@
             <!-- ignoring <input type='hidden' id='userhandle' name='userhandle' value='someuser'/> -->
             <input type='hidden' id='type' name='type' value='something'/>
             <input type='hidden' id='operation' name='operation' value='AUTH'/>
-            <input type='checkbox' id='credentialChange' name='credentialChange'>After authenticating, I want to register a new token or delete an existing one.</input><br/>
-            <button type='button' onClick="{{ authForm|raw }}" onsubmit='false' >Authenticate with existing Token</button>
+            <input type='checkbox' id='credentialChange' name='credentialChange'>{{ '{fido2SecondFactor:fido2SecondFactor:wantsModification}'|trans }}</input><br/>
+            <button type='button' onClick="{{ authForm|raw }}" onsubmit='false' >{{ '{fido2SecondFactor:fido2SecondFactor:authTokenButton}'|trans }}</button>
         </form>
     {% endif %}
 {% endblock %}
