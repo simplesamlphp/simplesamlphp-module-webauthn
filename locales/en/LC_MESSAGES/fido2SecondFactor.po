@@ -39,6 +39,9 @@ msgstr "Token registered at"
 msgid "{fido2SecondFactor:fido2SecondFactor:authTokenButton}"
 msgstr "Authenticate"
 
+msgid "{fido2SecondFactor:fido2SecondFactor:wantsAdd}"
+msgstr "After authenticating, I want to register a new token."
+
 msgid "{fido2SecondFactor:fido2SecondFactor:wantsModification}"
 msgstr "After authenticating, I want to register a new token or delete an existing one."
 

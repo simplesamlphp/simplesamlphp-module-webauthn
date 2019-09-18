@@ -39,6 +39,9 @@ msgstr "Schlüssel vom"
 msgid "{fido2SecondFactor:fido2SecondFactor:authTokenButton}"
 msgstr "Authentifizieren"
 
+msgid "{fido2SecondFactor:fido2SecondFactor:wantsAdd}"
+msgstr "Nach der Anmeldung möchte ich einen Schlüssel hinzufügen."
+
 msgid "{fido2SecondFactor:fido2SecondFactor:wantsModification}"
 msgstr "Nach der Anmeldung möchte ich Schlüssel hinzufügen oder löschen."
 
