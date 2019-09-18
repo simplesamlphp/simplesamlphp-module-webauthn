@@ -1,7 +1,5 @@
 <?php
 
-include 'common.php';
-
 session_cache_limiter('nocache');
 $globalConfig = \SimpleSAML\Configuration::getInstance();
 
@@ -27,7 +25,7 @@ $publicKey = FALSE;
 $previousCounter = -1;
 foreach ($state['FIDO2Tokens'] as $oneToken) {
     if ($oneToken[0] == $incomingID) {
-        pass("Credential ID is eligible for user " . $state['FIDO2Username'] . ". Using publicKey " . $oneToken[1] . " with current counter value " . $oneToken[2]);
+        // Credential ID is eligible for user $state['FIDO2Username']; using publicKey $oneToken[1] with current counter value $oneToken[2]
         $publicKey = $oneToken[1];
         $previousCounter = $oneToken[2];
         break;
