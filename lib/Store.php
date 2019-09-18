@@ -30,10 +30,11 @@ abstract class Store
      * This function checks whether a given user has been enabled for FIDO2 second factor.
      *
      * @param string $userId        The hash identifying the user at an IdP.
+     * @param bool   $defaultIfNx   if not found in the DB, should the user be considered enabled (true) or disabled(false)
      *
      * @return bool True if the user is enabled for 2FA, false if not
      */
-    abstract public function is2FAEnabled($userId);
+    abstract public function is2FAEnabled($userId, $defaultIfNx);
 
     /**
      * does a given credentialID already exist?

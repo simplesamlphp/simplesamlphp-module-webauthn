@@ -136,10 +136,11 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
      * This function checks whether a given user has been enabled for FIDO2 second factor.
      *
      * @param string $userId        The hash identifying the user at an IdP.
+     * @param bool   $defaultIfNx   if not found in the DB, should the user be considered enabled (true) or disabled(false)
      *
      * @return bool True if the user is enabled for 2FA, false if not
      */
-    public function is2FAEnabled($userId) {
+    public function is2FAEnabled($userId, $defaultIfNx) {
         assert(is_string($userId));
 
         $query = 'SELECT fido2Status FROM fido2UserStatus WHERE user_id = ?';
@@ -152,8 +153,8 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
 
         $rowCount = $st->rowCount();
         if ($rowCount === 0) {
-            \SimpleSAML\Logger::debug('User does not exist in DB, default to 2FA DISABLED.');
-            return false;
+            \SimpleSAML\Logger::debug('User does not exist in DB, returning desired default.');
+            return $defaultIfNx;
         } else {
             $query2 = 'SELECT fido2Status FROM fido2UserStatus WHERE user_id = ? AND fido2Status = "FIDO2Disabled"';
             $st2 = $this->execute($query2, [$userId]);

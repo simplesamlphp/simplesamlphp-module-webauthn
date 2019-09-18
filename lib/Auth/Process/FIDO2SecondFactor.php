@@ -51,6 +51,11 @@ class FIDO2SecondFactor extends \SimpleSAML\Auth\ProcessingFilter {
     private $requestTokenModel;
     
     /**
+     * @var boolean should new users be considered as enabled by default?
+     */
+    private $defaultEnabled;
+    
+    /**
      * Initialize filter.
      *
      * Validates and parses the configuration.
@@ -97,6 +102,11 @@ class FIDO2SecondFactor extends \SimpleSAML\Auth\ProcessingFilter {
         } else {
             $this->requestTokenModel = false;
         }
+        if (array_key_exists('default_enable', $config)) {
+            $this->defaultEnabled = $config['default_enable'];
+        } else {
+            $this->defaultEnabled = false;
+        }
     }
 
     /**
@@ -129,7 +139,7 @@ class FIDO2SecondFactor extends \SimpleSAML\Auth\ProcessingFilter {
         $state['fido2SecondFactor:store'] = $this->store;
         Logger::debug('fido2SecondFactor: userid: ' . $state['Attributes'][$this->usernameAttrib][0]);
 
-        if ($this->store->is2FAEnabled($state['Attributes'][$this->usernameAttrib][0]) === false) {
+        if ($this->store->is2FAEnabled($state['Attributes'][$this->usernameAttrib][0], $this->defaultEnabled) === false) {
             // nothing to be done here, end authprocfilter processing
             return;
         }
