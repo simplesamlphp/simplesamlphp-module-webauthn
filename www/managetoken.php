@@ -22,6 +22,9 @@ switch ($_POST['submit']) {
         \SimpleSAML\Auth\ProcessingChain::resumeProcessing($state);
         break;
     case "DELETE":
+        if ($state['FIDO2AuthSuccessful'] == $_POST['credId']) {
+            throw new Exception("Attempt to delete the currently used credential despite UI preventing this.");
+        }
         $store = $state['fido2SecondFactor:store'];
         $store->deleteTokenData($_POST['credId']);
         \SimpleSAML\Auth\ProcessingChain::resumeProcessing($state);
