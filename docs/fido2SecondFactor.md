@@ -8,11 +8,61 @@ The module is implemented as an Authentication Processing Filter. That
 means it can be configured in the global config.php file or the SP remote or 
 IdP hosted metadata.
 
-  * [Read more about processing filters in SimpleSAMLphp](simplesamlphp-authproc)
-
-
 How to setup the fido2SecondFactor module
 -----------------------------------------
+You need to enable and configure the module's authprocfilter at a priority level
+so that it takes place AFTER the first-factor authentication. E.g. at 100:
+
+100 => 
+    ['class' => 'fido2SecondFactor:FIDO2SecondFactor',
+
+    /* required configuration parameters */
+
+        'store' => [
+            'fido2SecondFactor:Database',
+            'dsn' => 'mysql:host=db.example.org;dbname=fido2',
+            'username' => 'simplesaml',
+            'password' => 'sdfsdf',
+        ],
+        
+    'attrib_username' => 'urn:oid:1.3.6.1.4.1.23735.100.0',
+    'attrib_displayname' => 'urn:oid:2.5.4.3',
+
+    /* optional configuration parameters */
+
+    /* FIDO2 is phishing-resistent by binding generated credentials to a scope.
+     * Browsers will only invoke the registration/authentication if the scope
+     * matches the principal domain name the user is currently visiting.
+     * If not specified, the scope will be the hostname of the IdP as per 
+     * its metadata. It is permissible to widen the scope up to the prinicpal
+     * domain though (e.g. authentication service is "saml.example.com" => scope
+     * can be extended to "example.com"; but not "examp1e.com".
+     * If configuring this item, be sure that the authentication server name and
+     * the desired scope are a suffix match.
+     */
+    'scope' => 'example.com',
+
+    /* the following will interactively ask the user if he is willing to share
+     * manufacturer and model information during credential registration. 
+     * The user can decline, in which case registration will still succeed but
+     * vendor and model will be logged as "unknown model [unknown vendor]"
+     *
+     * When not requesting this, there is one less user interaction during the
+     * registration process; and no model information will be saved.
+     *
+     * defaults to "false"
+     */
+    'request_tokenmodel' => true,
+
+    /* should FIDO2 be enabled by default for all users? If not, users need to
+     * be white-listed in the database - other users simply pass through the
+     * filter without being subjected to 2FA.
+     *
+     * defaults to "disabled by default" === false
+     */
+    'default_enable' => false,
+
+    ],
 
 Using storage
 -------------
@@ -34,7 +84,6 @@ Here is the initialization SQL script:
 	CREATE TABLE fido2UserStatus (
                 user_id VARCHAR(80) NOT NULL,
 		fido2Status ENUM("FIDO2Disabled","FIDO2Enabled") NOT NULL DEFAULT "FIDO2Disabled",
-		fido2PendingChallenge VARCHAR(128) DEFAULT NULL,
 		UNIQUE (user_id)
 	);
 
@@ -57,7 +106,7 @@ The `fido2SecondFactor:Database` backend storage has the following options:
 
 Example config using PostgreSQL database:
 
-    90 => array(
+    100 => array(
         'class'	=> 'fido2SecondFactor:FIDO2SecondFactor', 
         'store'	=> array(
             'fido2SecondFactor:Database', 
@@ -69,7 +118,7 @@ Example config using PostgreSQL database:
 
 Example config using MySQL database:
 
-    90 => array(
+    100 => array(
         'class'	=> 'fido2SecondFactor:FIDO2SecondFactor', 
         'store'	=> array(
             'fido2SecondFactor:Database', 
@@ -82,9 +131,40 @@ Example config using MySQL database:
 
 Options
 -------
+  * scope
+    FIDO2 is phishing-resistent by binding generated credentials to a scope.
+    Browsers will only invoke the registration/authentication if the scope
+    matches the principal domain name the user is currently visiting.
+    If not specified, the scope will be the hostname of the IdP as per 
+    its metadata. It is permissible to widen the scope up to the prinicpal
+    domain though (e.g. authentication service is "saml.example.com" => scope
+    can be extended to "example.com"; but not "examp1e.com".
+    If configuring this item, be sure that the authentication server name and
+    the desired scope are a suffix match.
 
-External options
-----------------
+  * request_tokenmodel
+    the following will interactively ask the user if he is willing to share
+    manufacturer and model information during credential registration. 
+    The user can decline, in which case registration will still succeed but
+    vendor and model will be logged as "unknown model [unknown vendor]"
+    When not requesting this, there is one less user interaction during the
+    registration process; and no model information will be saved.
+    Defaults to "false".
+    
+  * default_enable
+    should FIDO2 be enabled by default for all users? If not, users need to
+    be white-listed in the database - other users simply pass through the
+    filter without being subjected to 2FA.
+    Defaults to "disabled by default" === false    
 
 Disabling FIDO2 Second Factor
 -----------------------------
+You can disable the module entirely by not listing it as an authprocfilter.
+
+You can disable the module by default by setting default_enable = false. You can
+then enable FIDO2 second-factor authentication for individual users by adding
+them with status "FIDO2Enabled" to the fido2UserStatus table.
+
+If the module is enabled by default, you can selectively disable FIDO second-
+factor authentication by adding the username with status FIDO2Disabled to the
+fido2UserStatus table.
