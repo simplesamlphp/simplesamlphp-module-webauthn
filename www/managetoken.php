@@ -14,7 +14,7 @@ if (!array_key_exists('StateId', $_REQUEST)) {
 $id = $_REQUEST['StateId'];
 $state = \SimpleSAML\Auth\State::loadState($id, 'fido2SecondFactor:request');
 
-if ($state['FIDO2AuthSuccessful'] !== TRUE) {
+if ($state['FIDO2AuthSuccessful'] === false) {
     throw new Exception("Attempt to access the token management page unauthenticated.");
 }
 switch ($_POST['submit']) {

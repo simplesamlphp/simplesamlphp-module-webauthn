@@ -8,6 +8,10 @@ div.space {
     margin: 10px;
 }
 
+li.currenttoken {
+    font-weight: bold;
+    color: blue;
+}
 span#tokencaption {
     font-weight: bold;
 }

@@ -150,6 +150,7 @@ class FIDO2SecondFactor extends \SimpleSAML\Auth\ProcessingFilter {
         $state['FIDO2Displayname'] = $state['Attributes'][$this->displaynameAttrib][0];
         $state['FIDO2SignupChallenge'] = hash('sha512', random_bytes(64));
         $state['FIDO2WantsRegister'] = false;
+        $state['FIDO2AuthSuccessful'] = false;
 
         // Save state and redirect
         $id = \SimpleSAML\Auth\State::saveState($state, 'fido2SecondFactor:request');

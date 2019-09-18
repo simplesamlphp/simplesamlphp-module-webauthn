@@ -47,3 +47,6 @@ msgstr "Keine Änderungen durchführen."
 
 msgid "{fido2SecondFactor:fido2SecondFactor:removePrefix}"
 msgstr "Löschen von"
+
+msgid "{fido2SecondFactor:fido2SecondFactor:currentToken}"
+msgstr "(mit diesem Schlüssel sind Sie angemeldet)"

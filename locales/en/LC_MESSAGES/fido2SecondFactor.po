@@ -47,3 +47,6 @@ msgstr "Do not change anything."
 
 msgid "{fido2SecondFactor:fido2SecondFactor:removePrefix}"
 msgstr "Remove"
+
+msgid "{fido2SecondFactor:fido2SecondFactor:currentToken}"
+msgstr "(you authenticated with this token)"

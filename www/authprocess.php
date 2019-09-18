@@ -54,12 +54,12 @@ $authObject = new SimpleSAML\Module\fido2SecondFactor\FIDO2SecondFactor\FIDO2Aut
 if (($previousCounter != 0 || $authObject->counter != 0) && $authObject->counter > $previousCounter) {
     // Signature counter was incremented compared to last time, good
     $store = $state['fido2SecondFactor:store'];
-    $store->updateSignCount($incomingID, $authObject->counter);
+    $store->updateSignCount($oneToken[0], $authObject->counter);
 } else {
     throw new Exception("Signature counter less or equal to a previous authentication! Token cloning likely (old: $previousCounter, new: $authObject->counter.");
 }
-// THAT'S IT. The user authenticated successfully.
-$state['FIDO2AuthSuccessful'] = TRUE;
+// THAT'S IT. The user authenticated successfully. Remember the credential ID that was used.
+$state['FIDO2AuthSuccessful'] = $oneToken[0];
 // See if he wants to hang around for token management operations
 if (isset($_POST['credentialChange']) && $_POST['credentialChange'] == "on") {
     $state['FIDO2WantsRegister'] = TRUE;

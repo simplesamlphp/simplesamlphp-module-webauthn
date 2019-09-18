@@ -19,7 +19,7 @@ $id = $_REQUEST['StateId'];
 $state = \SimpleSAML\Auth\State::loadState($id, 'fido2SecondFactor:request');
 
 // registering a credential is only allowed for new users or after being authenticated
-if (count($state['FIDO2Tokens']) > 0 && $state['FIDO2AuthSuccessful'] !== TRUE) {
+if (count($state['FIDO2Tokens']) > 0 && $state['FIDO2AuthSuccessful'] === false) {
     throw new Exception("Attempt to register new token in unacceptable context.");
 }
 

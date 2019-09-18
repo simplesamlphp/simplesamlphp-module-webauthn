@@ -15,7 +15,11 @@
         <div id="currentTokens"><span id='tokencaption'>{{ '{fido2SecondFactor:fido2SecondFactor:tokenList}'|trans }}</span>
             <ul>
                 {% for token in FIDO2Tokens %}
-                    <li>{{ token.3|e }}</li>
+                    {%  if FIDO2AuthSuccessful == false or FIDO2AuthSuccessful != token.0 %}
+                        <li class='othertoken'>{{ token.3|e }}</li>
+                        {% else %}
+                        <li class='currenttoken'>{{ token.3|e }} {{ '{fido2SecondFactor:fido2SecondFactor:currentToken}'|trans }}</li>
+                        {% endif %}
                     {% endfor %}
             </ul>
         </div>
@@ -33,15 +37,18 @@
                 id='tokenname' 
                 name='tokenname' 
                 size='40' 
-                value='{{ '{fido2SecondFactor:fido2SecondFactor:newTokenDefaultName}'|trans }} {{ "now"|date('Y-m-d', timezone="Europe/Luxembourg") }}' onkeydown="if (event.keyCode == 13) return false;"/>
+                value='{{ '{fido2SecondFactor:fido2SecondFactor:newTokenDefaultName}'|trans }} {{ "now"|date('Y-m-d', timezone="Europe/Luxembourg") }}' onkeydown="if (event.keyCode == 13)
+                            return false;"/>
         </form>
         <div class='space'></div>
         {%  if FIDO2Tokens|length > 0 %}
             {% for token in FIDO2Tokens %}
-                <form class='deleteform' id='delete-{{ loop.index }}' method='POST' action='{{ delURL|raw }}'>
-                    <input type='hidden' id='credId-{{ loop.index }}' name='credId' value='{{ token.0 }}'/>
-                    <button type='submit' id='submit-{{ loop.index }}' name='submit' value='DELETE'>{{ '{fido2SecondFactor:fido2SecondFactor:removePrefix}'|trans }} &quot;{{ token.3 }}&quot;</button>
-                </form>
+                {%  if FIDO2AuthSuccessful != token.0 %}
+                    <form class='deleteform' id='delete-{{ loop.index }}' method='POST' action='{{ delURL|raw }}'>
+                        <input type='hidden' id='credId-{{ loop.index }}' name='credId' value='{{ token.0 }}'/>
+                        <button type='submit' id='submit-{{ loop.index }}' name='submit' value='DELETE'>{{ '{fido2SecondFactor:fido2SecondFactor:removePrefix}'|trans }} &quot;{{ token.3 }}&quot;</button>
+                    </form>
+                {%  endif %}
             {%  endfor %}
             <div class='space'></div>
             <form id='nevermind' method='POST' action='{{ delURL|raw }}'>

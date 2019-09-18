@@ -70,8 +70,9 @@ foreach ($username as $oneChar) {
     $usernameEncoded .= "0x$oneChar, ";
 }
 
+$t->data['FIDO2AuthSuccessful'] = $state['FIDO2AuthSuccessful'];
 $t->data['regForm'] = "";
-if (count($state['FIDO2Tokens']) == 0 || ($state['FIDO2WantsRegister'] === true && $state['FIDO2AuthSuccessful'] === true)) {
+if (count($state['FIDO2Tokens']) == 0 || ($state['FIDO2WantsRegister'] === true && $state['FIDO2AuthSuccessful'] !== false)) {
     $t->data['regURL'] = \SimpleSAML\Module::getModuleURL('fido2SecondFactor/regprocess.php?StateId=' . urlencode($id));
     $t->data['delURL'] = \SimpleSAML\Module::getModuleURL('fido2SecondFactor/managetoken.php?StateId=' . urlencode($id));
     $t->data['regForm'] = "navigator.credentials.create(publicKeyCredentialCreationOptions)
@@ -111,7 +112,7 @@ var publicKeyCredentialCreationOptions = {
 }
 
 $t->data['authForm'] = "";
-if (count($state['FIDO2Tokens']) > 0 && ($state['FIDO2WantsRegister'] !== true || $state['FIDO2AuthSuccessful'] !== true )) {
+if (count($state['FIDO2Tokens']) > 0 && ($state['FIDO2WantsRegister'] !== true || $state['FIDO2AuthSuccessful'] === false )) {
     $t->data['authURL'] = \SimpleSAML\Module::getModuleURL('fido2SecondFactor/authprocess.php?StateId=' . urlencode($id));
     $t->data['authForm'] = "navigator.credentials.get(publicKeyCredentialRequestOptions)
     .then((cred) => {

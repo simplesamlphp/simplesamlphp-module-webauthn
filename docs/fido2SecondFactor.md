@@ -36,7 +36,8 @@ so that it takes place AFTER the first-factor authentication. E.g. at 100:
      * If not specified, the scope will be the hostname of the IdP as per 
      * its metadata. It is permissible to widen the scope up to the prinicpal
      * domain though (e.g. authentication service is "saml.example.com" => scope
-     * can be extended to "example.com"; but not "examp1e.com".
+     * can be extended to "example.com"; but not "examp1e.com". A registered
+     * FIDO2 token can then also be used on other servers in the same domain.
      * If configuring this item, be sure that the authentication server name and
      * the desired scope are a suffix match.
      */
@@ -138,7 +139,8 @@ Options
     If not specified, the scope will be the hostname of the IdP as per 
     its metadata. It is permissible to widen the scope up to the prinicpal
     domain though (e.g. authentication service is "saml.example.com" => scope
-    can be extended to "example.com"; but not "examp1e.com".
+    can be extended to "example.com"; but not "examp1e.com". A registered
+    FIDO2 token can then also be used on other servers in the same domain.
     If configuring this item, be sure that the authentication server name and
     the desired scope are a suffix match.
 
