@@ -122,7 +122,7 @@ class FIDO2RegistrationEvent extends FIDO2AbstractEvent {
                             }
                             if (AAGUID_DICTIONARY[strtolower($this->AAGUID)]['multi'] === TRUE) { // need to check the OID
                                 if (!isset($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4'])) {
-                                    fail("This vendor uses one cert for multiple authenticator model attestations, but lacks the AAGUID OID.");
+                                    $this->fail("This vendor uses one cert for multiple authenticator model attestations, but lacks the AAGUID OID.");
                                 }
                                 $AAGUIDFromOid = substr(bin2hex($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4']),4);
                                 $this->debugBuffer .= "AAGUID from OID = $AAGUIDFromOid<br/>";

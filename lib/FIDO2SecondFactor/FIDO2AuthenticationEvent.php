@@ -44,7 +44,7 @@ class FIDO2AuthenticationEvent extends FIDO2AbstractEvent {
         $keyObject = new Ec2Key($keyArray);
         $keyResource = openssl_pkey_get_public($keyObject->asPEM());
         if ($keyResource === FALSE) {
-            fail("Unable to construct public key resource from PEM.");
+            $this->fail("Unable to construct public key resource from PEM.");
         }
         $sigcheck = openssl_verify($sigData, $signature, $keyResource, OPENSSL_ALGO_SHA256);
         switch ($sigcheck) {
