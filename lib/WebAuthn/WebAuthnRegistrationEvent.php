@@ -184,6 +184,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
                 $this->AAGUIDAssurance = WebAuthnRegistrationEvent::AAGUID_ASSURANCE_LEVEL_SELF;
             }
             $this->pass("x5c attestation passed.");
+            return;
         }
         if (isset($stmtDecoded['ecdaa'])) {
             $this->fail("ecdaa attestation not supported right now.");
