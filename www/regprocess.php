@@ -49,6 +49,9 @@ if ($state['requestTokenModel']) {
     $vendor = SimpleSAML\Module\webauthn\WebAuthn\AAGUID::AAGUID_DICTIONARY[$regObject->AAGUID]["O"] ?? "unknown vendor";
     $friendlyName .= " ($model [$vendor])";
 }
+/**
+ * STEP 20 of the validation procedure in § 7.1 of the spec: store credentialId, credential, signCount and associate with user
+ */
 $store->storeTokenData($state['FIDO2Username'], $regObject->credentialId, $regObject->credential, $regObject->counter, $friendlyName);
 // make sure $state gets the news, the token is to be displayed to the user on the next page
 $state['FIDO2Tokens'][] = [0 => $regObject->credentialId, 1 => $regObject->credential, 2 => $regObject->counter, 3 => $friendlyName];
