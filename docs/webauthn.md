@@ -145,6 +145,28 @@ Options
 `default_enable`
 :    Should WebAuthn be enabled by default for all users? If not, users need to be white-listed in the database - other users simply pass through the filter without being subjected to 2FA. Defaults to "disabled by default" === false    
 
+User Experience / Workflow
+--------------------------
+Users for which WebAuthn is enabled cannot continue without a FIDO2 token. The
+UI is different depending on the number of tokens the user has registered:
+
+- User has 0 tokens: UI requires the user to register a token. After 
+  registration, the authprocfilter is done (user continues to SP)
+- User has 1 token: UI requires the user to authenticate. After the 
+  authentication, user can optionally enroll another token.
+- User has 2+ tokens: UI requires the user to authenticate. After the 
+  authentication, user can optionally enroll another token or delete an obsolete
+  one.
+
+If a user is enabled but has forgotten all of his tokens, the person would need
+to contact his administrator and have his account temporarily disabled for two-
+factor authentication.
+
+As long as a user account has 0 tokens there is no benefit yet; it's effectively
+still single factor authentication because anyone with the user's password can 
+register any token. That is in the nature of things. It could be avoided with
+an out-of-band registration process (in the same scope).
+
 Device model detection
 ----------------------
 The option request_tokenmodel can be used to get a token's so-called AAGUID
