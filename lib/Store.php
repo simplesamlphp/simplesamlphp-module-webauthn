@@ -1,6 +1,6 @@
 <?php
 
-namespace SimpleSAML\Module\fido2SecondFactor;
+namespace SimpleSAML\Module\webauthn;
 
 /**
  * Base class for consent storage handlers.
@@ -27,7 +27,7 @@ abstract class Store
     /**
      * is the user subject to 2nd factor at all?
      *
-     * This function checks whether a given user has been enabled for FIDO2 second factor.
+     * This function checks whether a given user has been enabled for WebAuthn.
      *
      * @param string $userId        The hash identifying the user at an IdP.
      * @param bool   $defaultIfNx   if not found in the DB, should the user be considered enabled (true) or disabled(false)
@@ -126,8 +126,8 @@ abstract class Store
 
         $className = \SimpleSAML\Module::resolveClass(
             $config[0],
-            'FIDO2SecondFactor\Store',
-            '\SimpleSAML\Module\fido2SecondFactor\Store'
+            'WebAuthn\Store',
+            '\SimpleSAML\Module\webauthn\Store'
         );
 
         unset($config[0]);

@@ -1,3 +1,6 @@
+<?php
+namespace SimpleSAML\Module\webauthn\WebAuthn;
+class AAGUID {
 const AAGUID_DICTIONARY = array (
   '12ded7454bed47d4abaae713f51d6393' => 
   array (
@@ -166,3 +169,4 @@ const AAGUID_DICTIONARY = array (
     'multi' => NULL,
   ),
 );
+}

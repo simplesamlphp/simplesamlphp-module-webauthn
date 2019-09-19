@@ -1,6 +1,6 @@
 <?php
 
-namespace SimpleSAML\Module\fido2SecondFactor\FIDO2SecondFactor\Store;
+namespace SimpleSAML\Module\webauthn\WebAuthn\Store;
 
 /**
  * Store FIDO2 information in database.
@@ -17,7 +17,7 @@ namespace SimpleSAML\Module\fido2SecondFactor\FIDO2SecondFactor\Store;
  * @author Stefan Winter <stefan.winter@restena.lu>
  * @package SimpleSAMLphp
  */
-class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
+class Database extends \SimpleSAML\Module\webauthn\Store {
 
     /**
      * DSN for the database.
@@ -71,10 +71,10 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
         parent::__construct($config);
 
         if (!array_key_exists('dsn', $config)) {
-            throw new \Exception('fido2SecondFactor:Database - Missing required option \'dsn\'.');
+            throw new \Exception('webauthn:Database - Missing required option \'dsn\'.');
         }
         if (!is_string($config['dsn'])) {
-            throw new \Exception('fido2SecondFactor:Database - \'dsn\' is supposed to be a string.');
+            throw new \Exception('webauthn:Database - \'dsn\' is supposed to be a string.');
         }
 
         $this->dsn = $config['dsn'];
@@ -82,7 +82,7 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
 
         if (array_key_exists('username', $config)) {
             if (!is_string($config['username'])) {
-                throw new \Exception('fido2SecondFactor:Database - \'username\' is supposed to be a string.');
+                throw new \Exception('webauthn:Database - \'username\' is supposed to be a string.');
             }
             $this->username = $config['username'];
         } else {
@@ -91,7 +91,7 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
 
         if (array_key_exists('password', $config)) {
             if (!is_string($config['password'])) {
-                throw new \Exception('fido2SecondFactor:Database - \'password\' is supposed to be a string.');
+                throw new \Exception('webauthn:Database - \'password\' is supposed to be a string.');
             }
             $this->password = $config['password'];
         } else {
@@ -100,7 +100,7 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
 
         if (array_key_exists('options', $config)) {
             if (!is_array($config['options'])) {
-                throw new \Exception('fido2SecondFactor:Database - \'options\' is supposed to be an array.');
+                throw new \Exception('webauthn:Database - \'options\' is supposed to be an array.');
             }
             $this->options = $config['options'];
         } else {
@@ -109,7 +109,7 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
 
         if (isset($config['timeout'])) {
             if (!is_int($config['timeout'])) {
-                throw new \Exception('fido2SecondFactor:Database - \'timeout\' is supposed to be an integer.');
+                throw new \Exception('webauthn:Database - \'timeout\' is supposed to be an integer.');
             }
             $this->timeout = $config['timeout'];
         }
@@ -133,7 +133,7 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
     /**
      * is the user subject to 2nd factor at all?
      *
-     * This function checks whether a given user has been enabled for FIDO2 second factor.
+     * This function checks whether a given user has been enabled for WebAuthn.
      *
      * @param string $userId        The hash identifying the user at an IdP.
      * @param bool   $defaultIfNx   if not found in the DB, should the user be considered enabled (true) or disabled(false)
@@ -143,7 +143,7 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
     public function is2FAEnabled($userId, $defaultIfNx) {
         assert(is_string($userId));
 
-        $query = 'SELECT fido2Status FROM fido2UserStatus WHERE user_id = ?';
+        $query = 'SELECT fido2Status FROM userstatus WHERE user_id = ?';
 
         $st = $this->execute($query, [$userId]);
 
@@ -156,7 +156,7 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
             \SimpleSAML\Logger::debug('User does not exist in DB, returning desired default.');
             return $defaultIfNx;
         } else {
-            $query2 = 'SELECT fido2Status FROM fido2UserStatus WHERE user_id = ? AND fido2Status = "FIDO2Disabled"';
+            $query2 = 'SELECT fido2Status FROM userstatus WHERE user_id = ? AND fido2Status = "FIDO2Disabled"';
             $st2 = $this->execute($query2, [$userId]);
             $rowCount2 = $st2->rowCount();
             if ($rowCount2 === 1 /* explicitly disabled user in DB */) {
@@ -179,7 +179,7 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
     public function doesCredentialExist($credIdHex) {
         assert(is_string($userId));
 
-        $query = 'SELECT credentialId FROM fido2SecondFactor ' .
+        $query = 'SELECT credentialId FROM credentials ' .
                 'WHERE credentialId = ?';
 
         $st = $this->execute($query, [$credIdHex]);
@@ -213,7 +213,7 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
         assert(is_string($userId));
 
         $st = $this->execute(
-                'INSERT INTO fido2SecondFactor ' .
+                'INSERT INTO credentials ' .
                 '(user_id, credentialId, credential, signCounter, friendlyName) VALUES (?,?,?,' . $signCounter . ',?)',
                 [$userId, $credentialId, $credential, $friendlyName]
         );
@@ -222,15 +222,6 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
             throw new Exception("Unable to save new token in database!");
         }
 
-        $st2 = $this->execute(
-                'UPDATE fido2UserStatus  ' .
-                'SET fido2Status = ? WHERE user_id = ?',
-                ["FIDO2Enabled", $userId]
-        );
-
-        if ($st2 === false) {
-            throw new Exception("Unable to set user status to Enabled.");
-        }
         return true;
     }
 
@@ -242,12 +233,12 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
      */
     public function deleteTokenData($credentialId) {
         $st = $this->execute(
-                'DELETE FROM fido2SecondFactor WHERE credentialId = ?',
+                'DELETE FROM credentials WHERE credentialId = ?',
                 [$credentialId]
         );
 
         if ($st !== false) {
-            \SimpleSAML\Logger::debug('fido2SecondFactor:Database - DELETED credential.');
+            \SimpleSAML\Logger::debug('webauthn:Database - DELETED credential.');
         } else {
             throw new Exception("Database execution did not work.");
         }
@@ -263,12 +254,12 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
      */
     public function updateSignCount($credentialId, $signCounter) {
         $st = $this->execute(
-                'UPDATE fido2SecondFactor SET signCounter = ? WHERE credentialId = ?',
+                'UPDATE credentials SET signCounter = ? WHERE credentialId = ?',
                 [$signCounter, $credentialId]
         );
 
         if ($st !== false) {
-            \SimpleSAML\Logger::debug('fido2SecondFactor:Database - UPDATED signature counter.');
+            \SimpleSAML\Logger::debug('webauthn:Database - UPDATED signature counter.');
         } else {
             throw new Exception("Database execution did not work.");
         }
@@ -287,7 +278,7 @@ class Database extends \SimpleSAML\Module\fido2SecondFactor\Store {
         $ret = [];
 
         $st = $this->execute(
-                'SELECT credentialId, credential, signCounter, friendlyName FROM fido2SecondFactor WHERE user_id = ?',
+                'SELECT credentialId, credential, signCounter, friendlyName FROM credentials WHERE user_id = ?',
                 [$userId]
         );
 

@@ -12,7 +12,7 @@ if (!array_key_exists('StateId', $_REQUEST)) {
 }
 
 $id = $_REQUEST['StateId'];
-$state = \SimpleSAML\Auth\State::loadState($id, 'fido2SecondFactor:request');
+$state = \SimpleSAML\Auth\State::loadState($id, 'webauthn:request');
 
 if ($state['FIDO2AuthSuccessful'] === false) {
     throw new Exception("Attempt to access the token management page unauthenticated.");
@@ -25,7 +25,7 @@ switch ($_POST['submit']) {
         if ($state['FIDO2AuthSuccessful'] == $_POST['credId']) {
             throw new Exception("Attempt to delete the currently used credential despite UI preventing this.");
         }
-        $store = $state['fido2SecondFactor:store'];
+        $store = $state['webauthn:store'];
         $store->deleteTokenData($_POST['credId']);
         \SimpleSAML\Auth\ProcessingChain::resumeProcessing($state);
         break;

@@ -1,6 +1,6 @@
 <?php
 
-namespace SimpleSAML\Module\fido2SecondFactor\FIDO2SecondFactor;
+namespace SimpleSAML\Module\webauthn\WebAuthn;
 
 use Cose\Key\Ec2Key;
 
@@ -15,7 +15,7 @@ include_once 'AAGUID.php';
  * @author Stefan Winter <stefan.winter@restena.lu>
  * @package SimpleSAMLphp
  */
-class FIDO2RegistrationEvent extends FIDO2AbstractEvent {
+class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
 
     /**
      * Public key algorithm supported. This is -7 - ECDSA with curve P-256
@@ -88,7 +88,7 @@ class FIDO2RegistrationEvent extends FIDO2AbstractEvent {
                  */
                 if (count($attestationArray['attStmt']) == 0) {
                     $this->pass("Attestation format and statement as expected, and no attestation authorities to retrieve.");
-                    $this->AAGUIDAssurance = FIDO2RegistrationEvent::AAGUID_ASSURANCE_LEVEL_NONE;
+                    $this->AAGUIDAssurance = WebAuthnRegistrationEvent::AAGUID_ASSURANCE_LEVEL_NONE;
                 } else {
                     $this->fail("Non-empty attestation authorities not implemented, can't go on.");
                 }
@@ -115,12 +115,12 @@ class FIDO2RegistrationEvent extends FIDO2AbstractEvent {
                                 ) {
                             $this->fail("Attestation certificate properties are no good.");
                         }
-                        if (isset(AAGUID_DICTIONARY[strtolower($this->AAGUID)])) {
-                            if ($certProps['subject']['O'] != AAGUID_DICTIONARY[strtolower($this->AAGUID)]['O'] ||
-                                $certProps['subject']['C'] != AAGUID_DICTIONARY[strtolower($this->AAGUID)]['C']) {
+                        if (isset(AAGUID::AAGUID_DICTIONARY[strtolower($this->AAGUID)])) {
+                            if ($certProps['subject']['O'] != AAGUID::AAGUID_DICTIONARY[strtolower($this->AAGUID)]['O'] ||
+                                $certProps['subject']['C'] != AAGUID::AAGUID_DICTIONARY[strtolower($this->AAGUID)]['C']) {
                                 $this->fail("AAGUID does not match vendor data.");
                             }
-                            if (AAGUID_DICTIONARY[strtolower($this->AAGUID)]['multi'] === TRUE) { // need to check the OID
+                            if (AAGUID::AAGUID_DICTIONARY[strtolower($this->AAGUID)]['multi'] === TRUE) { // need to check the OID
                                 if (!isset($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4'])) {
                                     $this->fail("This vendor uses one cert for multiple authenticator model attestations, but lacks the AAGUID OID.");
                                 }
@@ -131,12 +131,12 @@ class FIDO2RegistrationEvent extends FIDO2AbstractEvent {
                                 }
                             }
                             // we would need to verify the attestation certificate against a known-good root CA certificate to get more than basic
-                            $this->AAGUIDAssurance = FIDO2RegistrationEvent::AAGUID_ASSURANCE_LEVEL_BASIC;
+                            $this->AAGUIDAssurance = WebAuthnRegistrationEvent::AAGUID_ASSURANCE_LEVEL_BASIC;
                         } else {
                             $this->warn("Unknown authenticator model found: ".$this->AAGUID.".");
                             // unable to verify all cert properties, so this is not enough for BASIC.
                             // but it's our own fault, we should add the device to our DB.
-                            $this->AAGUIDAssurance = FIDO2RegistrationEvent::AAGUID_ASSURANCE_LEVEL_SELF;
+                            $this->AAGUIDAssurance = WebAuthnRegistrationEvent::AAGUID_ASSURANCE_LEVEL_SELF;
                         }
                         $this->pass("x5c attestation passed.");
                     } else {
@@ -149,7 +149,7 @@ class FIDO2RegistrationEvent extends FIDO2AbstractEvent {
                     break;
                 }
                 // if we are still here, we are in the "self" type.
-                if ($stmtDecoded['alg'] != FIDO2RegistrationEvent::PK_ALGORITHM) {
+                if ($stmtDecoded['alg'] != WebAuthnRegistrationEvent::PK_ALGORITHM) {
                     $this->fail("Unexpected algorithm type in packed basic attestation: " . $stmtDecoded['alg'] . ".");
                 }
                 $keyObject = new Ec2Key($this->cborDecode(hex2bin($this->credential)));
@@ -191,10 +191,10 @@ class FIDO2RegistrationEvent extends FIDO2AbstractEvent {
         $this->debugBuffer .= "Length Raw = " . bin2hex($credIdLenBytes) . "<br/>";
         $this->debugBuffer .= "Credential ID Length (decimal) = " . $credIdLen . "<br/>";
         $this->debugBuffer .= "Credential ID (hex) = " . bin2hex($credId) . "<br/>";
-        if (bin2hex(FIDO2AbstractEvent::base64url_decode($responseId)) == bin2hex($credId)) {
+        if (bin2hex(WebAuthnAbstractEvent::base64url_decode($responseId)) == bin2hex($credId)) {
             $this->pass("Credential IDs in authenticator response and in attestation data match.");
         } else {
-            $this->fail("Mismatch of credentialId (".bin2hex($credId).") vs. response ID (".bin2hex(FIDO2AbstractEvent::base64url_decode($responseId)).").");
+            $this->fail("Mismatch of credentialId (".bin2hex($credId).") vs. response ID (".bin2hex(WebAuthnAbstractEvent::base64url_decode($responseId)).").");
         }
         // so far so good. Now extract the actual public key from its COSE 
         // encoding.
@@ -209,7 +209,7 @@ class FIDO2RegistrationEvent extends FIDO2AbstractEvent {
         /**
          * STEP 13 of the validation procedure in § 7.1 of the spec: is the algorithm the expected one?
          */
-        if ($arrayPK['3'] == FIDO2RegistrationEvent::PK_ALGORITHM) { // we requested -7, so want to see it here
+        if ($arrayPK['3'] == WebAuthnRegistrationEvent::PK_ALGORITHM) { // we requested -7, so want to see it here
             $this->pass("Public Key Algorithm is the expected one (-7, ECDSA).");
         } else {
             $this->fail("Public Key Algorithm mismatch!");

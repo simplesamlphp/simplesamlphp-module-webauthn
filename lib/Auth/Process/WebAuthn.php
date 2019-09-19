@@ -1,6 +1,6 @@
 <?php
 
-namespace SimpleSAML\Module\fido2SecondFactor\Auth\Process;
+namespace SimpleSAML\Module\webauthn\Auth\Process;
 
 /**
  * FIDO2/WebAuthn Authentication Processing filter
@@ -15,12 +15,12 @@ use SimpleSAML\Logger;
 use SimpleSAML\Module;
 use SimpleSAML\Utils;
 
-class FIDO2SecondFactor extends \SimpleSAML\Auth\ProcessingFilter {
+class WebAuthn extends \SimpleSAML\Auth\ProcessingFilter {
 
     /**
      * backend storage configuration. Required.
      *
-     * @var \SimpleSAML\Module\fido2SecondFactor\Store
+     * @var \SimpleSAML\Module\webauthn\Store
      */
     private $store;
 
@@ -71,10 +71,10 @@ class FIDO2SecondFactor extends \SimpleSAML\Auth\ProcessingFilter {
 
 
         try {
-            $this->store = \SimpleSAML\Module\fido2SecondFactor\Store::parseStoreConfig($config['store']);
+            $this->store = \SimpleSAML\Module\webauthn\Store::parseStoreConfig($config['store']);
         } catch (\Exception $e) {
             Logger::error(
-                    'fido2SecondFactor: Could not create storage: ' .
+                    'webauthn: Could not create storage: ' .
                     $e->getMessage()
             );
         }
@@ -88,13 +88,13 @@ class FIDO2SecondFactor extends \SimpleSAML\Auth\ProcessingFilter {
         if (array_key_exists('attrib_username', $config)) {
             $this->usernameAttrib = $config['attrib_username'];
         } else {
-            Logger::error('fido2SecondFactor: it is required to set attrib_username in config.');
+            Logger::error('webauthn: it is required to set attrib_username in config.');
         }
 
         if (array_key_exists('attrib_displayname', $config)) {
             $this->displaynameAttrib = $config['attrib_displayname'];
         } else {
-            Logger::error('fido2SecondFactor: it is required to set attrib_displayname in config.');
+            Logger::error('webauthn: it is required to set attrib_displayname in config.');
         }
         
         if (array_key_exists('request_tokenmodel', $config)) {
@@ -136,8 +136,8 @@ class FIDO2SecondFactor extends \SimpleSAML\Auth\ProcessingFilter {
         }
 
         $state['requestTokenModel'] = $this->requestTokenModel;
-        $state['fido2SecondFactor:store'] = $this->store;
-        Logger::debug('fido2SecondFactor: userid: ' . $state['Attributes'][$this->usernameAttrib][0]);
+        $state['webauthn:store'] = $this->store;
+        Logger::debug('webauthn: userid: ' . $state['Attributes'][$this->usernameAttrib][0]);
 
         if ($this->store->is2FAEnabled($state['Attributes'][$this->usernameAttrib][0], $this->defaultEnabled) === false) {
             // nothing to be done here, end authprocfilter processing
@@ -153,8 +153,8 @@ class FIDO2SecondFactor extends \SimpleSAML\Auth\ProcessingFilter {
         $state['FIDO2AuthSuccessful'] = false;
 
         // Save state and redirect
-        $id = \SimpleSAML\Auth\State::saveState($state, 'fido2SecondFactor:request');
-        $url = Module::getModuleURL('fido2SecondFactor/fido2.php');
+        $id = \SimpleSAML\Auth\State::saveState($state, 'webauthn:request');
+        $url = Module::getModuleURL('webauthn/webauthn.php');
         Utils\HTTP::redirectTrustedURL($url, ['StateId' => $id]);
     }
 

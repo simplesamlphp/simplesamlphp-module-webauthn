@@ -1,6 +1,6 @@
 <?php
 
-namespace SimpleSAML\Module\fido2SecondFactor\FIDO2SecondFactor;
+namespace SimpleSAML\Module\webauthn\WebAuthn;
 
 use Cose\Key\Ec2Key;
 
@@ -13,7 +13,7 @@ use Cose\Key\Ec2Key;
  * @author Stefan Winter <stefan.winter@restena.lu>
  * @package SimpleSAMLphp
  */
-class FIDO2AuthenticationEvent extends FIDO2AbstractEvent {
+class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent {
 
     /**
      * Initialize the event object.

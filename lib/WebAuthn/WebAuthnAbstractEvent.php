@@ -1,6 +1,6 @@
 <?php
 
-namespace SimpleSAML\Module\fido2SecondFactor\FIDO2SecondFactor;
+namespace SimpleSAML\Module\webauthn\WebAuthn;
 
 use CBOR\Decoder;
 use CBOR\OtherObject;
@@ -80,7 +80,7 @@ include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/web-auth/cos
  * @author Stefan Winter <stefan.winter@restena.lu>
  * @package SimpleSAMLphp
  */
-abstract class FIDO2AbstractEvent {
+abstract class WebAuthnAbstractEvent {
 
     /**
      * Scope of the FIDO2 attestation. Can only be in the own domain.
@@ -245,7 +245,7 @@ abstract class FIDO2AbstractEvent {
          * §7.1 STEP 5 : check if incoming challenge matches issued challenge
          * §7.2 STEP 9 : check if incoming challenge matches issued challenge
          */
-        if ($this->challenge == bin2hex(FIDO2AbstractEvent::base64url_decode($clientData['challenge']))) {
+        if ($this->challenge == bin2hex(WebAuthnAbstractEvent::base64url_decode($clientData['challenge']))) {
             $this->pass("Challenge matches");
         } else {
             $this->fail("Challenge does not match");

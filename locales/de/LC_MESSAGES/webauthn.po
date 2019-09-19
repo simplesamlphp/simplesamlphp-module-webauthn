@@ -15,41 +15,41 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
 
-msgid "{fido2SecondFactor:fido2SecondFactor:heading1}"
+msgid "{webauthn:webauthn:heading1}"
 msgstr "Zwei-Faktor-Authentifizierung"
 
-msgid "{fido2SecondFactor:fido2SecondFactor:page_title}"
+msgid "{webauthn:webauthn:page_title}"
 msgstr "Zwei-Faktor-Authentifizierung mit FIDO2"
 
-msgid "{fido2SecondFactor:fido2SecondFactor:accountEnabled}"
+msgid "{webauthn:webauthn:accountEnabled}"
 msgstr "Für Ihr Benutzerkonto ist der Zugang nur mit einem FIDO2/WebAuthn Schlüssel möglich."
 
-msgid "{fido2SecondFactor:fido2SecondFactor:tokenList}"
+msgid "{webauthn:webauthn:tokenList}"
 msgstr "Bei Ihrem Benutzerkonto sind die folgenden Schlüssel registriert:"
 
-msgid "{fido2SecondFactor:fido2SecondFactor:newTokenButton}"
+msgid "{webauthn:webauthn:newTokenButton}"
 msgstr "Neuen Schlüssel registrieren"
 
-msgid "{fido2SecondFactor:fido2SecondFactor:newTokenName}"
+msgid "{webauthn:webauthn:newTokenName}"
 msgstr "Name für den neuen Schlüssel:"
 
-msgid "{fido2SecondFactor:fido2SecondFactor:newTokenDefaultName}"
+msgid "{webauthn:webauthn:newTokenDefaultName}"
 msgstr "Schlüssel vom"
 
-msgid "{fido2SecondFactor:fido2SecondFactor:authTokenButton}"
+msgid "{webauthn:webauthn:authTokenButton}"
 msgstr "Authentifizieren"
 
-msgid "{fido2SecondFactor:fido2SecondFactor:wantsAdd}"
+msgid "{webauthn:webauthn:wantsAdd}"
 msgstr "Nach der Anmeldung möchte ich einen Schlüssel hinzufügen."
 
-msgid "{fido2SecondFactor:fido2SecondFactor:wantsModification}"
+msgid "{webauthn:webauthn:wantsModification}"
 msgstr "Nach der Anmeldung möchte ich Schlüssel hinzufügen oder löschen."
 
-msgid "{fido2SecondFactor:fido2SecondFactor:noChange}"
+msgid "{webauthn:webauthn:noChange}"
 msgstr "Keine Änderungen durchführen."
 
-msgid "{fido2SecondFactor:fido2SecondFactor:removePrefix}"
+msgid "{webauthn:webauthn:removePrefix}"
 msgstr "Löschen von"
 
-msgid "{fido2SecondFactor:fido2SecondFactor:currentToken}"
+msgid "{webauthn:webauthn:currentToken}"
 msgstr "(mit diesem Schlüssel sind Sie angemeldet)"

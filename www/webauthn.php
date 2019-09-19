@@ -18,10 +18,10 @@ if (!array_key_exists('StateId', $_REQUEST)) {
 }
 
 $id = $_REQUEST['StateId'];
-$state = \SimpleSAML\Auth\State::loadState($id, 'fido2SecondFactor:request');
+$state = \SimpleSAML\Auth\State::loadState($id, 'webauthn:request');
 
 // Make, populate and layout consent form
-$t = new \SimpleSAML\XHTML\Template($globalConfig, 'fido2SecondFactor:fido2.php');
+$t = new \SimpleSAML\XHTML\Template($globalConfig, 'webauthn:webauthn.php');
 $translator = $t->getTranslator();
 $t->data['UserID'] = $state['FIDO2Username'];
 $t->data['FIDO2Tokens'] = $state['FIDO2Tokens'];
@@ -73,8 +73,8 @@ foreach ($username as $oneChar) {
 $t->data['FIDO2AuthSuccessful'] = $state['FIDO2AuthSuccessful'];
 $t->data['regForm'] = "";
 if (count($state['FIDO2Tokens']) == 0 || ($state['FIDO2WantsRegister'] === true && $state['FIDO2AuthSuccessful'] !== false)) {
-    $t->data['regURL'] = \SimpleSAML\Module::getModuleURL('fido2SecondFactor/regprocess.php?StateId=' . urlencode($id));
-    $t->data['delURL'] = \SimpleSAML\Module::getModuleURL('fido2SecondFactor/managetoken.php?StateId=' . urlencode($id));
+    $t->data['regURL'] = \SimpleSAML\Module::getModuleURL('webauthn/regprocess.php?StateId=' . urlencode($id));
+    $t->data['delURL'] = \SimpleSAML\Module::getModuleURL('webauthn/managetoken.php?StateId=' . urlencode($id));
     $t->data['regForm'] = "navigator.credentials.create(publicKeyCredentialCreationOptions)
     .then((cred) => {
         console.log('NEW CREDENTIAL', cred);
@@ -113,7 +113,7 @@ var publicKeyCredentialCreationOptions = {
 
 $t->data['authForm'] = "";
 if (count($state['FIDO2Tokens']) > 0 && ($state['FIDO2WantsRegister'] !== true || $state['FIDO2AuthSuccessful'] === false )) {
-    $t->data['authURL'] = \SimpleSAML\Module::getModuleURL('fido2SecondFactor/authprocess.php?StateId=' . urlencode($id));
+    $t->data['authURL'] = \SimpleSAML\Module::getModuleURL('webauthn/authprocess.php?StateId=' . urlencode($id));
     $t->data['authForm'] = "navigator.credentials.get(publicKeyCredentialRequestOptions)
     .then((cred) => {
         console.log('NEW CREDENTIAL', cred);

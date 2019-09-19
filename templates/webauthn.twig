@@ -1,24 +1,24 @@
-{% set pagetitle = '{fido2SecondFactor:fido2SecondFactor:page_title}'|trans %}
+{% set pagetitle = '{webauthn:webauthn:page_title}'|trans %}
 {% extends "base.twig" %}
 
 {% block preload %}
-    <link rel="stylesheet" type="text/css" href="{{ asset }}assets/css/fido2SecondFactor.css" />
+    <link rel="stylesheet" type="text/css" href="{{ asset }}assets/css/webauthn.css" />
     <script>
         {{ JSCode|raw }}
     </script>
 {% endblock %}
 
 {% block content %}
-    <h1>{{ '{fido2SecondFactor:fido2SecondFactor:heading1}'|trans }}</h1>
-    <h2>{{ '{fido2SecondFactor:fido2SecondFactor:accountEnabled}'|trans }}</h2>
+    <h1>{{ '{webauthn:webauthn:heading1}'|trans }}</h1>
+    <h2>{{ '{webauthn:webauthn:accountEnabled}'|trans }}</h2>
     {% if FIDO2Tokens|length > 0 %}
-        <div id="currentTokens"><span id='tokencaption'>{{ '{fido2SecondFactor:fido2SecondFactor:tokenList}'|trans }}</span>
+        <div id="currentTokens"><span id='tokencaption'>{{ '{webauthn:webauthn:tokenList}'|trans }}</span>
             <ul>
                 {% for token in FIDO2Tokens %}
                     {%  if FIDO2AuthSuccessful == false or FIDO2AuthSuccessful != token.0 %}
                         <li class='othertoken'>{{ token.3|e }}</li>
                         {% else %}
-                        <li class='currenttoken'>{{ token.3|e }} {{ '{fido2SecondFactor:fido2SecondFactor:currentToken}'|trans }}</li>
+                        <li class='currenttoken'>{{ token.3|e }} {{ '{webauthn:webauthn:currentToken}'|trans }}</li>
                         {% endif %}
                     {% endfor %}
             </ul>
@@ -31,13 +31,13 @@
             <input type='hidden' id='attobj' name='attestation_object' value='mehrnix'/>
             <input type='hidden' id='type' name='type' value='something'/>
             <input type='hidden' id='operation' name='operation' value='REG'/>
-            <button type='button' onClick="{{ regForm|raw }}" onsubmit='false' >{{ '{fido2SecondFactor:fido2SecondFactor:newTokenButton}'|trans }}</button>
-            {{ '{fido2SecondFactor:fido2SecondFactor:newTokenName}'|trans }} <input 
+            <button type='button' onClick="{{ regForm|raw }}" onsubmit='false' >{{ '{webauthn:webauthn:newTokenButton}'|trans }}</button>
+            {{ '{webauthn:webauthn:newTokenName}'|trans }} <input 
                 type='text' 
                 id='tokenname' 
                 name='tokenname' 
                 size='40' 
-                value='{{ '{fido2SecondFactor:fido2SecondFactor:newTokenDefaultName}'|trans }} {{ "now"|date('Y-m-d', timezone="Europe/Luxembourg") }}' onkeydown="if (event.keyCode == 13)
+                value='{{ '{webauthn:webauthn:newTokenDefaultName}'|trans }} {{ "now"|date('Y-m-d', timezone="Europe/Luxembourg") }}' onkeydown="if (event.keyCode == 13)
                             return false;"/>
         </form>
         <div class='space'></div>
@@ -46,13 +46,13 @@
                 {%  if FIDO2AuthSuccessful != token.0 %}
                     <form class='deleteform' id='delete-{{ loop.index }}' method='POST' action='{{ delURL|raw }}'>
                         <input type='hidden' id='credId-{{ loop.index }}' name='credId' value='{{ token.0 }}'/>
-                        <button type='submit' id='submit-{{ loop.index }}' name='submit' value='DELETE'>{{ '{fido2SecondFactor:fido2SecondFactor:removePrefix}'|trans }} &quot;{{ token.3 }}&quot;</button>
+                        <button type='submit' id='submit-{{ loop.index }}' name='submit' value='DELETE'>{{ '{webauthn:webauthn:removePrefix}'|trans }} &quot;{{ token.3 }}&quot;</button>
                     </form>
                 {%  endif %}
             {%  endfor %}
             <div class='space'></div>
             <form id='nevermind' method='POST' action='{{ delURL|raw }}'>
-                <button type='submit' id='submit-nevermind' name='submit' value='NEVERMIND'>{{ '{fido2SecondFactor:fido2SecondFactor:noChange}'|trans }}</button>
+                <button type='submit' id='submit-nevermind' name='submit' value='NEVERMIND'>{{ '{webauthn:webauthn:noChange}'|trans }}</button>
             </form>
         {%  endif %}
     {% endif %}
@@ -67,11 +67,11 @@
             <input type='hidden' id='type' name='type' value='something'/>
             <input type='hidden' id='operation' name='operation' value='AUTH'/>
             <input type='checkbox' id='credentialChange' name='credentialChange'>{% if FIDO2Tokens|length < 2 %}
-            {{ '{fido2SecondFactor:fido2SecondFactor:wantsAdd}'|trans }}
+            {{ '{webauthn:webauthn:wantsAdd}'|trans }}
         {%  else  %}
-            {{ '{fido2SecondFactor:fido2SecondFactor:wantsModification}'|trans }}
+            {{ '{webauthn:webauthn:wantsModification}'|trans }}
         {%  endif %}</input><br/>
-        <button type='button' onClick="{{ authForm|raw }}" onsubmit='false' >{{ '{fido2SecondFactor:fido2SecondFactor:authTokenButton}'|trans }}</button>
+        <button type='button' onClick="{{ authForm|raw }}" onsubmit='false' >{{ '{webauthn:webauthn:authTokenButton}'|trans }}</button>
     </form>
     {% endif %}
         {% endblock %}

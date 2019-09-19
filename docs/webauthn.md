@@ -1,4 +1,4 @@
-FIDO2 as Second Factor module
+WebAuthn as Second Factor module
 ==============
 
 <!-- {{TOC}} -->
@@ -8,18 +8,18 @@ The module is implemented as an Authentication Processing Filter. That
 means it can be configured in the global config.php file or the SP remote or 
 IdP hosted metadata.
 
-How to setup the fido2SecondFactor module
+How to setup the webauthn module
 -----------------------------------------
 You need to enable and configure the module's authprocfilter at a priority level
 so that it takes place AFTER the first-factor authentication. E.g. at 100:
 
 100 => 
-    ['class' => 'fido2SecondFactor:FIDO2SecondFactor',
+    ['class' => 'webauthn:WebAuthn',
 
     /* required configuration parameters */
 
         'store' => [
-            'fido2SecondFactor:Database',
+            'webauthn:Database',
             'dsn' => 'mysql:host=db.example.org;dbname=fido2',
             'username' => 'simplesaml',
             'password' => 'sdfsdf',
@@ -72,26 +72,30 @@ You first need to setup the database.
 
 Here is the initialization SQL script:
 
-	CREATE TABLE fido2SecondFactor (
-		creation_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-		user_id VARCHAR(80) NOT NULL,
-		credentialId VARCHAR(800) NOT NULL,
-		credential MEDIUMBLOB NOT NULL,
-		signCounter INT NOT NULL,
-		friendlyName VARCHAR(100) DEFAULT "Unnamed Token",
-		UNIQUE (user_id,credentialId)
-	);
+CREATE TABLE credentials (
+    creation_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    user_id VARCHAR(80) NOT NULL,
+    credentialId VARCHAR(800) NOT NULL,
+    credential MEDIUMBLOB NOT NULL,
+    signCounter INT NOT NULL,
+    friendlyName VARCHAR(100) DEFAULT "Unnamed Token",
+    UNIQUE (user_id,credentialId)
+);
 
-	CREATE TABLE fido2UserStatus (
-                user_id VARCHAR(80) NOT NULL,
-		fido2Status ENUM("FIDO2Disabled","FIDO2Enabled") NOT NULL DEFAULT "FIDO2Disabled",
-		UNIQUE (user_id)
-	);
+GRANT SELECT,INSERT,UPDATE,DELETE ON ...credentials TO '...dbuser'@'1.2.3.4' IDENTIFIED BY '...dbpass';
 
-The `fido2SecondFactor:Database` backend storage has the following options:
+CREATE TABLE userstatus (
+    user_id VARCHAR(80) NOT NULL,
+    fido2Status ENUM("FIDO2Disabled","FIDO2Enabled") NOT NULL DEFAULT "FIDO2Disabled",
+    UNIQUE (user_id)
+);
+
+GRANT SELECT ON ...userstatus TO '...dbuser'@'1.2.3.4' IDENTIFIED BY '...dbpass';
+
+The `webauthn:Database` backend storage has the following options:
 
 `class`
-:   Must be set to `fido2SecondFactor:Database`.
+:   Must be set to `webauthn:Database`.
 
 `dsn`
 :   Data Source Name must comply to the syntax for the PHP PDO layer.
@@ -108,9 +112,9 @@ The `fido2SecondFactor:Database` backend storage has the following options:
 Example config using PostgreSQL database:
 
     100 => array(
-        'class'	=> 'fido2SecondFactor:FIDO2SecondFactor', 
+        'class'	=> 'webauthn:WebAuthn', 
         'store'	=> array(
-            'fido2SecondFactor:Database', 
+            'webauthn:Database', 
             'dsn' => 'pgsql:host=sql.example.org;dbname=fido2',
             'username' => 'simplesaml',
             'password' => 'sdfsdf',
@@ -120,9 +124,9 @@ Example config using PostgreSQL database:
 Example config using MySQL database:
 
     100 => array(
-        'class'	=> 'fido2SecondFactor:FIDO2SecondFactor', 
+        'class'	=> 'webauthn:WebAuthn', 
         'store'	=> array(
-            'fido2SecondFactor:Database', 
+            'webauthn:Database', 
             'dsn' => 'mysql:host=db.example.org;dbname=fido2',
             'username' => 'simplesaml',
             'password' => 'sdfsdf',
@@ -139,7 +143,7 @@ Options
 :    The following will interactively ask the user if he is willing to share manufacturer and model information during credential registration. The user can decline, in which case registration will still succeed but vendor and model will be logged as "unknown model [unknown vendor]". When not requesting this, there is one less user interaction during the registration process; and no model information will be saved. Defaults to "false".
     
 `default_enable`
-:    Should FIDO2 be enabled by default for all users? If not, users need to be white-listed in the database - other users simply pass through the filter without being subjected to 2FA. Defaults to "disabled by default" === false    
+:    Should WebAuthn be enabled by default for all users? If not, users need to be white-listed in the database - other users simply pass through the filter without being subjected to 2FA. Defaults to "disabled by default" === false    
 
 Device model detection
 ----------------------
@@ -166,14 +170,14 @@ I contacted FIDO Alliance to ask about the lack of complete information in their
 MDS. Purportedly, listing in the MDS has chances of becoming mandatory in a
 future FIDO Certification. Until then, there is no good solution to the problem.
 
-Disabling FIDO2 Second Factor
------------------------------
+Disabling WebAuthn
+------------------
 You can disable the module entirely by not listing it as an authprocfilter.
 
 You can disable the module by default by setting default_enable = false. You can
-then enable FIDO2 second-factor authentication for individual users by adding
-them with status "FIDO2Enabled" to the fido2UserStatus table.
+then enable WebAuthn second-factor authentication for individual users by adding
+them with status "FIDO2Enabled" to the `userstatus` table.
 
-If the module is enabled by default, you can selectively disable FIDO second-
-factor authentication by adding the username with status FIDO2Disabled to the
-fido2UserStatus table.
+If the module is enabled by default, you can selectively disable WebAuthn 
+second-factor authentication by adding the username with status FIDO2Disabled to
+the `userstatus` table.

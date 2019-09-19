@@ -15,41 +15,41 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
 
-msgid "{fido2SecondFactor:fido2SecondFactor:heading1}"
+msgid "{webauthn:webauthn:heading1}"
 msgstr "Two Factor Authentication"
 
-msgid "{fido2SecondFactor:fido2SecondFactor:page_title}"
+msgid "{webauthn:webauthn:page_title}"
 msgstr "Two factor authentication with FIDO2"
 
-msgid "{fido2SecondFactor:fido2SecondFactor:accountEnabled}"
+msgid "{webauthn:webauthn:accountEnabled}"
 msgstr "For your account, authentication with a FIDO2/WebAuthn token is required."
 
-msgid "{fido2SecondFactor:fido2SecondFactor:tokenList}"
+msgid "{webauthn:webauthn:tokenList}"
 msgstr "The following tokens are associated with your account:"
 
-msgid "{fido2SecondFactor:fido2SecondFactor:newTokenButton}"
+msgid "{webauthn:webauthn:newTokenButton}"
 msgstr "Enroll new token"
 
-msgid "{fido2SecondFactor:fido2SecondFactor:newTokenName}"
+msgid "{webauthn:webauthn:newTokenName}"
 msgstr "Name for the new token:"
 
-msgid "{fido2SecondFactor:fido2SecondFactor:newTokenDefaultName}"
+msgid "{webauthn:webauthn:newTokenDefaultName}"
 msgstr "Token registered at"
 
-msgid "{fido2SecondFactor:fido2SecondFactor:authTokenButton}"
+msgid "{webauthn:webauthn:authTokenButton}"
 msgstr "Authenticate"
 
-msgid "{fido2SecondFactor:fido2SecondFactor:wantsAdd}"
+msgid "{webauthn:webauthn:wantsAdd}"
 msgstr "After authenticating, I want to register a new token."
 
-msgid "{fido2SecondFactor:fido2SecondFactor:wantsModification}"
+msgid "{webauthn:webauthn:wantsModification}"
 msgstr "After authenticating, I want to register a new token or delete an existing one."
 
-msgid "{fido2SecondFactor:fido2SecondFactor:noChange}"
+msgid "{webauthn:webauthn:noChange}"
 msgstr "Do not change anything."
 
-msgid "{fido2SecondFactor:fido2SecondFactor:removePrefix}"
+msgid "{webauthn:webauthn:removePrefix}"
 msgstr "Remove"
 
-msgid "{fido2SecondFactor:fido2SecondFactor:currentToken}"
+msgid "{webauthn:webauthn:currentToken}"
 msgstr "(you authenticated with this token)"
