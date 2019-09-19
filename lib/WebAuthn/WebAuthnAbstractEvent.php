@@ -7,44 +7,6 @@ use CBOR\OtherObject;
 use CBOR\Tag;
 use CBOR\StringStream;
 
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Stream.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "StringStream.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "CBORObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "AbstractCBORObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "OtherObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "TagObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "MapObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "LengthCalculator.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "TextStringObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "MapItem.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "ByteStringObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "ByteStringWithChunkObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "ListObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "UnsignedIntegerObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "SignedIntegerObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "OtherObject/SimpleObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "OtherObject/FalseObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "OtherObject/TrueObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "OtherObject/NullObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "OtherObject/UndefinedObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "OtherObject/HalfPrecisionFloatObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "OtherObject/SinglePrecisionFloatObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "OtherObject/DoublePrecisionFloatObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "OtherObject/OtherObjectManager.php";
-
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Tag/EpochTag.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Tag/TimestampTag.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Tag/PositiveBigIntegerTag.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Tag/NegativeBigIntegerTag.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Tag/DecimalFractionTag.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Tag/BigFloatTag.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Tag/Base64UrlEncodingTag.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Tag/Base64EncodingTag.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Tag/Base16EncodingTag.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Tag/TagObjectManager.php";
-
-include dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/Spomky-labs/cbor-php/src/" . "Decoder.php";
-
 use FG\ASN1\ExplicitlyTaggedObject;
 use FG\ASN1\Universal\BitString;
 use FG\ASN1\Universal\Integer;
@@ -52,24 +14,12 @@ use FG\ASN1\Universal\ObjectIdentifier;
 use FG\ASN1\Universal\OctetString;
 use FG\ASN1\Universal\Sequence;
 
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/Utility/" . "BigInteger.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/Utility/" . "BigIntegerGmp.php";
-
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/" . "Parsable.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/" . "ASNObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/" . "ExplicitlyTaggedObject.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/" . "Construct.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/" . "Identifier.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/" . "Base128.php";
-
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/Universal/" . "OctetString.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/Universal/" . "BitString.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/Universal/" . "Integer.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/Universal/" . "ObjectIdentifier.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/fgrosse/phpasn1/lib/ASN1/Universal/" . "Sequence.php";
-
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/web-auth/cose-lib/src/Key/" . "Key.php";
-include_once dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/web-auth/cose-lib/src/Key/" . "Ec2Key.php";
+/**
+ * not part of the repo, and can be deleted/ignored - I deploy this on a server
+ * where autoloading doesn't work properly, so there are some includes I have
+ * to do manually there.
+ */
+include_once "restena.php";
 
 /**
  * FIDO2/WebAuthn Authentication Processing filter
