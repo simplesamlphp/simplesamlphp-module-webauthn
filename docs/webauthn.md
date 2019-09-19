@@ -150,8 +150,12 @@ User Experience / Workflow
 Users for which WebAuthn is enabled cannot continue without a FIDO2 token. The
 UI is different depending on the number of tokens the user has registered:
 
-- User has 0 tokens: UI requires the user to register a token. After 
-  registration, the authprocfilter is done (user continues to SP)
+- User has 0 tokens: UI requires the user to register a token. The user can 
+  choose a convenient name for the token to recognise it later. If 
+  request_tokenmodel is set, the name will be appended with the token model and
+  vendor. 
+  After successful registration, the authprocfilter is done (user continues to 
+  SP)
 - User has 1 token: UI requires the user to authenticate. After the 
   authentication, user can optionally enroll another token.
 - User has 2+ tokens: UI requires the user to authenticate. After the 
