@@ -181,3 +181,38 @@ them with status "FIDO2Enabled" to the `userstatus` table.
 If the module is enabled by default, you can selectively disable WebAuthn 
 second-factor authentication by adding the username with status FIDO2Disabled to
 the `userstatus` table.
+
+Limitations / Design Decisions
+------------------------------
+This implementation does not validate token bindings, if sent by the 
+authenticator (§7.1 step 7 skips token binding information validation if present
+during registration). That is because Yubikeys do not support token binding and 
+the corresponding functionality thus has no test case.
+
+This implementation does not distinguish between User Presence (user has proven
+to be near the authenticator) and User Verification (user has proven to be near
+the authenticator AND to have unlocked the authenticator with a personal asset
+such as PIN or fingerprint). Both variants are considered sufficient to 
+authenticate successfully (§7.1 steps 11 and 12 are joined into one condition)
+
+The implementation requests ECDSA keys (algorithm -7) because all Yubikeys 
+support that. It is trivial to add RSA support if there are keys which don't.
+
+The implementation does not request any client extensions. The specification
+gives implementations a policy choice on what to do if a client sends extensions
+anyway: this implementation chose to then fail the registration.
+
+The implementation supports the attestation formats "none" and "packed / x5c". 
+Other attestation formats lead to a registration failure.
+
+For the attation type "packed / x5c", 
+* the optional OCSP checks are not performed (this is explicitly permitted in 
+  the spec due to other means of revocation checking in the FIDO MDS).
+* due to the lack of any externally provided knowledge about CAs(???) all
+  attestations are classified as "Basic" (i.e. no "AttCA" level)
+
+Given the sorry state of completeness of the FIDO MDS, only very few attestation
+root CAs are known and validation as per §7.1 Step 18 would often fail. That
+step is therefore ignored. All the "None", "Self" and "Basic" attestation levels
+are considered acceptable; meaning §7.1 Step 21 does not apply.
+
