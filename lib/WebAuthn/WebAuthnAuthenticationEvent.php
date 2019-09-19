@@ -46,6 +46,9 @@ class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent {
         if ($keyResource === FALSE) {
             $this->fail("Unable to construct public key resource from PEM.");
         }
+        /**
+         * §7.2 STEP 17: validate signature
+         */
         $sigcheck = openssl_verify($sigData, $signature, $keyResource, OPENSSL_ALGO_SHA256);
         switch ($sigcheck) {
         case 1: 

@@ -220,7 +220,8 @@ abstract class WebAuthnAbstractEvent {
             $this->warn("Validation of the present token binding data not implemented, continuing without!");
         }
         /**
-         * STEP 14 (clientData part) of the validation procedure in § 7.1 of the spec: we did not request any client extensions, so none are allowed to be present
+         * §7.1 STEP 14 (clientData part): we did not request any client extensions, and do not allow any to be present
+         * §7.2 STEP 15 (clientData part): we did not request any client extensions, and do not allow any to be present
          */
         if (!isset($clientData['clientExtensions']) || count($clientData['clientExtensions']) == 0) {
             $this->pass("As expected, no client extensions.");
@@ -229,6 +230,7 @@ abstract class WebAuthnAbstractEvent {
         }
         /**
          * §7.1 STEP 8 : SHA-256 hashing the clientData
+         * §7.2 STEP 16: SHA-256 hashing the clientData
          */
         return hash("sha256", $clientDataJSON, true);
     }

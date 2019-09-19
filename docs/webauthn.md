@@ -185,9 +185,9 @@ the `userstatus` table.
 Limitations / Design Decisions
 ------------------------------
 This implementation does not validate token bindings, if sent by the 
-authenticator (§7.1 step 7 skips token binding information validation if present
-during registration). That is because Yubikeys do not support token binding and 
-the corresponding functionality thus has no test case.
+authenticator (§7.1 Step 7 / §7.2 Step 11 skip token binding information 
+validation if present). That is because Yubikeys do not support token binding 
+and the corresponding functionality thus has no test case.
 
 This implementation does not distinguish between User Presence (user has proven
 to be near the authenticator) and User Verification (user has proven to be near
@@ -200,7 +200,7 @@ support that. It is trivial to add RSA support if there are keys which don't.
 
 The implementation does not request any client extensions. The specification
 gives implementations a policy choice on what to do if a client sends extensions
-anyway: this implementation chose to then fail the registration.
+anyway: this implementation chose to then fail the registration/authentication.
 
 The implementation supports the attestation formats "none" and "packed / x5c". 
 Other attestation formats lead to a registration failure.
@@ -216,3 +216,5 @@ root CAs are known and validation as per §7.1 Step 18 would often fail. That
 step is therefore ignored. All the "None", "Self" and "Basic" attestation levels
 are considered acceptable; meaning §7.1 Step 21 does not apply.
 
+If the implementation detects signs of physical object cloning (not incremented
+signature counter), it follows the policy of failing authentication.
