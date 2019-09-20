@@ -1,6 +1,8 @@
 <?php
 
-session_cache_limiter('nocache');
+if (session_status != PHP_SESSION_ACTIVE) {
+    session_cache_limiter('nocache');
+}
 $globalConfig = \SimpleSAML\Configuration::getInstance();
 
 \SimpleSAML\Logger::info('FIDO2 - Accessing WebAuthn enrollment validation');
