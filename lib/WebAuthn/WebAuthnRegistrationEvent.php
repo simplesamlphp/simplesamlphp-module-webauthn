@@ -205,7 +205,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
         /**
          * §8.2 Step 4 Bullet 2: verify signature
          */
-        if (openssl_verify($sigdata, $stmtDecoded['sig'], $keyResource) == 1) {
+        if (openssl_verify($sigdata, $stmtDecoded['sig'], $keyResource, OPENSSL_ALGO_SHA256) == 1) {
             $this->pass("Self-Attestation veried.");
             /**
              * §8.2 Step 4 Bullet 3: return Self level
