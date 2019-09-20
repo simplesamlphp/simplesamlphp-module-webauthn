@@ -228,8 +228,8 @@ The implementation does not request any client extensions. The specification
 gives implementations a policy choice on what to do if a client sends extensions
 anyway: this implementation chose to then fail the registration/authentication.
 
-The implementation supports the attestation formats "none" and "packed / x5c". 
-Other attestation formats lead to a registration failure.
+The implementation supports the attestation formats "none", "packed / x5c" and
+"packed / self". Other attestation formats lead to a registration failure.
 
 For the attation type "packed / x5c", 
 * the optional OCSP checks are not performed (this is explicitly permitted in 
