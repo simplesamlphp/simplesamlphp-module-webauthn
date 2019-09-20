@@ -17,7 +17,7 @@
     },
     "require": {
 	"simplesamlphp/simplesamlphp": "*",
-        "Spomky-labs/cbor-php": "*",
+        "spomky-labs/cbor-php": "*",
 	"web-auth/cose-lib": "*"
     },
     "require-dev": {
