@@ -75,7 +75,7 @@ Here is the initialization SQL script:
 CREATE TABLE credentials (
     creation_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     user_id VARCHAR(80) NOT NULL,
-    credentialId VARCHAR(800) NOT NULL,
+    credentialId VARCHAR(500) NOT NULL,
     credential MEDIUMBLOB NOT NULL,
     signCounter INT NOT NULL,
     friendlyName VARCHAR(100) DEFAULT "Unnamed Token",
