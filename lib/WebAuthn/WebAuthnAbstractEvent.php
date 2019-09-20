@@ -15,13 +15,6 @@ use FG\ASN1\Universal\OctetString;
 use FG\ASN1\Universal\Sequence;
 
 /**
- * not part of the repo, and can be deleted/ignored - I deploy this on a server
- * where autoloading doesn't work properly, so there are some includes I have
- * to do manually there.
- */
-include_once "restena.php";
-
-/**
  * FIDO2/WebAuthn Authentication Processing filter
  *
  * Filter for registering or authenticating with a FIDO2/WebAuthn token after
