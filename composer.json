@@ -1,5 +1,5 @@
 {
-    "name": "simplesamlphp/webauthn",
+    "name": "simplesamlphp/simplesamlphp-module-webauthn",
     "description": "A PHP implementation of a FIDO2 / WebAuthn authentication agent",
     "type": "project",
     "keywords": [ "idp", "fido2", "webauthn", "2fa" ],
