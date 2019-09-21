@@ -28,11 +28,13 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
 
     /**
      * the AAGUID of the newly registered authenticator
+     * @var string
      */
     public $AAGUID;
 
     /**
      * how sure are we about the AAGUID?
+     * @var int
      */
     public $AAGUIDAssurance;
 
@@ -70,6 +72,9 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
 
     /**
      * validate the incoming attestation data CBOR blob and return the embedded authData
+     * @param string $attestationData
+     * @param string $clientDataJSON
+     * @return void
      */
     private function validateAttestationData($attestationData, $clientDataJSON)
     {
@@ -103,6 +108,10 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         }
     }
 
+    /**
+     * @param array $attestationArray
+     * @return void
+     */
     private function validateAttestationFormatNone(array $attestationArray)
     {
         // § 8.7 of the spec
@@ -119,6 +128,11 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         }
     }
 
+    /**
+     * @param array $attestationArray
+     * @param string $clientDataJSON
+     * @return void
+     */
     private function validateAttestationFormatPacked(array $attestationArray, $clientDataJSON)
     {
         $stmtDecoded = $attestationArray['attStmt'];
@@ -225,6 +239,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * The registration contains the actual credential. This function parses it.
      * @param string $attData    the attestation data binary blob
      * @param string $responseId the response ID
+     * @return void
      */
     private function validateAttestedCredentialData($attData, $responseId)
     {

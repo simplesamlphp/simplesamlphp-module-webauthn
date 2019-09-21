@@ -40,6 +40,11 @@ class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent
         $this->validateSignature($authData . $this->clientDataHash, $signature);
     }
     
+    /**
+     * @param string $sigData
+     * @param string $signature
+     * @return void
+     */
     private function validateSignature($sigData, $signature)
     {
         $keyArray = $this->cborDecode(hex2bin($this->credential));

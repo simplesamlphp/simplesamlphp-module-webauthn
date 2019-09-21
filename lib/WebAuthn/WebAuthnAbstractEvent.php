@@ -34,42 +34,58 @@ abstract class WebAuthnAbstractEvent
 
     /**
      * The SHA256 hash of the clientDataJSON
+     *
+     * @var string
      */
     protected $clientDataHash;
 
     /**
      * The challenge that was used to trigger this event
+     *
+     * @var string
      */
     private $challenge;
 
     /**
      * Our IdP EntityId
+     *
+     * @var string
      */
     private $idpEntityId;
 
     /**
      * the authenticator's signature counter
+     *
+     * @var int
      */
     public $counter;
 
     /**
      * extensive debug information collection?
+     *
+     * @var bool
      */
     public $debugMode = false;
 
     /**
      * A string buffer to hold debug information in case we need it.
+     *
+     * @var string
      */
     public $debugBuffer = "";
 
     /**
      * A string buffer to hold raw validation data in case we want to look at it.
+     *
+     * @var string
      */
     public $validateBuffer = "";
 
     /**
      * the type of event requested. This is to be set in child class constructors
      * before calling the parent's.
+     *
+     * @var string
      */
     protected $eventType;
 
@@ -78,6 +94,8 @@ abstract class WebAuthnAbstractEvent
      * the one that gets used to authenticate)
      * 
      * To be set by the constructors of the child classes.
+     *
+     * @var string
      */
     public $credentialId;
 
@@ -86,6 +104,8 @@ abstract class WebAuthnAbstractEvent
      * registered, or the one that gets used to authenticate)
      *
      * To be set by the constructors of the child classes.
+     *
+     * @var string
      */
     public $credential;
 
@@ -344,11 +364,20 @@ abstract class WebAuthnAbstractEvent
         return $object->getNormalizedData(true);
     }
 
+    /**
+     * @param string $text
+     * @return void
+     */
     protected function warn($text)
     {
         $this->validateBuffer .= "<span style='background-color:yellow;'>WARN: $text</span><br/>";
     }
 
+    /**
+     * @param string $text
+     * @throws \Exception
+     * @return void
+     */
     protected function fail($text)
     {
         $this->validateBuffer .= "<span style='background-color:red;'>FAIL: $text</span><br/>";
@@ -359,11 +388,19 @@ abstract class WebAuthnAbstractEvent
         throw new \Exception($text);
     }
 
+    /**
+     * @param string $text
+     * @return void
+     */
     protected function pass($text)
     {
         $this->validateBuffer .= "<span style='background-color:green; color:white;'>PASS: $text</span><br/>";
     }
 
+    /**
+     * @param string $text
+     * @return void
+     */
     protected function ignore($text)
     {
         $this->validateBuffer .= "<span style='background-color:blue; color:white;'>IGNORE: $text</span><br/>";

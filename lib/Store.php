@@ -59,7 +59,7 @@ abstract class Store
      */
     abstract public function storeTokenData($userId, $credentialId, $credential, $signCounter, $friendlyName);
 
-        /**
+    /**
      * remove an existing credential from the database
      *
      * @param string $credentialId the credential
@@ -105,7 +105,7 @@ abstract class Store
      *
      * @param mixed $config The configuration.
      *
-     * @return \SimpleSAML\Module\consent\Store An object which implements the \SimpleSAML\Module\consent\Store class.
+     * @return \SimpleSAML\Module\webauthn\Store An object which implements the \SimpleSAML\Module\webauthn\Store class.
      *
      * @throws \Exception if the configuration is invalid.
      */
