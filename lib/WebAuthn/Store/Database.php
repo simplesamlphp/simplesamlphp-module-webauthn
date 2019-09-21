@@ -67,7 +67,7 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      *
      * @throws \Exception in case of a configuration error.
      */
-    public function __construct($config) {
+    public function __construct(array $config) {
         parent::__construct($config);
 
         if (!array_key_exists('dsn', $config)) {
@@ -304,9 +304,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      *
      * @return \PDOStatement|bool  The statement, or false if execution failed.
      */
-    private function execute($statement, $parameters) {
+    private function execute($statement, array $parameters) {
         assert(is_string($statement));
-        assert(is_array($parameters));
 
         $db = $this->getDB();
         if ($db === false) {
@@ -367,8 +366,7 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      *
      * @return string Error text.
      */
-    private static function formatError($error) {
-        assert(is_array($error));
+    private static function formatError(array $error) {
         assert(count($error) >= 3);
 
         return $error[0] . ' - ' . $error[2] . ' (' . $error[1] . ')';

@@ -19,9 +19,8 @@ abstract class Store
      *
      * @param array &$config The configuration for this storage handler.
      */
-    protected function __construct(&$config)
+    protected function __construct(array &$config)
     {
-        assert(is_array($config));
     }
 
     /**

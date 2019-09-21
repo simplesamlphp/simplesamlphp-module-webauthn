@@ -100,7 +100,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
         }
     }
 
-    private function validateAttestationFormatNone($attestationArray) {
+    private function validateAttestationFormatNone(array $attestationArray) {
         // § 8.7 of the spec
         /**
          * § 7.1 Step 16 && §8.7 Verification Procedure: stmt must be an empty array
@@ -115,7 +115,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
         }
     }
 
-    private function validateAttestationFormatPacked($attestationArray, $clientDataJSON) {
+    private function validateAttestationFormatPacked(array $attestationArray, $clientDataJSON) {
         $stmtDecoded = $attestationArray['attStmt'];
         $this->debugBuffer .= "AttStmt: " . print_r($stmtDecoded, true) . "<br/>";
         /**
