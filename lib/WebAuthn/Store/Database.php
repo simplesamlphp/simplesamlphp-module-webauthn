@@ -210,12 +210,12 @@ class Database extends \SimpleSAML\Module\webauthn\Store
      *
      * @return true
      */
-    public function storeTokenData(string $userId, string $credentialId, string $credential, string $signCounter, string $friendlyName) : bool
+    public function storeTokenData(string $userId, string $credentialId, string $credential, int $signCounter, string $friendlyName) : bool
     {
         $st = $this->execute(
                 'INSERT INTO credentials ' .
-                '(user_id, credentialId, credential, signCounter, friendlyName) VALUES (?,?,?,' . $signCounter . ',?)',
-                [$userId, $credentialId, $credential, $friendlyName]
+                '(user_id, credentialId, credential, signCounter, friendlyName) VALUES (?,?,?,?,?)',
+                [$userId, $credentialId, $credential, $signCounter, $friendlyName]
         );
 
         if ($st === false) {

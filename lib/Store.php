@@ -55,9 +55,9 @@ abstract class Store
      * @param int    $signCounter   The signature counter for this credential.
      * @param string $friendlyName  A user-supplied name for this token.
      *
-     * @return void
+     * @return bool
      */
-    abstract public function storeTokenData(string $userId, string $credentialId, string $credential, int $signCounter, string $friendlyName) : void;
+    abstract public function storeTokenData(string $userId, string $credentialId, string $credential, int $signCounter, string $friendlyName) : bool;
 
     /**
      * remove an existing credential from the database
