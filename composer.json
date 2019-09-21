@@ -21,6 +21,7 @@
 	"web-auth/cose-lib": "*"
     },
     "require-dev": {
-        "lcobucci/jwt": "^3.3"
+        "lcobucci/jwt": "^3.3",
+        "simplesamlphp/simplesamlphp-test-framework": "0.0.11"
     }
 }
