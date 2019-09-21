@@ -59,7 +59,7 @@ $store->storeTokenData($state['FIDO2Username'], $regObject->credentialId, $regOb
 // make sure $state gets the news, the token is to be displayed to the user on the next page
 $state['FIDO2Tokens'][] = [0 => $regObject->credentialId, 1 => $regObject->credential, 2 => $regObject->counter, 3 => $friendlyName];
 \SimpleSAML\Auth\State::saveState($state, 'webauthn:request');
-if ($debugEnabled) {
+if ($debugEnabled === true) {
     echo $regObject->debugBuffer;
     echo $regObject->validateBuffer;
     echo "<form id='regform' method='POST' action='" . \SimpleSAML\Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($id)) . "'>";
