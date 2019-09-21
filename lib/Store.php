@@ -113,7 +113,7 @@ abstract class Store
     public static function parseStoreConfig($config)
     {
         if (is_string($config)) {
-            $config = [$config];
+            $config = \SimpleSAML\Utils\Arrays::arrayize($config);
         }
 
         if (!is_array($config)) {
