@@ -219,7 +219,7 @@ class Database extends \SimpleSAML\Module\webauthn\Store
         );
 
         if ($st === false) {
-            throw new Exception("Unable to save new token in database!");
+            throw new \Exception("Unable to save new token in database!");
         }
 
         return true;
@@ -241,7 +241,7 @@ class Database extends \SimpleSAML\Module\webauthn\Store
         if ($st !== false) {
             \SimpleSAML\Logger::debug('webauthn:Database - DELETED credential.');
         } else {
-            throw new Exception("Database execution did not work.");
+            throw new \Exception("Database execution did not work.");
         }
         return true;
     }
@@ -263,7 +263,7 @@ class Database extends \SimpleSAML\Module\webauthn\Store
         if ($st !== false) {
             \SimpleSAML\Logger::debug('webauthn:Database - UPDATED signature counter.');
         } else {
-            throw new Exception("Database execution did not work.");
+            throw new \Exception("Database execution did not work.");
         }
         return true;
     }
