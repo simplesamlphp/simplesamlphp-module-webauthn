@@ -29,10 +29,20 @@ class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent
      * @param string $credentialId    the credential ID
      * @param string $publicKey       the public key which is supposed to validate the sig (COSE format, still needs to be converted to PEM!)
      * @param string $signature       the signature value to verify
-     * @param string $debugMode       print debugging statements?
+     * @param bool $debugMode         print debugging statements?
      */
-    public function __construct($pubkeyCredType, $scope, $challenge, $idpEntityId, $authData, $clientDataJSON, $credentialId, $publicKey, $signature, $debugMode = false)
-    {
+    public function __construct(
+        string $pubkeyCredType,
+        string $scope,
+        string $challenge,
+        string $idpEntityId,
+        string $authData,
+        string $clientDataJSON,
+        string $credentialId,
+        string $publicKey,
+        string $signature,
+        bool $debugMode = false
+    ) {
         $this->eventType = "AUTH";
         $this->credential = $publicKey;
         $this->credentialId = $credentialId;
@@ -45,7 +55,7 @@ class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent
      * @param string $signature
      * @return void
      */
-    private function validateSignature($sigData, $signature)
+    private function validateSignature(string $sigData, string $signature) : void
     {
         $keyArray = $this->cborDecode(hex2bin($this->credential));
         $keyObject = new Ec2Key($keyArray);

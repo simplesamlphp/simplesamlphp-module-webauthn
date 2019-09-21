@@ -33,7 +33,7 @@ abstract class Store
      *
      * @return bool True if the user is enabled for 2FA, false if not
      */
-    abstract public function is2FAEnabled($userId, $defaultIfNx);
+    abstract public function is2FAEnabled(string $userId, bool $defaultIfNx) : bool;
 
     /**
      * does a given credentialID already exist?
@@ -44,7 +44,7 @@ abstract class Store
      *
      * @return bool True if the credential exists, false if not
      */
-    abstract public function doesCredentialExist($credIdHex);
+    abstract public function doesCredentialExist(string $credIdHex) : bool;
 
     /**
      * store newly enrolled token data
@@ -57,7 +57,7 @@ abstract class Store
      *
      * @return void
      */
-    abstract public function storeTokenData($userId, $credentialId, $credential, $signCounter, $friendlyName);
+    abstract public function storeTokenData(string $userId, string $credentialId, string $credential, int $signCounter, string $friendlyName) : void;
 
     /**
      * remove an existing credential from the database
@@ -65,7 +65,7 @@ abstract class Store
      * @param string $credentialId the credential
      * @return true
      */
-    abstract public function deleteTokenData($credentialId);
+    abstract public function deleteTokenData(string $credentialId) : bool;
             
     /**
      * increment the signature counter after a successful authentication
@@ -74,7 +74,7 @@ abstract class Store
      * @param int    $signCounter  the new counter value
      * @return true
      */
-    abstract public function updateSignCount($credentialId, $signCounter);
+    abstract public function updateSignCount(string $credentialId, int $signCounter) : bool;
 
     /**
      * Retrieve existing token data
@@ -82,7 +82,7 @@ abstract class Store
      * @param string $userId the username
      * @return array Array of all crypto data we have on file.
      */
-    abstract public function getTokenData($userId);
+    abstract public function getTokenData(string $userId) : array;
 
     /**
      * Get statistics for all consent given in the consent store
@@ -109,7 +109,7 @@ abstract class Store
      *
      * @throws \Exception if the configuration is invalid.
      */
-    public static function parseStoreConfig($config)
+    public static function parseStoreConfig($config) : \SimpleSAML\Module\webauthn\Store
     {
         if (is_string($config)) {
             $config = \SimpleSAML\Utils\Arrays::arrayize($config);

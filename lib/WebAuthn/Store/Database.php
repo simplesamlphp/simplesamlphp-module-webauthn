@@ -122,7 +122,7 @@ class Database extends \SimpleSAML\Module\webauthn\Store
      *
      * @return array The variables which should be serialized.
      */
-    public function __sleep()
+    public function __sleep() : array
     {
         return [
             'dsn',
@@ -143,10 +143,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store
      *
      * @return bool True if the user is enabled for 2FA, false if not
      */
-    public function is2FAEnabled($userId, $defaultIfNx)
+    public function is2FAEnabled(string $userId, bool $defaultIfNx) : bool
     {
-        assert(is_string($userId));
-
         $query = 'SELECT fido2Status FROM userstatus WHERE user_id = ?';
 
         $st = $this->execute($query, [$userId]);
@@ -180,10 +178,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store
      *
      * @return bool True if the credential exists, false if not
      */
-    public function doesCredentialExist($credIdHex)
+    public function doesCredentialExist(string $credIdHex) : bool
     {
-        assert(is_string($userId));
-
         $query = 'SELECT credentialId FROM credentials ' .
                 'WHERE credentialId = ?';
 
@@ -214,10 +210,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store
      *
      * @return true
      */
-    public function storeTokenData($userId, $credentialId, $credential, $signCounter, $friendlyName)
+    public function storeTokenData(string $userId, string $credentialId, string $credential, string $signCounter, string $friendlyName) : bool
     {
-        assert(is_string($userId));
-
         $st = $this->execute(
                 'INSERT INTO credentials ' .
                 '(user_id, credentialId, credential, signCounter, friendlyName) VALUES (?,?,?,' . $signCounter . ',?)',
@@ -237,7 +231,7 @@ class Database extends \SimpleSAML\Module\webauthn\Store
      * @param string $credentialId the credential
      * @return true
      */
-    public function deleteTokenData($credentialId)
+    public function deleteTokenData(string $credentialId) : bool
     {
         $st = $this->execute(
                 'DELETE FROM credentials WHERE credentialId = ?',
@@ -259,7 +253,7 @@ class Database extends \SimpleSAML\Module\webauthn\Store
      * @param int    $signCounter  the new counter value
      * @return true
      */
-    public function updateSignCount($credentialId, $signCounter)
+    public function updateSignCount(string $credentialId, int $signCounter) : bool
     {
         $st = $this->execute(
                 'UPDATE credentials SET signCounter = ? WHERE credentialId = ?',
@@ -280,10 +274,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store
      * @param string $userId the username
      * @return array Array of all crypto data we have on file.
      */
-    public function getTokenData($userId)
+    public function getTokenData(string $userId) : array
     {
-        assert(is_string($userId));
-
         $ret = [];
 
         $st = $this->execute(
@@ -313,10 +305,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store
      *
      * @return \PDOStatement|bool  The statement, or false if execution failed.
      */
-    private function execute($statement, array $parameters)
+    private function execute(string $statement, array $parameters)
     {
-        assert(is_string($statement));
-
         $db = $this->getDB();
         if ($db === false) {
             return false;
@@ -377,7 +367,7 @@ class Database extends \SimpleSAML\Module\webauthn\Store
      *
      * @return string Error text.
      */
-    private static function formatError(array $error)
+    private static function formatError(array $error) : string
     {
         assert(count($error) >= 3);
 

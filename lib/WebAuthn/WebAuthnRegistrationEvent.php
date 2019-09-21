@@ -50,10 +50,18 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * @param string $attestationData the attestation data CBOR blob
      * @param string $responseId      the response ID
      * @param string $clientDataJSON  the client data JSON string which is present in all types of events
-     * @param string $debugMode       print debugging statements?
+     * @param bool $debugMode         print debugging statements?
      */
-    public function __construct($pubkeyCredType, $scope, $challenge, $idpEntityId, $attestationData, $responseId, $clientDataJSON, $debugMode = false)
-    {
+    public function __construct(
+        string $pubkeyCredType,
+        string $scope,
+        string $challenge,
+        string $idpEntityId,
+        string $attestationData,
+        string $responseId,
+        string $clientDataJSON,
+        bool $debugMode = false
+    ) {
         $this->debugBuffer .= "attestationData raw: " . $attestationData . "<br/>";
         /**
          * §7.1 STEP 9 : CBOR decode attestationData.
@@ -76,7 +84,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * @param string $clientDataJSON
      * @return void
      */
-    private function validateAttestationData($attestationData, $clientDataJSON)
+    private function validateAttestationData(string $attestationData, string $clientDataJSON) : void
     {
         /**
          * STEP 9 of the validation procedure in § 7.1 of the spec: CBOR-decode the attestationObject
@@ -112,7 +120,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * @param array $attestationArray
      * @return void
      */
-    private function validateAttestationFormatNone(array $attestationArray)
+    private function validateAttestationFormatNone(array $attestationArray) : void
     {
         // § 8.7 of the spec
         /**
@@ -133,7 +141,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * @param string $clientDataJSON
      * @return void
      */
-    private function validateAttestationFormatPacked(array $attestationArray, $clientDataJSON)
+    private function validateAttestationFormatPacked(array $attestationArray, string $clientDataJSON) : void
     {
         $stmtDecoded = $attestationArray['attStmt'];
         $this->debugBuffer .= "AttStmt: " . print_r($stmtDecoded, true) . "<br/>";
@@ -241,7 +249,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * @param string $responseId the response ID
      * @return void
      */
-    private function validateAttestedCredentialData($attData, $responseId)
+    private function validateAttestedCredentialData(string $attData, string $responseId) : void
     {
         $aaguid = substr($attData, 0, 16);
         $credIdLenBytes = substr($attData, 16, 2);
@@ -285,7 +293,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * @param string $derData blob of DER data
      * @return string the PEM representation of the certificate
      */
-    private function der2pem($derData)
+    private function der2pem(string $derData) : string
     {
         $pem = chunk_split(base64_encode($derData), 64, "\n");
         $pem = "-----BEGIN CERTIFICATE-----\n" . $pem . "-----END CERTIFICATE-----\n";

@@ -122,7 +122,7 @@ abstract class WebAuthnAbstractEvent
      * @param string $clientDataJSON  the client data JSON string which is present in all types of events
      * @param bool   $debugMode       shall we collect and output some extensive debugging information along the way?
      */
-    public function __construct($pubkeyCredType, $scope, $challenge, $idpEntityId, $authData, $clientDataJSON, $debugMode = false)
+    public function __construct(string $pubkeyCredType, string $scope, string $challenge, string $idpEntityId, string $authData, string $clientDataJSON, bool $debugMode = false)
     {
         $this->scope = $scope;
         $this->challenge = $challenge;
@@ -158,7 +158,7 @@ abstract class WebAuthnAbstractEvent
      * @param string $data the base64url-encoded source string
      * @return string the decoded string
      */
-    public static function base64url_decode($data)
+    public static function base64url_decode(string $data) : string
     {
         return base64_decode(strtr($data, '-_', '+/'));
     }
@@ -177,7 +177,7 @@ abstract class WebAuthnAbstractEvent
      *
      * @return string
      */
-    private function verifyClientDataJSON($clientDataJSON)
+    private function verifyClientDataJSON(string $clientDataJSON) : string
     {
         /**
          * §7.1 STEP 2 + 3 : convert to JSON and dissect JSON into PHP associative array
@@ -270,7 +270,7 @@ abstract class WebAuthnAbstractEvent
      *
      * @return int the current counter value of the authenticator
      */
-    private function validateAuthData($authData)
+    private function validateAuthData(string $authData) : int
     {
         $this->debugBuffer .= "AuthData: <pre>";
         $this->debugBuffer .= print_r($authData, true);
@@ -335,7 +335,7 @@ abstract class WebAuthnAbstractEvent
      * @param string $rawData the binary CBOR blob
      * @return array the decoded CBOR data
      */
-    protected function cborDecode(string $rawData)
+    protected function cborDecode(string $rawData) : array
     {
         $otherObjectManager = new OtherObject\OtherObjectManager();
         $otherObjectManager->add(OtherObject\SimpleObject::class);
@@ -368,7 +368,7 @@ abstract class WebAuthnAbstractEvent
      * @param string $text
      * @return void
      */
-    protected function warn($text)
+    protected function warn(string $text) : void
     {
         $this->validateBuffer .= "<span style='background-color:yellow;'>WARN: $text</span><br/>";
     }
@@ -378,7 +378,7 @@ abstract class WebAuthnAbstractEvent
      * @throws \Exception
      * @return void
      */
-    protected function fail($text)
+    protected function fail(string $text) : void
     {
         $this->validateBuffer .= "<span style='background-color:red;'>FAIL: $text</span><br/>";
         if ($this->debugMode === true) {
@@ -392,7 +392,7 @@ abstract class WebAuthnAbstractEvent
      * @param string $text
      * @return void
      */
-    protected function pass($text)
+    protected function pass(string $text) : void
     {
         $this->validateBuffer .= "<span style='background-color:green; color:white;'>PASS: $text</span><br/>";
     }
@@ -401,7 +401,7 @@ abstract class WebAuthnAbstractEvent
      * @param string $text
      * @return void
      */
-    protected function ignore($text)
+    protected function ignore(string $text) : void
     {
         $this->validateBuffer .= "<span style='background-color:blue; color:white;'>IGNORE: $text</span><br/>";
     }
