@@ -237,7 +237,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
             /**
              * §8.2 Step 4 Bullet 3: return Self level
              */
-            $this->AAGUIDAssurance = FIDO2RegistrationEvent::AAGUID_ASSURANCE_LEVEL_SELF;
+            $this->AAGUIDAssurance = WebAuthnRegistrationEvent::AAGUID_ASSURANCE_LEVEL_SELF;
         } else {
             $this->fail("Self-Attestation failed.");
         }
