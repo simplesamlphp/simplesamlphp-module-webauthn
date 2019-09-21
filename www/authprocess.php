@@ -76,7 +76,7 @@ if ($debugEnabled) {
     echo "Debug mode, not continuing to ". ($state['FIDO2WantsRegister'] ? "credential registration page." : "destination.");
 } else {
     if ($state['FIDO2WantsRegister']) {
-        header("Location: ".\SimpleSAML\Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($id)));
+        header("Location: ".\SimpleSAML\Module::getModuleURL('webauthn/webauthn.php?StateId='.urlencode($id)));
     } else {
         \SimpleSAML\Auth\ProcessingChain::resumeProcessing($state);
     }

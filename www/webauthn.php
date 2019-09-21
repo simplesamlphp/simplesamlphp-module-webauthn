@@ -108,13 +108,13 @@ var publicKeyCredentialCreationOptions = {
       },
       pubKeyCredParams: [{alg: -7, type: 'public-key'}],
       timeout: 60000,
-      attestation: '".($state['requestTokenModel'] ? "indirect" : "none")."',
+      attestation: '".($state['requestTokenModel'] ? "indirect" : "none") . "',
   }
 };";
 }
 
 $t->data['authForm'] = "";
-if (count($state['FIDO2Tokens']) > 0 && ($state['FIDO2WantsRegister'] !== true || $state['FIDO2AuthSuccessful'] === false )) {
+if (count($state['FIDO2Tokens']) > 0 && ($state['FIDO2WantsRegister'] !== true || $state['FIDO2AuthSuccessful'] === false)) {
     $t->data['authURL'] = \SimpleSAML\Module::getModuleURL('webauthn/authprocess.php?StateId=' . urlencode($id));
     $t->data['authForm'] = "navigator.credentials.get(publicKeyCredentialRequestOptions)
     .then((cred) => {

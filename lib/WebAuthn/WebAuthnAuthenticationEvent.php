@@ -68,15 +68,15 @@ class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent
          */
         $sigcheck = openssl_verify($sigData, $signature, $keyResource, OPENSSL_ALGO_SHA256);
         switch ($sigcheck) {
-        case 1: 
-            $this->pass("Signature validation succeeded!");
-            break;
-        case 0:
-            $this->fail("Signature validation failed (sigdata = $sigData) (signature = $signature) !");
-            break;
-        default:
-            $this->fail("There was an error executing the signature check.");
-            break;
+            case 1: 
+                $this->pass("Signature validation succeeded!");
+                break;
+            case 0:
+                $this->fail("Signature validation failed (sigdata = $sigData) (signature = $signature) !");
+                break;
+            default:
+                $this->fail("There was an error executing the signature check.");
+                break;
         }
     }
 }
