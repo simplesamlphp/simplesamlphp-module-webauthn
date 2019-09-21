@@ -23,8 +23,8 @@ use FG\ASN1\Universal\Sequence;
  * @author Stefan Winter <stefan.winter@restena.lu>
  * @package SimpleSAMLphp
  */
-abstract class WebAuthnAbstractEvent {
-
+abstract class WebAuthnAbstractEvent
+{
     /**
      * Scope of the FIDO2 attestation. Can only be in the own domain.
      *
@@ -102,7 +102,8 @@ abstract class WebAuthnAbstractEvent {
      * @param string $clientDataJSON  the client data JSON string which is present in all types of events
      * @param bool   $debugMode       shall we collect and output some extensive debugging information along the way?
      */
-    public function __construct($pubkeyCredType, $scope, $challenge, $idpEntityId, $authData, $clientDataJSON, $debugMode = false) {
+    public function __construct($pubkeyCredType, $scope, $challenge, $idpEntityId, $authData, $clientDataJSON, $debugMode = false)
+    {
         $this->scope = $scope;
         $this->challenge = $challenge;
         $this->idpEntityId = $idpEntityId;
@@ -113,11 +114,15 @@ abstract class WebAuthnAbstractEvent {
          * "undefined" even though its own API spec says it will send "public-key".
          */
         switch ($pubkeyCredType) {
-            case "public-key": $this->pass("Key Type OK");
+            case "public-key":
+                $this->pass("Key Type OK");
                 break;
-            case "undefined": $this->warn("Key Type 'undefined' - Firefox or Yubikey issue?");
+            case "undefined":
+                $this->warn("Key Type 'undefined' - Firefox or Yubikey issue?");
                 break;
-            default: $this->fail("Unknown Key Type: " . $_POST['type']);
+            default:
+                $this->fail("Unknown Key Type: " . $_POST['type']);
+                break;
         }
 
         /* eventType is already set by child constructor, otherwise the function will fail because of the missing type) */
@@ -133,7 +138,8 @@ abstract class WebAuthnAbstractEvent {
      * @param string $data the base64url-encoded source string
      * @return string the decoded string
      */
-    public static function base64url_decode($data) {
+    public static function base64url_decode($data)
+    {
         return base64_decode(strtr($data, '-_', '+/'));
     }
 
@@ -151,8 +157,8 @@ abstract class WebAuthnAbstractEvent {
      *
      * @return string
      */
-    private function verifyClientDataJSON($clientDataJSON) {
-
+    private function verifyClientDataJSON($clientDataJSON)
+    {
         /**
          * §7.1 STEP 2 + 3 : convert to JSON and dissect JSON into PHP associative array
          * §7.2 STEP 6 + 7 : convert to JSON and dissect JSON into PHP associative array
@@ -183,6 +189,7 @@ abstract class WebAuthnAbstractEvent {
                 break;
             default:
                 $this->fail("Unexpected operation " . $this->eventType);
+                break;
         }
         /**
          * §7.1 STEP 5 : check if incoming challenge matches issued challenge
@@ -243,7 +250,8 @@ abstract class WebAuthnAbstractEvent {
      *
      * @return int the current counter value of the authenticator
      */
-    private function validateAuthData($authData) {
+    private function validateAuthData($authData)
+    {
         $this->debugBuffer .= "AuthData: <pre>";
         $this->debugBuffer .= print_r($authData, true);
         $this->debugBuffer .= "</pre>";
@@ -281,8 +289,9 @@ abstract class WebAuthnAbstractEvent {
                     $this->pass("AT: not present, like it should be during an authentication.");
                 }
                 break;
-
-            default: $this->fail("unknown type of operation!");
+            default:
+                $this->fail("unknown type of operation!");
+                break;
         }
         /**
          * §7.1 STEP 11 + 12 : check user presence (this implementation does not insist on verification currently)
@@ -306,7 +315,8 @@ abstract class WebAuthnAbstractEvent {
      * @param string $rawData the binary CBOR blob
      * @return array the decoded CBOR data
      */
-    protected function cborDecode(string $rawData) {
+    protected function cborDecode(string $rawData)
+    {
         $otherObjectManager = new OtherObject\OtherObjectManager();
         $otherObjectManager->add(OtherObject\SimpleObject::class);
         $otherObjectManager->add(OtherObject\FalseObject::class);
@@ -334,24 +344,28 @@ abstract class WebAuthnAbstractEvent {
         return $object->getNormalizedData(true);
     }
 
-    protected function warn($text) {
+    protected function warn($text)
+    {
         $this->validateBuffer .= "<span style='background-color:yellow;'>WARN: $text</span><br/>";
     }
 
-    protected function fail($text) {
+    protected function fail($text)
+    {
         $this->validateBuffer .= "<span style='background-color:red;'>FAIL: $text</span><br/>";
-        if ($this->debugMode === TRUE) {
+        if ($this->debugMode === true) {
             echo $this->debugBuffer;
             echo $this->validateBuffer;
         }
         throw new \Exception($text);
     }
 
-    protected function pass($text) {
+    protected function pass($text)
+    {
         $this->validateBuffer .= "<span style='background-color:green; color:white;'>PASS: $text</span><br/>";
     }
 
-    protected function ignore($text) {
+    protected function ignore($text)
+    {
         $this->validateBuffer .= "<span style='background-color:blue; color:white;'>IGNORE: $text</span><br/>";
     }
 

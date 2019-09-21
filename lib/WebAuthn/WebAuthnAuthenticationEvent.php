@@ -13,8 +13,8 @@ use Cose\Key\Ec2Key;
  * @author Stefan Winter <stefan.winter@restena.lu>
  * @package SimpleSAMLphp
  */
-class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent {
-
+class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent
+{
     /**
      * Initialize the event object.
      *
@@ -31,7 +31,8 @@ class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent {
      * @param string $signature       the signature value to verify
      * @param string $debugMode       print debugging statements?
      */
-    public function __construct($pubkeyCredType, $scope, $challenge, $idpEntityId, $authData, $clientDataJSON, $credentialId, $publicKey, $signature, $debugMode = false) {
+    public function __construct($pubkeyCredType, $scope, $challenge, $idpEntityId, $authData, $clientDataJSON, $credentialId, $publicKey, $signature, $debugMode = false)
+    {
         $this->eventType = "AUTH";
         $this->credential = $publicKey;
         $this->credentialId = $credentialId;
@@ -39,11 +40,12 @@ class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent {
         $this->validateSignature($authData . $this->clientDataHash, $signature);
     }
     
-    private function validateSignature($sigData, $signature) {
+    private function validateSignature($sigData, $signature)
+    {
         $keyArray = $this->cborDecode(hex2bin($this->credential));
         $keyObject = new Ec2Key($keyArray);
         $keyResource = openssl_pkey_get_public($keyObject->asPEM());
-        if ($keyResource === FALSE) {
+        if ($keyResource === false) {
             $this->fail("Unable to construct public key resource from PEM.");
         }
         /**
@@ -59,6 +61,7 @@ class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent {
             break;
         default:
             $this->fail("There was an error executing the signature check.");
+            break;
         }
     }
 }

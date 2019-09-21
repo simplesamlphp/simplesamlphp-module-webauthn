@@ -29,7 +29,8 @@ $t->data['FIDO2Tokens'] = $state['FIDO2Tokens'];
 $t->data['JSCode'] = "
 // the following two functions are taken from https://stackoverflow.com/questions/16363419/how-to-get-binary-string-from-arraybuffer
 
-function BinaryToString(binary) {
+function BinaryToString(binary)
+{
     var error;
 
     try {
@@ -44,7 +45,8 @@ function BinaryToString(binary) {
     }
 }
 
-function ArrayBufferToString(buffer) {
+function ArrayBufferToString(buffer)
+{
     return BinaryToString(String.fromCharCode.apply(null, Array.prototype.slice.apply(new Uint8Array(buffer))));
 }
 ";

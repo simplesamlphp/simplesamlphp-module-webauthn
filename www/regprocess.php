@@ -9,11 +9,11 @@ $globalConfig = \SimpleSAML\Configuration::getInstance();
 
 if (!array_key_exists('StateId', $_REQUEST)) {
     throw new \SimpleSAML\Error\BadRequest(
-            'Missing required StateId query parameter.'
+        'Missing required StateId query parameter.'
     );
 }
 
-$debugEnabled = FALSE;
+$debugEnabled = false;
 
 $id = $_REQUEST['StateId'];
 $state = \SimpleSAML\Auth\State::loadState($id, 'webauthn:request');
@@ -24,14 +24,15 @@ if (count($state['FIDO2Tokens']) > 0 && $state['FIDO2AuthSuccessful'] === false)
 }
 
 $regObject = new SimpleSAML\Module\webauthn\WebAuthn\WebAuthnRegistrationEvent(
-        $_POST['type'],
-        $state['FIDO2Scope'],
-        $state['FIDO2SignupChallenge'],
-        $state['IdPMetadata']['entityid'],
-        base64_decode($_POST['attestation_object']),
-        $_POST['response_id'],
-        $_POST['attestation_client_data_json'],
-        $debugEnabled);
+    $_POST['type'],
+    $state['FIDO2Scope'],
+    $state['FIDO2SignupChallenge'],
+    $state['IdPMetadata']['entityid'],
+    base64_decode($_POST['attestation_object']),
+    $_POST['response_id'],
+    $_POST['attestation_client_data_json'],
+    $debugEnabled
+);
 
 // at this point, we need to talk to the DB
 /**

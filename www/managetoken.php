@@ -9,7 +9,7 @@ $globalConfig = \SimpleSAML\Configuration::getInstance();
 
 if (!array_key_exists('StateId', $_REQUEST)) {
     throw new \SimpleSAML\Error\BadRequest(
-            'Missing required StateId query parameter.'
+        'Missing required StateId query parameter.'
     );
 }
 

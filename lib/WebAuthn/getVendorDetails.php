@@ -23,7 +23,13 @@ foreach ($token->getClaim('entries') as $oneEntryObject) {
         $x509 = openssl_x509_parse("-----BEGIN CERTIFICATE-----\n" . $mdArray['attestationRootCertificates'][0] . "\n-----END CERTIFICATE-----");
         // print_r($x509);
         if (isset($x509['subject']['C']) && isset($x509['subject']['O'])) {
-            $res[$compressedAaguid] = ["C" => $x509['subject']['C'], "O" => $x509['subject']['O'], "model" => $mdArray['description'], "RootPEMs" => $mdArray['attestationRootCertificates'], "multi" => NULL];
+            $res[$compressedAaguid] = [
+                "C" => $x509['subject']['C'],
+                "O" => $x509['subject']['O'],
+                "model" => $mdArray['description'],
+                "RootPEMs" => $mdArray['attestationRootCertificates'],
+                "multi" => null
+            ];
         }
     }
 }
@@ -32,13 +38,13 @@ foreach ($token->getClaim('entries') as $oneEntryObject) {
 //     * Yubico values from: https://support.yubico.com/support/solutions/articles/15000014219-yubikey-5-series-technical-manual#AAGUID_Valuesbu3ryn
 //     * Microsoft values from: https://docs.microsoft.com/en-us/microsoft-edge/dev-guide/windows-integration/web-authentication
 
-$res["fa2b99dc9e3942578f924a30d23c4118"] = ["C" => "SE", "O" => "Yubico AB", "model" => "YubiKey 5 NFC", "RootPEMs" => [YUBICO_CA], "multi" => NULL];
-$res["cb69481e8ff7403993ec0a2729a154a8"] = ["C" => "SE", "O" => "Yubico AB", "model" => "YubiKey 5C/5C Nano/5 Nano", "RootPEMs" => [YUBICO_CA], "multi" => NULL];
-$res["c5ef55ffad9a4b9fb580adebafe026d0"] = ["C" => "SE", "O" => "Yubico AB", "model" => "YubiKey 5Ci", "RootPEMs" => [YUBICO_CA], "multi" => NULL];
-$res["6028b017b1d44c02b4b3afcdafc96bb2"] = ["C" => "US", "O" => "Microsoft Corporation", "model" => "Windows Hello software authenticator", "multi" => NULL];
-$res["6e96969ea5cf4aad9b56305fe6c82795"] = ["C" => "US", "O" => "Microsoft Corporation", "model" => "Windows Hello VBS software authenticator", "multi" => NULL];
-$res["08987058cadc4b81b6e130de50dcbe96"] = ["C" => "US", "O" => "Microsoft Corporation", "model" => "Windows Hello hardware authenticator", "multi" => NULL];
-$res["9ddd1817af5a4672a2b93e3dd95000a9"] = ["C" => "US", "O" => "Microsoft Corporation", "model" => "Windows Hello VBS hardware authenticator", "multi" => NULL];
+$res["fa2b99dc9e3942578f924a30d23c4118"] = ["C" => "SE", "O" => "Yubico AB", "model" => "YubiKey 5 NFC", "RootPEMs" => [YUBICO_CA], "multi" => null];
+$res["cb69481e8ff7403993ec0a2729a154a8"] = ["C" => "SE", "O" => "Yubico AB", "model" => "YubiKey 5C/5C Nano/5 Nano", "RootPEMs" => [YUBICO_CA], "multi" => null];
+$res["c5ef55ffad9a4b9fb580adebafe026d0"] = ["C" => "SE", "O" => "Yubico AB", "model" => "YubiKey 5Ci", "RootPEMs" => [YUBICO_CA], "multi" => null];
+$res["6028b017b1d44c02b4b3afcdafc96bb2"] = ["C" => "US", "O" => "Microsoft Corporation", "model" => "Windows Hello software authenticator", "multi" => null];
+$res["6e96969ea5cf4aad9b56305fe6c82795"] = ["C" => "US", "O" => "Microsoft Corporation", "model" => "Windows Hello VBS software authenticator", "multi" => null];
+$res["08987058cadc4b81b6e130de50dcbe96"] = ["C" => "US", "O" => "Microsoft Corporation", "model" => "Windows Hello hardware authenticator", "multi" => null];
+$res["9ddd1817af5a4672a2b93e3dd95000a9"] = ["C" => "US", "O" => "Microsoft Corporation", "model" => "Windows Hello VBS hardware authenticator", "multi" => null];
 echo "
 <?php
 namespace SimpleSAML\Module\webauthn\WebAuthn;

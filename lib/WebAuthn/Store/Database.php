@@ -17,8 +17,9 @@ namespace SimpleSAML\Module\webauthn\WebAuthn\Store;
  * @author Stefan Winter <stefan.winter@restena.lu>
  * @package SimpleSAMLphp
  */
-class Database extends \SimpleSAML\Module\webauthn\Store {
 
+class Database extends \SimpleSAML\Module\webauthn\Store
+{
     /**
      * DSN for the database.
      */
@@ -67,7 +68,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      *
      * @throws \Exception in case of a configuration error.
      */
-    public function __construct(array $config) {
+    public function __construct(array $config)
+    {
         parent::__construct($config);
 
         if (!array_key_exists('dsn', $config)) {
@@ -120,7 +122,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      *
      * @return array The variables which should be serialized.
      */
-    public function __sleep() {
+    public function __sleep()
+    {
         return [
             'dsn',
             'dateTime',
@@ -140,7 +143,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      *
      * @return bool True if the user is enabled for 2FA, false if not
      */
-    public function is2FAEnabled($userId, $defaultIfNx) {
+    public function is2FAEnabled($userId, $defaultIfNx)
+    {
         assert(is_string($userId));
 
         $query = 'SELECT fido2Status FROM userstatus WHERE user_id = ?';
@@ -176,7 +180,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      *
      * @return bool True if the credential exists, false if not
      */
-    public function doesCredentialExist($credIdHex) {
+    public function doesCredentialExist($credIdHex)
+    {
         assert(is_string($userId));
 
         $query = 'SELECT credentialId FROM credentials ' .
@@ -209,7 +214,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      *
      * @return true
      */
-    public function storeTokenData($userId, $credentialId, $credential, $signCounter, $friendlyName) {
+    public function storeTokenData($userId, $credentialId, $credential, $signCounter, $friendlyName)
+    {
         assert(is_string($userId));
 
         $st = $this->execute(
@@ -231,7 +237,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      * @param string $credentialId the credential
      * @return true
      */
-    public function deleteTokenData($credentialId) {
+    public function deleteTokenData($credentialId)
+    {
         $st = $this->execute(
                 'DELETE FROM credentials WHERE credentialId = ?',
                 [$credentialId]
@@ -252,7 +259,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      * @param int    $signCounter  the new counter value
      * @return true
      */
-    public function updateSignCount($credentialId, $signCounter) {
+    public function updateSignCount($credentialId, $signCounter)
+    {
         $st = $this->execute(
                 'UPDATE credentials SET signCounter = ? WHERE credentialId = ?',
                 [$signCounter, $credentialId]
@@ -272,7 +280,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      * @param string $userId the username
      * @return array Array of all crypto data we have on file.
      */
-    public function getTokenData($userId) {
+    public function getTokenData($userId)
+    {
         assert(is_string($userId));
 
         $ret = [];
@@ -304,7 +313,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      *
      * @return \PDOStatement|bool  The statement, or false if execution failed.
      */
-    private function execute($statement, array $parameters) {
+    private function execute($statement, array $parameters)
+    {
         assert(is_string($statement));
 
         $db = $this->getDB();
@@ -337,7 +347,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      *
      * @return \PDO|false Database handle, or false if we fail to connect.
      */
-    private function getDB() {
+    private function getDB()
+    {
         if ($this->db !== null) {
             return $this->db;
         }
@@ -366,7 +377,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      *
      * @return string Error text.
      */
-    private static function formatError(array $error) {
+    private static function formatError(array $error)
+    {
         assert(count($error) >= 3);
 
         return $error[0] . ' - ' . $error[2] . ' (' . $error[1] . ')';

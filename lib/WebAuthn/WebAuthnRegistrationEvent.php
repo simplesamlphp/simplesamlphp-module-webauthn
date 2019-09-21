@@ -15,8 +15,8 @@ include_once 'AAGUID.php';
  * @author Stefan Winter <stefan.winter@restena.lu>
  * @package SimpleSAMLphp
  */
-class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
-
+class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
+{
     /**
      * Public key algorithm supported. This is -7 - ECDSA with curve P-256
      */
@@ -50,7 +50,8 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
      * @param string $clientDataJSON  the client data JSON string which is present in all types of events
      * @param string $debugMode       print debugging statements?
      */
-    public function __construct($pubkeyCredType, $scope, $challenge, $idpEntityId, $attestationData, $responseId, $clientDataJSON, $debugMode = false) {
+    public function __construct($pubkeyCredType, $scope, $challenge, $idpEntityId, $attestationData, $responseId, $clientDataJSON, $debugMode = false)
+    {
         $this->debugBuffer .= "attestationData raw: " . $attestationData . "<br/>";
         /**
          * §7.1 STEP 9 : CBOR decode attestationData.
@@ -70,7 +71,8 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
     /**
      * validate the incoming attestation data CBOR blob and return the embedded authData
      */
-    private function validateAttestationData($attestationData, $clientDataJSON) {
+    private function validateAttestationData($attestationData, $clientDataJSON)
+    {
         /**
          * STEP 9 of the validation procedure in § 7.1 of the spec: CBOR-decode the attestationObject
          */
@@ -97,10 +99,12 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
                 break;
             default:
                 $this->fail("Unknown attestation format.");
+                break;
         }
     }
 
-    private function validateAttestationFormatNone(array $attestationArray) {
+    private function validateAttestationFormatNone(array $attestationArray)
+    {
         // § 8.7 of the spec
         /**
          * § 7.1 Step 16 && §8.7 Verification Procedure: stmt must be an empty array
@@ -115,7 +119,8 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
         }
     }
 
-    private function validateAttestationFormatPacked(array $attestationArray, $clientDataJSON) {
+    private function validateAttestationFormatPacked(array $attestationArray, $clientDataJSON)
+    {
         $stmtDecoded = $attestationArray['attStmt'];
         $this->debugBuffer .= "AttStmt: " . print_r($stmtDecoded, true) . "<br/>";
         /**
@@ -127,7 +132,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
              */
             $sigdata = $attestationArray['authData'] . hash("sha256", $clientDataJSON, true);
             $keyResource = openssl_pkey_get_public($this->der2pem($stmtDecoded['x5c'][0]));
-            if ($keyResource === FALSE) {
+            if ($keyResource === false) {
                 $this->fail("Unable to construct public key resource from PEM.");
             }
             /**
@@ -147,7 +152,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
                     $certProps['subject']['OU'] != "Authenticator Attestation" ||                                  /** §8.2.1 Bullet 2 [Subject-OU] */
                     !isset($certProps['subject']['CN']) ||                                                         /** §8.2.1 Bullet 2 [Subject-CN] */
                     !isset($certProps['extensions']['basicConstraints']) ||
-                    strstr("CA:FALSE", $certProps['extensions']['basicConstraints']) === FALSE                     /** §8.2.1 Bullet 4 */
+                    strstr("CA:FALSE", $certProps['extensions']['basicConstraints']) === false                     /** §8.2.1 Bullet 4 */
             ) {
                 $this->fail("Attestation certificate properties are no good.");
             }
@@ -156,7 +161,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
                         $certProps['subject']['C'] != AAGUID::AAGUID_DICTIONARY[strtolower($this->AAGUID)]['C']) { /** §8.2.1 Bullet 2 [Subject-C] */
                     $this->fail("AAGUID does not match vendor data.");
                 }
-                if (AAGUID::AAGUID_DICTIONARY[strtolower($this->AAGUID)]['multi'] === TRUE) { // need to check the OID
+                if (AAGUID::AAGUID_DICTIONARY[strtolower($this->AAGUID)]['multi'] === true) { // need to check the OID
                     if (!isset($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4'])) {                             /** §8.2.1 Bullet 3 */
                         $this->fail("This vendor uses one cert for multiple authenticator model attestations, but lacks the AAGUID OID.");
                     }
@@ -198,7 +203,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
         }
         $keyObject = new Ec2Key($this->cborDecode(hex2bin($this->credential)));
         $keyResource = openssl_pkey_get_public($keyObject->asPEM());
-        if ($keyResource === FALSE) {
+        if ($keyResource === false) {
             $this->fail("Unable to construct public key resource from PEM.");
         }
         $sigdata = $attestationArray['authData'] . $this->clientDataHash;
@@ -221,7 +226,8 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
      * @param string $attData    the attestation data binary blob
      * @param string $responseId the response ID
      */
-    private function validateAttestedCredentialData($attData, $responseId) {
+    private function validateAttestedCredentialData($attData, $responseId)
+    {
         $aaguid = substr($attData, 0, 16);
         $credIdLenBytes = substr($attData, 16, 2);
         $credIdLen = intval(bin2hex($credIdLenBytes), 16);
@@ -264,7 +270,8 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
      * @param string $derData blob of DER data
      * @return string the PEM representation of the certificate
      */
-    private function der2pem($derData) {
+    private function der2pem($derData)
+    {
         $pem = chunk_split(base64_encode($derData), 64, "\n");
         $pem = "-----BEGIN CERTIFICATE-----\n" . $pem . "-----END CERTIFICATE-----\n";
         return $pem;

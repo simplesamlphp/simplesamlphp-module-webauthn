@@ -15,8 +15,8 @@ use SimpleSAML\Logger;
 use SimpleSAML\Module;
 use SimpleSAML\Utils;
 
-class WebAuthn extends \SimpleSAML\Auth\ProcessingFilter {
-
+class WebAuthn extends \SimpleSAML\Auth\ProcessingFilter
+{
     /**
      * backend storage configuration. Required.
      *
@@ -65,7 +65,8 @@ class WebAuthn extends \SimpleSAML\Auth\ProcessingFilter {
      *
      * @throws \SimpleSAML\Error\Exception if the configuration is not valid.
      */
-    public function __construct($config, $reserved) {
+    public function __construct($config, $reserved)
+    {
         assert(is_array($config));
         parent::__construct($config, $reserved);
 
@@ -119,7 +120,8 @@ class WebAuthn extends \SimpleSAML\Auth\ProcessingFilter {
      *
      * @return void
      */
-    public function process(&$state) {
+    public function process(&$state)
+    {
         assert(is_array($state));
         assert(array_key_exists('UserID', $state));
         assert(array_key_exists('Destination', $state));
@@ -157,5 +159,4 @@ class WebAuthn extends \SimpleSAML\Auth\ProcessingFilter {
         $url = Module::getModuleURL('webauthn/webauthn.php');
         Utils\HTTP::redirectTrustedURL($url, ['StateId' => $id]);
     }
-
 }
