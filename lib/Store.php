@@ -2,6 +2,10 @@
 
 namespace SimpleSAML\Module\webauthn;
 
+use Exception;
+use SimpleSAML\Module;
+use SimpleSAML\Utils;
+
 /**
  * Base class for consent storage handlers.
  *
@@ -93,7 +97,7 @@ abstract class Store
      */
     public function getStatistics()
     {
-        throw new \Exception('Not implemented: getStatistics()');
+        throw new Exception('Not implemented: getStatistics()');
     }
 
 
@@ -109,27 +113,28 @@ abstract class Store
      *
      * @throws \Exception if the configuration is invalid.
      */
-    public static function parseStoreConfig($config) : \SimpleSAML\Module\webauthn\Store
+    public static function parseStoreConfig($config) : Store
     {
         if (is_string($config)) {
-            $config = \SimpleSAML\Utils\Arrays::arrayize($config);
+            $config = Utils\Arrays::arrayize($config);
         }
 
         if (!is_array($config)) {
-            throw new \Exception('Invalid configuration for consent store option: '.var_export($config, true));
+            throw new Exception('Invalid configuration for consent store option: '.var_export($config, true));
         }
 
         if (!array_key_exists(0, $config)) {
-            throw new \Exception('Consent store without name given.');
+            throw new Exception('Consent store without name given.');
         }
 
-        $className = \SimpleSAML\Module::resolveClass(
+        $className = Module::resolveClass(
             $config[0],
             'WebAuthn\Store',
             '\SimpleSAML\Module\webauthn\Store'
         );
-
         unset($config[0]);
+
+        /** @psalm-suppress InvalidStringClass */
         return new $className($config);
     }
 }

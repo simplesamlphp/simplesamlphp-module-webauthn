@@ -1,14 +1,22 @@
 <?php
 
+use Exception;
+use SimpleSAML\Configuration;
+use SimpleSAML\Error;
+use SimpleSAML\Logger;
+use SimpleSAML\Module;
+use SimpleSAML\Module\webauthn\WebAuthn\AAGUID;
+use SimpleSAML\Module\webauthn\WebAuthn\WebAuthnRegistrationEvent;
+
 if (session_status() != PHP_SESSION_ACTIVE) {
     session_cache_limiter('nocache');
 }
-$globalConfig = \SimpleSAML\Configuration::getInstance();
+$globalConfig = Configuration::getInstance();
 
-\SimpleSAML\Logger::info('FIDO2 - Accessing WebAuthn enrollment validation');
+Logger::info('FIDO2 - Accessing WebAuthn enrollment validation');
 
 if (!array_key_exists('StateId', $_REQUEST)) {
-    throw new \SimpleSAML\Error\BadRequest(
+    throw new Error\BadRequest(
         'Missing required StateId query parameter.'
     );
 }
@@ -16,14 +24,14 @@ if (!array_key_exists('StateId', $_REQUEST)) {
 $debugEnabled = false;
 
 $id = $_REQUEST['StateId'];
-$state = \SimpleSAML\Auth\State::loadState($id, 'webauthn:request');
+$state = Auth\State::loadState($id, 'webauthn:request');
 
 // registering a credential is only allowed for new users or after being authenticated
 if (count($state['FIDO2Tokens']) > 0 && $state['FIDO2AuthSuccessful'] === false) {
     throw new Exception("Attempt to register new token in unacceptable context.");
 }
 
-$regObject = new SimpleSAML\Module\webauthn\WebAuthn\WebAuthnRegistrationEvent(
+$regObject = new WebAuthnRegistrationEvent(
     $_POST['type'],
     $state['FIDO2Scope'],
     $state['FIDO2SignupChallenge'],
@@ -48,8 +56,8 @@ if ($store->doesCredentialExist(bin2hex($regObject->credentialId)) === false) {
 $friendlyName = $_POST['tokenname'];
 // if we have requested the token model, add it to the name
 if ($state['requestTokenModel']) {
-    $model = SimpleSAML\Module\webauthn\WebAuthn\AAGUID::AAGUID_DICTIONARY[$regObject->AAGUID]["model"] ?? "unknown model";
-    $vendor = SimpleSAML\Module\webauthn\WebAuthn\AAGUID::AAGUID_DICTIONARY[$regObject->AAGUID]["O"] ?? "unknown vendor";
+    $model = AAGUID::AAGUID_DICTIONARY[$regObject->AAGUID]["model"] ?? "unknown model";
+    $vendor = AAGUID::AAGUID_DICTIONARY[$regObject->AAGUID]["O"] ?? "unknown vendor";
     $friendlyName .= " ($model [$vendor])";
 }
 /**
@@ -58,12 +66,12 @@ if ($state['requestTokenModel']) {
 $store->storeTokenData($state['FIDO2Username'], $regObject->credentialId, $regObject->credential, $regObject->counter, $friendlyName);
 // make sure $state gets the news, the token is to be displayed to the user on the next page
 $state['FIDO2Tokens'][] = [0 => $regObject->credentialId, 1 => $regObject->credential, 2 => $regObject->counter, 3 => $friendlyName];
-\SimpleSAML\Auth\State::saveState($state, 'webauthn:request');
+Auth\State::saveState($state, 'webauthn:request');
 if ($debugEnabled === true) {
     echo $regObject->debugBuffer;
     echo $regObject->validateBuffer;
-    echo "<form id='regform' method='POST' action='" . \SimpleSAML\Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($id)) . "'>";
+    echo "<form id='regform' method='POST' action='" . Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($id)) . "'>";
     echo "<button type='submit'>Return to previous page.</button>";
 } else {
-    \SimpleSAML\Auth\ProcessingChain::resumeProcessing($state);
+    Auth\ProcessingChain::resumeProcessing($state);
 }
