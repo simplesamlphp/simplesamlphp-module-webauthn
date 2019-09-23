@@ -16,6 +16,7 @@
         }
     },
     "require": {
+        "ext-pdo": "*",
         "simplesamlphp/composer-module-installer": "~1.0",
         "simplesamlphp/simplesamlphp": "*",
         "spomky-labs/cbor-php": "*",
