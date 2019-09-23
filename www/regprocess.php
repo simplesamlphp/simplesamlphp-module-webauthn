@@ -5,6 +5,7 @@ use SimpleSAML\Configuration;
 use SimpleSAML\Error;
 use SimpleSAML\Logger;
 use SimpleSAML\Module;
+use SimpleSAML\Auth;
 use SimpleSAML\Module\webauthn\WebAuthn\AAGUID;
 use SimpleSAML\Module\webauthn\WebAuthn\WebAuthnRegistrationEvent;
 
