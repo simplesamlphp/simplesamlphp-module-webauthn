@@ -42,7 +42,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
     /**
      * An array of known hardware tokens
      *
-     * @var array
+     * @var AAGUID
      */
     protected $AAGUIDDictionary;
 
