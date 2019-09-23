@@ -3,9 +3,7 @@
 
 {% block preload %}
     <link rel="stylesheet" type="text/css" href="{{ asset }}assets/css/webauthn.css" />
-    <script>
-        {{ JSCode|raw }}
-    </script>
+    <meta name="frontendData" id="frontendData" content="{{ frontendData }}" />
 {% endblock %}
 
 {% block content %}
@@ -24,21 +22,20 @@
             </ul>
         </div>
     {% endif %}
-    {% if regForm|length > 0 %}
+    {% if regURL|length > 0 %}
         <form id='regform' method='POST' action='{{ regURL|raw }}'>
             <input type='hidden' id='resp' name='response_id' value='0'/>
             <input type='hidden' id='data' name='attestation_client_data_json' value='nix'/>
             <input type='hidden' id='attobj' name='attestation_object' value='mehrnix'/>
             <input type='hidden' id='type' name='type' value='something'/>
             <input type='hidden' id='operation' name='operation' value='REG'/>
-            <button type='button' onClick="{{ regForm|raw }}" onsubmit='false' >{{ '{webauthn:webauthn:newTokenButton}'|trans }}</button>
+            <button type='button' id='regformSubmit'>{{ '{webauthn:webauthn:newTokenButton}'|trans }}</button>
             {{ '{webauthn:webauthn:newTokenName}'|trans }} <input 
                 type='text' 
                 id='tokenname' 
                 name='tokenname' 
                 size='40' 
-                value='{{ '{webauthn:webauthn:newTokenDefaultName}'|trans }} {{ "now"|date('Y-m-d', timezone="Europe/Luxembourg") }}' onkeydown="if (event.keyCode == 13)
-                            return false;"/>
+                value='{{ '{webauthn:webauthn:newTokenDefaultName}'|trans }} {{ "now"|date('Y-m-d', timezone="Europe/Luxembourg") }}' />
         </form>
         <div class='space'></div>
         {% if FIDO2Tokens|length > 0 %}
@@ -56,7 +53,7 @@
             </form>
         {% endif %}
     {% endif %}
-    {% if authForm|length > 0 %}
+    {% if authURL|length > 0 %}
         <form id='authform' method='POST' action='{{ authURL|raw }}'>
             <input type='hidden' id='resp' name='response_id' value='0'/>
             <input type='hidden' id='data_raw_b64' name='client_data_raw' value='garnix'/>
@@ -71,7 +68,8 @@
         {% else %}
             {{ '{webauthn:webauthn:wantsModification}'|trans }}
         {% endif %}</input><br/>
-        <button type='button' onClick="{{ authForm|raw }}" onsubmit='false' >{{ '{webauthn:webauthn:authTokenButton}'|trans }}</button>
+        <button type='button' id='authformSubmit'>{{ '{webauthn:webauthn:authTokenButton}'|trans }}</button>
     </form>
     {% endif %}
+    <script src="{{ asset }}assets/js/webauthn.js"></script>
         {% endblock %}
