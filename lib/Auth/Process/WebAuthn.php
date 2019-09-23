@@ -143,7 +143,6 @@ class WebAuthn extends Auth\ProcessingFilter
             return;
         }
 
-        $idpEntityId = $state['Source']['entityid'];
         $state['requestTokenModel'] = $this->requestTokenModel;
         $state['webauthn:store'] = $this->store;
         Logger::debug('webauthn: userid: ' . $state['Attributes'][$this->usernameAttrib][0]);
