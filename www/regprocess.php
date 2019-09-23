@@ -1,6 +1,5 @@
 <?php
 
-use Exception;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error as SspError;
 use SimpleSAML\Logger;
