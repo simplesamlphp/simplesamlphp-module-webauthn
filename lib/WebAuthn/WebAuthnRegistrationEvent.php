@@ -6,7 +6,6 @@ use Cose\Key\Ec2Key;
 use SimpleSAML\Logger;
 use SimpleSAML\Utils\Config as SSPConfig;
 
-
 /**
  * FIDO2/WebAuthn Authentication Processing filter
  *
@@ -16,7 +15,7 @@ use SimpleSAML\Utils\Config as SSPConfig;
  * @author Stefan Winter <stefan.winter@restena.lu>
  * @package SimpleSAMLphp
  */
-class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent 
+class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
 {
 
     /**
@@ -52,8 +51,6 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      */
     protected $AAGUIDTable;
 
-
-
     /**
      * Initialize the event object.
      *
@@ -77,7 +74,8 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
             string $responseId,
             string $clientDataJSON,
             bool $debugMode = false
-    ) {
+    )
+    {
         $this->debugBuffer .= "attestationData raw: " . $attestationData . "<br/>";
         /**
          * §7.1 STEP 9 : CBOR decode attestationData.
@@ -97,7 +95,6 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         $this->debugBuffer .= "Attestation Data (bin2hex): " . bin2hex(substr($authData, 37)) . "<br/>";
     }
 
-
     /**
      * Retrieve the current mappings for vendors and models.
      *
@@ -105,29 +102,29 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      */
     private function loadAAGUIDTable()
     {
-        $path = SSPConfig::getConfigDir().'/'.self::AAGUID_CONFIG_FILE;
+        $path = SSPConfig::getConfigDir() . '/' . self::AAGUID_CONFIG_FILE;
         if (!file_exists($path)) {
-           Logger::warning('Missing "webauthn_tokens.json" configuration file. No device will be recognized.');
-           return [];
+            Logger::warning('Missing "webauthn_tokens.json" configuration file. No device will be recognized.');
+            return [];
         }
 
         $data = file_get_contents($path);
         $json = json_decode($data, true);
         if (!is_array($json)) {
             // there was probably an error decoding the config, log the error and pray for the best
-            Logger::warning('Broken configuration file "'.$path.'": could not JSON-decode it.');
+            Logger::warning('Broken configuration file "' . $path . '": could not JSON-decode it.');
             return [];
         }
         return $json;
     }
-
 
     /**
      * validate the incoming attestation data CBOR blob and return the embedded authData
      * @param string $attestationData
      * @return void
      */
-    private function validateAttestationData(string $attestationData): void {
+    private function validateAttestationData(string $attestationData): void
+    {
         /**
          * STEP 9 of the validation procedure in § 7.1 of the spec: CBOR-decode the attestationObject
          */
@@ -166,7 +163,8 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * @param array $attestationArray
      * @return void
      */
-    private function validateAttestationFormatNone(array $attestationArray): void {
+    private function validateAttestationFormatNone(array $attestationArray): void
+    {
         // § 8.7 of the spec
         /**
          * § 7.1 Step 16 && §8.7 Verification Procedure: stmt must be an empty array
@@ -185,7 +183,8 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * @param array $attestationArray
      * @return void
      */
-    private function validateAttestationFormatPacked(array $attestationArray): void {
+    private function validateAttestationFormatPacked(array $attestationArray): void
+    {
         $stmtDecoded = $attestationArray['attStmt'];
         $this->debugBuffer .= "AttStmt: " . print_r($stmtDecoded, true) . "<br/>";
         /**
@@ -201,7 +200,8 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         }
     }
 
-    private function validateAttestationFormatPackedX5C($attestationArray) {
+    private function validateAttestationFormatPackedX5C($attestationArray)
+    {
         $stmtDecoded = $attestationArray['attStmt'];
         /**
          * §8.2 Step 2: check x5c attestation
@@ -234,9 +234,9 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         }
         if (array_key_exists(strtolower($this->AAGUID), $this->AAGUIDTable)) {
             if ($certProps['subject']['O'] !== $this->AAGUIDTable[strtolower($this->AAGUID)]['O'] ||
-                // §8.2.1 Bullet 2 [Subject-O]
-                $certProps['subject']['C'] !== $this->AAGUIDTable[strtolower($this->AAGUID)]['C']
-                // §8.2ubject-C]
+                    // §8.2.1 Bullet 2 [Subject-O]
+                    $certProps['subject']['C'] !== $this->AAGUIDTable[strtolower($this->AAGUID)]['C']
+            // §8.2ubject-C]
             ) {
                 $this->fail("AAGUID does not match vendor data.");
             }
@@ -271,7 +271,8 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         return;
     }
 
-    private function validateAttestationFormatPackedSelf($attestationArray) {
+    private function validateAttestationFormatPackedSelf($attestationArray)
+    {
         $stmtDecoded = $attestationArray['attStmt'];
         /**
          * §8.2 Step 4 Bullet 1: check algorithm
@@ -304,7 +305,8 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      *
      * @param array $attestationData the incoming attestation data
      */
-    private function validateAttestationFormatFidoU2F($attestationData) {
+    private function validateAttestationFormatFidoU2F($attestationData)
+    {
         /**
          * §8.6 Verification Step 1 is a NOOP: if we're here, the attStmt was
          * already successfully CBOR decoded
@@ -369,8 +371,9 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      *
      * @param array $attestationData the incoming attestation data
      */
-    private function validateAttestationFormatAndroidSafetyNet($attestationData) {
-
+    private function validateAttestationFormatAndroidSafetyNet($attestationData)
+    {
+        
     }
 
     /**
@@ -379,7 +382,8 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * @param string $responseId the response ID
      * @return void
      */
-    private function validateAttestedCredentialData(string $attData, string $responseId): void {
+    private function validateAttestedCredentialData(string $attData, string $responseId): void
+    {
         $aaguid = substr($attData, 0, 16);
         $credIdLenBytes = substr($attData, 16, 2);
         $credIdLen = intval(bin2hex($credIdLenBytes), 16);
@@ -422,7 +426,8 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * @param string $derData blob of DER data
      * @return string the PEM representation of the certificate
      */
-    private function der2pem(string $derData): string {
+    private function der2pem(string $derData): string
+    {
         $pem = chunk_split(base64_encode($derData), 64, "\n");
         $pem = "-----BEGIN CERTIFICATE-----\n" . $pem . "-----END CERTIFICATE-----\n";
         return $pem;

@@ -15,6 +15,7 @@ use Cose\Key\Ec2Key;
  */
 class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent
 {
+
     /**
      * Initialize the event object.
      *
@@ -32,30 +33,31 @@ class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent
      * @param bool $debugMode         print debugging statements?
      */
     public function __construct(
-        string $pubkeyCredType,
-        string $scope,
-        string $challenge,
-        string $idpEntityId,
-        string $authData,
-        string $clientDataJSON,
-        string $credentialId,
-        string $publicKey,
-        string $signature,
-        bool $debugMode = false
-    ) {
+            string $pubkeyCredType,
+            string $scope,
+            string $challenge,
+            string $idpEntityId,
+            string $authData,
+            string $clientDataJSON,
+            string $credentialId,
+            string $publicKey,
+            string $signature,
+            bool $debugMode = false
+    )
+    {
         $this->eventType = "AUTH";
         $this->credential = $publicKey;
         $this->credentialId = $credentialId;
         parent::__construct($pubkeyCredType, $scope, $challenge, $idpEntityId, $authData, $clientDataJSON, $debugMode);
         $this->validateSignature($authData . $this->clientDataHash, $signature);
     }
-    
+
     /**
      * @param string $sigData
      * @param string $signature
      * @return void
      */
-    private function validateSignature(string $sigData, string $signature) : void
+    private function validateSignature(string $sigData, string $signature): void
     {
         $keyArray = $this->cborDecode(hex2bin($this->credential));
         $keyObject = new Ec2Key($keyArray);
@@ -68,7 +70,7 @@ class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent
          */
         $sigcheck = openssl_verify($sigData, $signature, $keyResource, OPENSSL_ALGO_SHA256);
         switch ($sigcheck) {
-            case 1: 
+            case 1:
                 $this->pass("Signature validation succeeded!");
                 break;
             case 0:
@@ -79,4 +81,5 @@ class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent
                 break;
         }
     }
+
 }
