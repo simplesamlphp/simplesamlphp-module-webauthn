@@ -73,7 +73,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
         // this function extracts the public key
         $this->validateAttestedCredentialData(substr($authData, 37), $responseId);
         // this function may need the public key to have been previously extracted
-        $this->validateAttestationData($attestationData, $clientDataJSON);
+        $this->validateAttestationData($attestationData);
         // the following function sets the credential properties
         $this->debugBuffer .= "Attestation Data (bin2hex): " . bin2hex(substr($authData, 37)) . "<br/>";
     }
@@ -293,6 +293,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
                 isset($this->credential[-3]) && sizeof($this->credential[-3]) == 32) {
             $publicKeyU2F = chr(4) . $this->credential[-2] . $this->credential[-3];
         } else {
+            $publicKeyU2F = FALSE;
             $this->fail("FIDO U2F attestation: the public key is not as expected.");
         }
         /**

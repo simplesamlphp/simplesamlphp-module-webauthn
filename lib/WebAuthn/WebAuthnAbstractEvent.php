@@ -367,7 +367,11 @@ abstract class WebAuthnAbstractEvent
         $decoder = new Decoder($tagManager, $otherObjectManager);
         $stream = new StringStream($rawData);
         $object = $decoder->decode($stream);
-        return $object->getNormalizedData(true);
+        $finalData = $object->getNormalizedData(true);
+        if ($finalData === null) {
+            $this->fail("CBOR data decoding failed.");
+        }
+        return $finalData;
     }
 
     /**
