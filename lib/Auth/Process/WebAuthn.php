@@ -12,7 +12,7 @@ namespace SimpleSAML\Module\webauthn\Auth\Process;
  * @package SimpleSAMLphp
  */
 use SimpleSAML\Auth;
-use SimpleSAML\Error;
+use SimpleSAML\Error\CriticalConfigurationError;
 use SimpleSAML\Logger;
 use SimpleSAML\Module;
 use SimpleSAML\Module\webauthn\Store;
@@ -52,12 +52,12 @@ class WebAuthn extends Auth\ProcessingFilter
      * @var boolean
      */
     private $requestTokenModel;
-    
+
     /**
      * @var boolean should new users be considered as enabled by default?
      */
     private $defaultEnabled;
-    
+
     /**
      * Initialize filter.
      *
@@ -85,7 +85,7 @@ class WebAuthn extends Auth\ProcessingFilter
         if (array_key_exists('scope', $config)) {
             $this->scope = $config['scope'];
         } else {
-            throw new Error\CriticalConfigurationException('Missing scope in authproc-configuration');
+            throw new CriticalConfigurationError('Missing scope in authproc-configuration');
         }
 
         if (array_key_exists('attrib_username', $config)) {
@@ -99,7 +99,7 @@ class WebAuthn extends Auth\ProcessingFilter
         } else {
             Logger::error('webauthn: it is required to set attrib_displayname in config.');
         }
-        
+
         if (array_key_exists('request_tokenmodel', $config)) {
             $this->requestTokenModel = $config['request_tokenmodel'];
         } else {
@@ -115,7 +115,7 @@ class WebAuthn extends Auth\ProcessingFilter
     /**
      * Process a authentication response
      *
-     * This function saves the state, and redirects the user to the page where 
+     * This function saves the state, and redirects the user to the page where
      * the user can register or authenticate with his token.
      *
      * @param array &$state The state of the response.
