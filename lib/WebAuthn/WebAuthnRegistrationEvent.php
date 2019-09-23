@@ -89,7 +89,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
     }
 
     /**
-     * validate the incoming attestation data CBOR blob and return the embedded authData
+     * Validate the incoming attestation data CBOR blob and return the embedded authData
      * @param string $attestationData
      * @return void
      */
@@ -169,7 +169,6 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
             $this->validateAttestationFormatPackedSelf($attestationArray);
         }
     }
-
 
     /**
      * @param array $attestationArray
@@ -253,8 +252,11 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         return;
     }
 
-    private function validateAttestationFormatPackedSelf($attestationArray)
-    {
+    /**
+     * @param array $attestationArray
+     * @return void
+     */
+    private function validateAttestationFormatPackedSelf(array $attestationArray): void {
         $stmtDecoded = $attestationArray['attStmt'];
         /**
          * §8.2 Step 4 Bullet 1: check algorithm
@@ -286,8 +288,9 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * support legacy U2F tokens
      *
      * @param array $attestationData the incoming attestation data
+     * @return void
      */
-    private function validateAttestationFormatFidoU2F($attestationData)
+    private function validateAttestationFormatFidoU2F(array $attestationData) : void
     {
         /**
          * §8.6 Verification Step 1 is a NOOP: if we're here, the attStmt was
