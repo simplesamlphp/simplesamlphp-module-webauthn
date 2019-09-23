@@ -253,7 +253,64 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * @param array $attestationData the incoming attestation data
      */
     private function validateAttestationFormatFidoU2F($attestationData) {
+        /**
+         * §8.6 Verification Step 1 is a NOOP: if we're here, the attStmt was
+         * already successfully CBOR decoded
+         */
+        $stmtDecoded = $attestationData['attStmt'];
+        if (!isset($stmtDecoded['x5c'])) {
+            fail("FIDO U2F attestation needs to have the 'x5c' key");
+        }
+        /**
+         * §8.6 Verification Step 2: extract attCert and sanity check it
+         */
+        if (count($stmtDecoded['x5c']) != 1) {
+            fail("FIDO U2F attestation requires 'x5c' to have only exactly one key.");
+        }
+        $attCert = $this->der2pem($stmtDecoded['x5c'][0]);
+        $key = openssl_pkey_get_public($attCert);
+        $keyProps = openssl_pkey_get_details($key);
+        if (!isset($keyProps['ec']['curve_name']) || $keyProps['ec']['curve_name'] != "prime256v1") {
+            $this->fail("FIDO U2F attestation public key is not P-256!");
+        }
+        /**
+         * §8.6 Verification Step 3 is a NOOP as these properties are already
+         * available as class members:
+         *
+         * $this->rpIdHash;
+         * $this->credentialId;
+         * $this->credential;
+         */
         
+        /**
+         * §8.6 Verification Step 4: encode the public key in ANSI X9.62 format
+         */
+        if (isset($this->credential[-2]) && sizeof($this->credential[-2]) == 32 
+              &&
+            isset($this->credential[-3]) && sizeof($this->credential[-3]) == 32) {
+            $publicKeyU2F = chr(4).$this->credential[-2].$this->credential[-3];
+        } else {
+            $this->fail("FIDO U2F attestation: the public key is not as expected.");
+        }
+        /**
+         * §8.6 Verification Step 5: create verificationData
+         */
+        $verificationData = chr(0).$this->rpIdHash.$this->clientDataHash.$this->credentialId.$publicKeyU2F;
+        /**
+         * §8.6 Verification Step 6: verify signature
+         */
+        if (openssl_verify($verificationData, $stmtDecoded['sig'],$attCert, OPENSSL_ALGO_SHA256) !== 1) {
+            $this->fail("FIDO U2F Attestation verification failed.");
+        } else {
+            $this->pass("Successfully verified FIDO U2F signature.");
+        }
+        /**
+         * §8.6 Verification Step 7: not performed, this is optional as per spec
+         */
+        /**
+         * §8.6 Verification Step 8: so we always settle for "Basic"
+         */
+        $this->AAGUIDAssurance = WebAuthnRegistrationEvent::AAGUID_ASSURANCE_LEVEL_BASIC;
     }
     
     /**

@@ -229,11 +229,14 @@ gives implementations a policy choice on what to do if a client sends extensions
 anyway: this implementation chose to then fail the registration/authentication.
 
 The implementation supports the attestation formats "none", "packed / x5c" and
-"packed / self". Other attestation formats lead to a registration failure.
+"packed / self", and "fido-u2f". Other attestation formats lead to a 
+registration failure.
 
 For the attation type "packed / x5c", 
 * the optional OCSP checks are not performed (this is explicitly permitted in 
   the spec due to other means of revocation checking in the FIDO MDS).
+
+For bith "packed / x5c" and "fido-u2f":
 * due to the lack of any externally provided knowledge about CAs(???) all
   attestations are classified as "Basic" (i.e. no "AttCA" level)
 

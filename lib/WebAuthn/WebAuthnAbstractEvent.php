@@ -90,6 +90,11 @@ abstract class WebAuthnAbstractEvent
     protected $eventType;
 
     /**
+     * The rpIdHash, available once validated during constructor of base class
+     */
+    protected $rpIdHash;
+    
+    /**
      * the credential ID for this event (either the one that gets registered, or
      * the one that gets used to authenticate)
      * 
@@ -281,6 +286,7 @@ abstract class WebAuthnAbstractEvent
          */
         if (bin2hex(substr($authData, 0, 32)) == hash("sha256", $this->scope)) {
             $this->pass("Relying Party hash correct.");
+            $this->rpIdHash = hash("sha256", $this->scope);
         } else {
             $this->fail("Mismatching Relying Party hash.");
         }
