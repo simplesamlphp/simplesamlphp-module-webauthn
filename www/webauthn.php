@@ -107,7 +107,7 @@ var publicKeyCredentialCreationOptions = {
       challenge: new Uint8Array([ " . $challengeEncoded . " ]).buffer, 
       rp: {
           name: '" . $state['Source']['entityid'] . "',
-          id: '" . $state['FIDO2Scope'] . "',
+          ".is_null($state['FIDO2Scope']) ? '' : ("id: '".$state['FIDO2Scope']."'"). ",
       },
       user: {
 	  id: new Uint8Array([ " . $usernameEncoded . " ]).buffer,
