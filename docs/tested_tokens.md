@@ -1,8 +1,8 @@
 The following tokens were tested against the implementation and found to work
 =============================================================================
 
-All attestation modes (None, Indirect, Direct)
-----------------------------------------------
+Attestation modes (None, Indirect)
+----------------------------------
 
   * Yubikey 5 NFC
   * Yubikey 5C
@@ -11,3 +11,7 @@ All attestation modes (None, Indirect, Direct)
   * [Feitian BioPass FIDO2](https://www.ftsafe.com/Products/FIDO/Bio)
   * [Solo - FIDO2 security key (USB only)](https://solokeys.com/collections/all/products/solo)
   * [Solo Tap - FIDO2 security key (USB + NFC)](https://solokeys.com/collections/all/products/solo-tap)
+
+Attestation mode None
+---------------------
+  * Android 7 (Samsung Galaxy S6, Fingerprint Sensor) - when requesting indirect/direct, None is delivered instead
