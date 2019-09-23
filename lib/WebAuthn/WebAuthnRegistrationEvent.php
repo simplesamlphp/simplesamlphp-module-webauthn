@@ -28,11 +28,6 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
     const AAGUID_ASSURANCE_LEVEL_ATTCA = 3;
 
     /**
-     * The name of the configuration file where we should expect the AAGUID dictionary.
-     */
-    public const AAGUID_CONFIG_FILE = 'webauthn-aaguid.json';
-
-    /**
      * the AAGUID of the newly registered authenticator
      * @var string
      */
@@ -49,7 +44,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      *
      * @var array
      */
-    protected $AAGUIDTable;
+    protected $AAGUIDDictionary;
 
     /**
      * Initialize the event object.
@@ -85,7 +80,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         $this->eventType = "REG";
         parent::__construct($pubkeyCredType, $scope, $challenge, $idpEntityId, $authData, $clientDataJSON, $debugMode);
 
-        $this->AAGUIDTable = $this->loadAAGUIDTable();
+        $this->AAGUIDDictionary = AAGUID::getInstance();
 
         // this function extracts the public key
         $this->validateAttestedCredentialData(substr($authData, 37), $responseId);
@@ -93,29 +88,6 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         $this->validateAttestationData($attestationData);
         // the following function sets the credential properties
         $this->debugBuffer .= "Attestation Data (bin2hex): " . bin2hex(substr($authData, 37)) . "<br/>";
-    }
-
-    /**
-     * Retrieve the current mappings for vendors and models.
-     *
-     * @return array An array with information for each known token, or an empty array if configuration is missing.
-     */
-    private function loadAAGUIDTable()
-    {
-        $path = SSPConfig::getConfigDir() . '/' . self::AAGUID_CONFIG_FILE;
-        if (!file_exists($path)) {
-            Logger::warning('Missing "webauthn_tokens.json" configuration file. No device will be recognized.');
-            return [];
-        }
-
-        $data = file_get_contents($path);
-        $json = json_decode($data, true);
-        if (!is_array($json)) {
-            // there was probably an error decoding the config, log the error and pray for the best
-            Logger::warning('Broken configuration file "' . $path . '": could not JSON-decode it.');
-            return [];
-        }
-        return $json;
     }
 
     /**
@@ -232,15 +204,17 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         ) {
             $this->fail("Attestation certificate properties are no good.");
         }
-        if (array_key_exists(strtolower($this->AAGUID), $this->AAGUIDTable)) {
-            if ($certProps['subject']['O'] !== $this->AAGUIDTable[strtolower($this->AAGUID)]['O'] ||
-                    // §8.2.1 Bullet 2 [Subject-O]
-                    $certProps['subject']['C'] !== $this->AAGUIDTable[strtolower($this->AAGUID)]['C']
-            // §8.2ubject-C]
+
+        if ($this->AAGUIDDictionary->hasToken($this->AAGUID)) {
+            $token = $this->AAGUIDDictionary->get($this->AAGUID);
+            if ($certProps['subject']['O'] !== $token['O'] ||
+                // §8.2.1 Bullet 2 [Subject-O]
+                $certProps['subject']['C'] !== $token['C']
+                // §8.2ubject-C]
             ) {
                 $this->fail("AAGUID does not match vendor data.");
             }
-            if ($this->AAGUIDTable[strtolower($this->AAGUID)]['multi'] === true) { // need to check the OID
+            if ($token['multi'] === true) { // need to check the OID
                 if (!isset($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4'])) { /** §8.2.1 Bullet 3 */
                     $this->fail("This vendor uses one cert for multiple authenticator model attestations, but lacks the AAGUID OID.");
                 }
@@ -255,7 +229,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
             }
             // we would need to verify the attestation certificate against a known-good root CA certificate to get more than basic
             /*
-             * §7.1 Step 17 is to look at $this->AAGUIDTable[strtolower($this->AAGUID)]['RootPEMs']
+             * §7.1 Step 17 is to look at $token['RootPEMs']
              */
             /*
              * §7.1 Step 18 is skipped, and we unconditionally return "only" Basic.
@@ -373,7 +347,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      */
     private function validateAttestationFormatAndroidSafetyNet($attestationData)
     {
-        
+
     }
 
     /**

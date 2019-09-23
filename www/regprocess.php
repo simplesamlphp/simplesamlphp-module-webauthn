@@ -56,8 +56,14 @@ if ($store->doesCredentialExist(bin2hex($regObject->credentialId)) === false) {
 $friendlyName = $_POST['tokenname'];
 // if we have requested the token model, add it to the name
 if ($state['requestTokenModel']) {
-    $model = AAGUID::AAGUID_DICTIONARY[$regObject->AAGUID]["model"] ?? "unknown model";
-    $vendor = AAGUID::AAGUID_DICTIONARY[$regObject->AAGUID]["O"] ?? "unknown vendor";
+    $model = \SimpleSAML\Locale\Translate::noop('unknown model');
+    $vendor = \SimpleSAML\Locale\Translate::noop('unknown vendor');
+    $aaguiddict = AAGUID::getInstance();
+    if ($aaguiddict->hasToken($regObject->AAGUID)) {
+        $token = $aaguiddict->get($regObject->AAGUID);
+        $model = $token['model'];
+        $vendor = $token['O'];
+    }
     $friendlyName .= " ($model [$vendor])";
 }
 /**
