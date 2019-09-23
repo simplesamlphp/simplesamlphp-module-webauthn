@@ -12,6 +12,7 @@ namespace SimpleSAML\Module\webauthn\Auth\Process;
  * @package SimpleSAMLphp
  */
 use SimpleSAML\Auth;
+use SimpleSAML\Error;
 use SimpleSAML\Logger;
 use SimpleSAML\Module;
 use SimpleSAML\Module\webauthn\Store;
@@ -84,7 +85,7 @@ class WebAuthn extends Auth\ProcessingFilter
         if (array_key_exists('scope', $config)) {
             $this->scope = $config['scope'];
         } else {
-            $this->scope = "NEEDTODERIVE";
+            throw new Error\CriticalConfigurationException('Missing scope in authproc-configuration');
         }
 
         if (array_key_exists('attrib_username', $config)) {
@@ -138,12 +139,6 @@ class WebAuthn extends Auth\ProcessingFilter
         }
 
         $idpEntityId = $state['Source']['entityid'];
-        if ($this->scope == "NEEDTODERIVE") {
-            $protoHostname = substr($idpEntityId, 0, strpos($idpEntityId, '/', 8));
-            $hostname = substr($protoHostname, strrpos($protoHostname, '/') + 1);
-            $this->scope = $hostname;
-        }
-
         $state['requestTokenModel'] = $this->requestTokenModel;
         $state['webauthn:store'] = $this->store;
         Logger::debug('webauthn: userid: ' . $state['Attributes'][$this->usernameAttrib][0]);
