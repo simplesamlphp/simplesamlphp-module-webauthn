@@ -1,7 +1,7 @@
 {
     "name": "simplesamlphp/simplesamlphp-module-webauthn",
     "description": "A PHP implementation of a FIDO2 / WebAuthn authentication agent",
-    "type": "project",
+    "type": "simplesamlphp-module",
     "keywords": [ "idp", "fido2", "webauthn", "2fa" ],
     "license": "LGPL-2.1-or-later",
     "authors": [
@@ -16,9 +16,10 @@
         }
     },
     "require": {
-	"simplesamlphp/simplesamlphp": "*",
+        "simplesamlphp/composer-module-installer": "~1.0",
+        "simplesamlphp/simplesamlphp": "*",
         "spomky-labs/cbor-php": "*",
-	"web-auth/cose-lib": "*"
+        "web-auth/cose-lib": "*"
     },
     "require-dev": {
         "lcobucci/jwt": "^3.3",

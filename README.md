@@ -8,11 +8,22 @@ The module is implemented as an Authentication Processing Filter. That
 means it can be configured in the global config.php file or the SP remote or 
 IdP hosted metadata.
 
+Installation
+------------
+
+You can install this module with composer:
+
+```bash
+% composer require simplesamlphp/simplesamlphp-module-webauthn
+```
+
+
 How to setup the webauthn module
 -----------------------------------------
 You need to enable and configure the module's authprocfilter at a priority level
 so that it takes place AFTER the first-factor authentication. E.g. at 100:
 
+```php
 100 => 
     ['class' => 'webauthn:WebAuthn',
 
@@ -64,6 +75,7 @@ so that it takes place AFTER the first-factor authentication. E.g. at 100:
     'default_enable' => false,
 
     ],
+```
 
 Using storage
 -------------
@@ -72,6 +84,7 @@ You first need to setup the database.
 
 Here is the initialization SQL script:
 
+```sql
 CREATE TABLE credentials (
     creation_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     user_id VARCHAR(80) NOT NULL,
@@ -91,6 +104,7 @@ CREATE TABLE userstatus (
 );
 
 GRANT SELECT ON ...userstatus TO '...dbuser'@'1.2.3.4' IDENTIFIED BY '...dbpass';
+```
 
 The `webauthn:Database` backend storage has the following options:
 
@@ -111,6 +125,7 @@ The `webauthn:Database` backend storage has the following options:
 
 Example config using PostgreSQL database:
 
+```php
     100 => array(
         'class'	=> 'webauthn:WebAuthn', 
         'store'	=> array(
@@ -120,9 +135,11 @@ Example config using PostgreSQL database:
             'password' => 'sdfsdf',
         ),
     ),
+```
 
 Example config using MySQL database:
 
+```php
     100 => array(
         'class'	=> 'webauthn:WebAuthn', 
         'store'	=> array(
@@ -132,7 +149,7 @@ Example config using MySQL database:
             'password' => 'sdfsdf',
         ),
     ),
-
+```
 
 Options
 -------
