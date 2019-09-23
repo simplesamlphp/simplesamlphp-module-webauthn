@@ -11,12 +11,14 @@ namespace SimpleSAML\Module\webauthn\Auth\Process;
  * @author Stefan Winter <stefan.winter@restena.lu>
  * @package SimpleSAMLphp
  */
+use SimpleSAML\Auth;
 use SimpleSAML\Logger;
 use SimpleSAML\Module;
+use SimpleSAML\Module\webauthn\Store;
 use SimpleSAML\Utils;
 
-class WebAuthn extends \SimpleSAML\Auth\ProcessingFilter {
-
+class WebAuthn extends Auth\ProcessingFilter
+{
     /**
      * backend storage configuration. Required.
      *
@@ -65,17 +67,17 @@ class WebAuthn extends \SimpleSAML\Auth\ProcessingFilter {
      *
      * @throws \SimpleSAML\Error\Exception if the configuration is not valid.
      */
-    public function __construct($config, $reserved) {
+    public function __construct($config, $reserved)
+    {
         assert(is_array($config));
         parent::__construct($config, $reserved);
 
-
         try {
-            $this->store = \SimpleSAML\Module\webauthn\Store::parseStoreConfig($config['store']);
+            $this->store = Store::parseStoreConfig($config['store']);
         } catch (\Exception $e) {
             Logger::error(
-                    'webauthn: Could not create storage: ' .
-                    $e->getMessage()
+                'webauthn: Could not create storage: '.
+                $e->getMessage()
             );
         }
 
@@ -119,7 +121,8 @@ class WebAuthn extends \SimpleSAML\Auth\ProcessingFilter {
      *
      * @return void
      */
-    public function process(&$state) {
+    public function process(&$state)
+    {
         assert(is_array($state));
         assert(array_key_exists('UserID', $state));
         assert(array_key_exists('Destination', $state));
@@ -153,9 +156,8 @@ class WebAuthn extends \SimpleSAML\Auth\ProcessingFilter {
         $state['FIDO2AuthSuccessful'] = false;
 
         // Save state and redirect
-        $id = \SimpleSAML\Auth\State::saveState($state, 'webauthn:request');
+        $id = Auth\State::saveState($state, 'webauthn:request');
         $url = Module::getModuleURL('webauthn/webauthn.php');
         Utils\HTTP::redirectTrustedURL($url, ['StateId' => $id]);
     }
-
 }

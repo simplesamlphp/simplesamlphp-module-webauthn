@@ -17,8 +17,9 @@ namespace SimpleSAML\Module\webauthn\WebAuthn\Store;
  * @author Stefan Winter <stefan.winter@restena.lu>
  * @package SimpleSAMLphp
  */
-class Database extends \SimpleSAML\Module\webauthn\Store {
 
+class Database extends \SimpleSAML\Module\webauthn\Store
+{
     /**
      * DSN for the database.
      */
@@ -67,7 +68,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      *
      * @throws \Exception in case of a configuration error.
      */
-    public function __construct($config) {
+    public function __construct(array $config)
+    {
         parent::__construct($config);
 
         if (!array_key_exists('dsn', $config)) {
@@ -120,7 +122,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      *
      * @return array The variables which should be serialized.
      */
-    public function __sleep() {
+    public function __sleep() : array
+    {
         return [
             'dsn',
             'dateTime',
@@ -140,9 +143,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      *
      * @return bool True if the user is enabled for 2FA, false if not
      */
-    public function is2FAEnabled($userId, $defaultIfNx) {
-        assert(is_string($userId));
-
+    public function is2FAEnabled(string $userId, bool $defaultIfNx) : bool
+    {
         $query = 'SELECT fido2Status FROM userstatus WHERE user_id = ?';
 
         $st = $this->execute($query, [$userId]);
@@ -176,9 +178,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      *
      * @return bool True if the credential exists, false if not
      */
-    public function doesCredentialExist($credIdHex) {
-        assert(is_string($userId));
-
+    public function doesCredentialExist(string $credIdHex) : bool
+    {
         $query = 'SELECT credentialId FROM credentials ' .
                 'WHERE credentialId = ?';
 
@@ -209,17 +210,16 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      *
      * @return true
      */
-    public function storeTokenData($userId, $credentialId, $credential, $signCounter, $friendlyName) {
-        assert(is_string($userId));
-
+    public function storeTokenData(string $userId, string $credentialId, string $credential, int $signCounter, string $friendlyName) : bool
+    {
         $st = $this->execute(
                 'INSERT INTO credentials ' .
-                '(user_id, credentialId, credential, signCounter, friendlyName) VALUES (?,?,?,' . $signCounter . ',?)',
-                [$userId, $credentialId, $credential, $friendlyName]
+                '(user_id, credentialId, credential, signCounter, friendlyName) VALUES (?,?,?,?,?)',
+                [$userId, $credentialId, $credential, $signCounter, $friendlyName]
         );
 
         if ($st === false) {
-            throw new Exception("Unable to save new token in database!");
+            throw new \Exception("Unable to save new token in database!");
         }
 
         return true;
@@ -231,7 +231,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      * @param string $credentialId the credential
      * @return true
      */
-    public function deleteTokenData($credentialId) {
+    public function deleteTokenData(string $credentialId) : bool
+    {
         $st = $this->execute(
                 'DELETE FROM credentials WHERE credentialId = ?',
                 [$credentialId]
@@ -240,7 +241,7 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
         if ($st !== false) {
             \SimpleSAML\Logger::debug('webauthn:Database - DELETED credential.');
         } else {
-            throw new Exception("Database execution did not work.");
+            throw new \Exception("Database execution did not work.");
         }
         return true;
     }
@@ -252,7 +253,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      * @param int    $signCounter  the new counter value
      * @return true
      */
-    public function updateSignCount($credentialId, $signCounter) {
+    public function updateSignCount(string $credentialId, int $signCounter) : bool
+    {
         $st = $this->execute(
                 'UPDATE credentials SET signCounter = ? WHERE credentialId = ?',
                 [$signCounter, $credentialId]
@@ -261,7 +263,7 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
         if ($st !== false) {
             \SimpleSAML\Logger::debug('webauthn:Database - UPDATED signature counter.');
         } else {
-            throw new Exception("Database execution did not work.");
+            throw new \Exception("Database execution did not work.");
         }
         return true;
     }
@@ -272,9 +274,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      * @param string $userId the username
      * @return array Array of all crypto data we have on file.
      */
-    public function getTokenData($userId) {
-        assert(is_string($userId));
-
+    public function getTokenData(string $userId) : array
+    {
         $ret = [];
 
         $st = $this->execute(
@@ -304,10 +305,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      *
      * @return \PDOStatement|bool  The statement, or false if execution failed.
      */
-    private function execute($statement, $parameters) {
-        assert(is_string($statement));
-        assert(is_array($parameters));
-
+    private function execute(string $statement, array $parameters)
+    {
         $db = $this->getDB();
         if ($db === false) {
             return false;
@@ -338,7 +337,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      *
      * @return \PDO|false Database handle, or false if we fail to connect.
      */
-    private function getDB() {
+    private function getDB()
+    {
         if ($this->db !== null) {
             return $this->db;
         }
@@ -367,8 +367,8 @@ class Database extends \SimpleSAML\Module\webauthn\Store {
      *
      * @return string Error text.
      */
-    private static function formatError($error) {
-        assert(is_array($error));
+    private static function formatError(array $error) : string
+    {
         assert(count($error) >= 3);
 
         return $error[0] . ' - ' . $error[2] . ' (' . $error[1] . ')';

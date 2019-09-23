@@ -1,29 +1,38 @@
 <?php
 
+use Exception;
+use SimpleSAML\Auth;
+use SimpleSAML\Configuration;
+use SimpleSAML\Error;
+use SimpleSAML\Logger;
+use SimpleSAML\Module;
+use SimpleSAML\Module\webauthn\WebAuthn\WebAuthnAbstractEvent;
+use SimpleSAML\Module\webauthn\WebAuthn\WebAuthnAuthenticationEvent;
+
 if (session_status() != PHP_SESSION_ACTIVE) {
     session_cache_limiter('nocache');
 }
-$globalConfig = \SimpleSAML\Configuration::getInstance();
+$globalConfig = Configuration::getInstance();
 
-\SimpleSAML\Logger::info('FIDO2 - Accessing WebAuthn enrollment validation');
+Logger::info('FIDO2 - Accessing WebAuthn enrollment validation');
 
 if (!array_key_exists('StateId', $_REQUEST)) {
-    throw new \SimpleSAML\Error\BadRequest(
-            'Missing required StateId query parameter.'
+    throw new Error\BadRequest(
+        'Missing required StateId query parameter.'
     );
 }
 
-$debugEnabled = FALSE;
+$debugEnabled = false;
 
 $id = $_REQUEST['StateId'];
-$state = \SimpleSAML\Auth\State::loadState($id, 'webauthn:request');
+$state = Auth\State::loadState($id, 'webauthn:request');
 
-$incomingID = bin2hex(\SimpleSAML\Module\webauthn\WebAuthn\WebAuthnAbstractEvent::base64url_decode($_POST['response_id']));
+$incomingID = bin2hex(WebAuthnAbstractEvent::base64url_decode($_POST['response_id']));
 
 /**
  * §7.2 STEP 2 - 4 : check that the credential is one of those the particular user owns
  */
-$publicKey = FALSE;
+$publicKey = false;
 $previousCounter = -1;
 foreach ($state['FIDO2Tokens'] as $oneToken) {
     if ($oneToken[0] == $incomingID) {
@@ -33,21 +42,23 @@ foreach ($state['FIDO2Tokens'] as $oneToken) {
         break;
     }
 }
-if ($publicKey === FALSE) {
+if ($publicKey === false) {
     throw new Exception("User attempted to authenticate with an unknown credential ID. This should already have been prevented by the browser!");
 }
 
-$authObject = new SimpleSAML\Module\webauthn\WebAuthn\WebAuthnAuthenticationEvent(
-        $_POST['type'],
-        $state['FIDO2Scope'], 
-        $state['FIDO2SignupChallenge'], 
-        $state['IdPMetadata']['entityid'], 
-        base64_decode($_POST['authenticator_data']), 
-        base64_decode($_POST['client_data_raw']), 
-        $oneToken[0],
-        $oneToken[1], 
-        base64_decode($_POST['signature']), 
-        $debugEnabled);
+$authObject = new WebAuthnAuthenticationEvent(
+    $_POST['type'],
+    $state['FIDO2Scope'], 
+    $state['FIDO2SignupChallenge'], 
+    $state['IdPMetadata']['entityid'], 
+    base64_decode($_POST['authenticator_data']), 
+    base64_decode($_POST['client_data_raw']), 
+    $oneToken[0],
+    $oneToken[1], 
+    base64_decode($_POST['signature']), 
+    $debugEnabled
+);
+
 /**
  * §7.2 STEP 18 : detect physical object cloning on the token
  */
@@ -62,11 +73,11 @@ if (($previousCounter != 0 || $authObject->counter != 0) && $authObject->counter
 $state['FIDO2AuthSuccessful'] = $oneToken[0];
 // See if he wants to hang around for token management operations
 if (isset($_POST['credentialChange']) && $_POST['credentialChange'] == "on") {
-    $state['FIDO2WantsRegister'] = TRUE;
+    $state['FIDO2WantsRegister'] = true;
 } else {
-    $state['FIDO2WantsRegister'] = FALSE;
+    $state['FIDO2WantsRegister'] = false;
 }
-\SimpleSAML\Auth\State::saveState($state, 'webauthn:request');
+Auth\State::saveState($state, 'webauthn:request');
 
 if ($debugEnabled) {
     echo $authObject->debugBuffer;
@@ -74,9 +85,9 @@ if ($debugEnabled) {
     echo "Debug mode, not continuing to ". ($state['FIDO2WantsRegister'] ? "credential registration page." : "destination.");
 } else {
     if ($state['FIDO2WantsRegister']) {
-        header("Location: ".\SimpleSAML\Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($id)));
+        header("Location: ".Module::getModuleURL('webauthn/webauthn.php?StateId='.urlencode($id)));
     } else {
-        \SimpleSAML\Auth\ProcessingChain::resumeProcessing($state);
+        Auth\ProcessingChain::resumeProcessing($state);
     }
 }
 
