@@ -87,7 +87,7 @@ class WebAuthn extends Auth\ProcessingFilter
         } else {
             $baseurl = Utils\HTTP::getSelfHost();
             $hostname = parse_url($baseurl, PHP_URL_HOST);
-            if ($hostname === false) {
+            if ($hostname === null) {
                 throw new Error\CriticalConfigurationError("Unable to derive scope from 'baseurlpath'.");
             }
             $this->scope = $hostname;
