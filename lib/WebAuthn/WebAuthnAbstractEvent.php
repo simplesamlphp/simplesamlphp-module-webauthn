@@ -7,13 +7,6 @@ use CBOR\OtherObject;
 use CBOR\Tag;
 use CBOR\StringStream;
 
-use FG\ASN1\ExplicitlyTaggedObject;
-use FG\ASN1\Universal\BitString;
-use FG\ASN1\Universal\Integer;
-use FG\ASN1\Universal\ObjectIdentifier;
-use FG\ASN1\Universal\OctetString;
-use FG\ASN1\Universal\Sequence;
-
 /**
  * FIDO2/WebAuthn Authentication Processing filter
  *
