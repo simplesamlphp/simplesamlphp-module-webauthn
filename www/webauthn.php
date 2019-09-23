@@ -7,21 +7,29 @@
  * @package SimpleSAMLphp
  */
 
-$globalConfig = \SimpleSAML\Configuration::getInstance();
+use SimpleSAML\Auth;
+use SimpleSAML\Configuration;
+use SimpleSAML\Error;
+use SimpleSAML\Logger;
+use SimpleSAML\Module;
+use SimpleSAML\Utils;
+use SimpleSAML\XHTML\Template;;
 
-\SimpleSAML\Logger::info('FIDO2 - Accessing WebAuthn interface');
+$globalConfig = Configuration::getInstance();
+
+Logger::info('FIDO2 - Accessing WebAuthn interface');
 
 if (!array_key_exists('StateId', $_REQUEST)) {
-    throw new \SimpleSAML\Error\BadRequest(
-            'Missing required StateId query parameter.'
+    throw new Error\BadRequest(
+        'Missing required StateId query parameter.'
     );
 }
 
 $id = $_REQUEST['StateId'];
-$state = \SimpleSAML\Auth\State::loadState($id, 'webauthn:request');
+$state = Auth\State::loadState($id, 'webauthn:request');
 
 // Make, populate and layout consent form
-$t = new \SimpleSAML\XHTML\Template($globalConfig, 'webauthn:webauthn.php');
+$t = new Template($globalConfig, 'webauthn:webauthn.php');
 $translator = $t->getTranslator();
 $t->data['UserID'] = $state['FIDO2Username'];
 $t->data['FIDO2Tokens'] = $state['FIDO2Tokens'];
@@ -29,7 +37,8 @@ $t->data['FIDO2Tokens'] = $state['FIDO2Tokens'];
 $t->data['JSCode'] = "
 // the following two functions are taken from https://stackoverflow.com/questions/16363419/how-to-get-binary-string-from-arraybuffer
 
-function BinaryToString(binary) {
+function BinaryToString(binary)
+{
     var error;
 
     try {
@@ -44,13 +53,14 @@ function BinaryToString(binary) {
     }
 }
 
-function ArrayBufferToString(buffer) {
+function ArrayBufferToString(buffer)
+{
     return BinaryToString(String.fromCharCode.apply(null, Array.prototype.slice.apply(new Uint8Array(buffer))));
 }
 ";
 
 $challenge = str_split($state['FIDO2SignupChallenge'], 2);
-$username = str_split(hash('sha512', $state['FIDO2Username'] . '|' . \SimpleSAML\Utils\Config::getSecretSalt() . '|' . $state['Source']['entityid']), 2);
+$username = str_split(hash('sha512', $state['FIDO2Username'] . '|' . Utils\Config::getSecretSalt() . '|' . $state['Source']['entityid']), 2);
 
 $challengeEncoded = "";
 foreach ($challenge as $oneChar) {
@@ -73,8 +83,8 @@ foreach ($username as $oneChar) {
 $t->data['FIDO2AuthSuccessful'] = $state['FIDO2AuthSuccessful'];
 $t->data['regForm'] = "";
 if (count($state['FIDO2Tokens']) == 0 || ($state['FIDO2WantsRegister'] === true && $state['FIDO2AuthSuccessful'] !== false)) {
-    $t->data['regURL'] = \SimpleSAML\Module::getModuleURL('webauthn/regprocess.php?StateId=' . urlencode($id));
-    $t->data['delURL'] = \SimpleSAML\Module::getModuleURL('webauthn/managetoken.php?StateId=' . urlencode($id));
+    $t->data['regURL'] = Module::getModuleURL('webauthn/regprocess.php?StateId=' . urlencode($id));
+    $t->data['delURL'] = Module::getModuleURL('webauthn/managetoken.php?StateId=' . urlencode($id));
     $t->data['regForm'] = "navigator.credentials.create(publicKeyCredentialCreationOptions)
     .then((cred) => {
         console.log('NEW CREDENTIAL', cred);
@@ -106,14 +116,14 @@ var publicKeyCredentialCreationOptions = {
       },
       pubKeyCredParams: [{alg: -7, type: 'public-key'}],
       timeout: 60000,
-      attestation: '".($state['requestTokenModel'] ? "indirect" : "none")."',
+      attestation: '".($state['requestTokenModel'] ? "indirect" : "none") . "',
   }
 };";
 }
 
 $t->data['authForm'] = "";
-if (count($state['FIDO2Tokens']) > 0 && ($state['FIDO2WantsRegister'] !== true || $state['FIDO2AuthSuccessful'] === false )) {
-    $t->data['authURL'] = \SimpleSAML\Module::getModuleURL('webauthn/authprocess.php?StateId=' . urlencode($id));
+if (count($state['FIDO2Tokens']) > 0 && ($state['FIDO2WantsRegister'] !== true || $state['FIDO2AuthSuccessful'] === false)) {
+    $t->data['authURL'] = Module::getModuleURL('webauthn/authprocess.php?StateId=' . urlencode($id));
     $t->data['authForm'] = "navigator.credentials.get(publicKeyCredentialRequestOptions)
     .then((cred) => {
         console.log('NEW CREDENTIAL', cred);
