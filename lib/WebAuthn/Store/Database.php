@@ -5,11 +5,11 @@ namespace SimpleSAML\Module\webauthn\WebAuthn\Store;
 /**
  * Store FIDO2 information in database.
  *
- * This class implements a store which stores the FIDO2 information in a 
+ * This class implements a store which stores the FIDO2 information in a
  * database. It is tested with MySQL, others might work, too.
  *
  * It has the following options:
- * - dsn: The DSN which should be used to connect to the database server. See 
+ * - dsn: The DSN which should be used to connect to the database server. See
  *   the PHP Manual for supported drivers and DSN formats.
  * - username: The username used for database connection.
  * - password: The password used for database connection.
@@ -115,6 +115,14 @@ class Database extends \SimpleSAML\Module\webauthn\Store
             }
             $this->timeout = $config['timeout'];
         }
+
+//        $this->db = \SimpleSAML\Database::getInstance(
+//            \SimpleSAML\Configuration::loadFromArray([
+//                'database.dsn' => $this->dsn,
+//                'database.username' => $this->username,
+//                'database.password' => $this->password
+//            ])
+//        );
     }
 
     /**
