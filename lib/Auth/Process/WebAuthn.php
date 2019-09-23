@@ -12,7 +12,7 @@ namespace SimpleSAML\Module\webauthn\Auth\Process;
  * @package SimpleSAMLphp
  */
 use SimpleSAML\Auth;
-use SimpleSAML\Error\CriticalConfigurationError;
+use SimpleSAML\Error;
 use SimpleSAML\Logger;
 use SimpleSAML\Module;
 use SimpleSAML\Module\webauthn\Store;
@@ -85,7 +85,12 @@ class WebAuthn extends Auth\ProcessingFilter
         if (array_key_exists('scope', $config)) {
             $this->scope = $config['scope'];
         } else {
-            throw new CriticalConfigurationError('Missing scope in authproc-configuration');
+            $baseurl = Utils\HTTP::getSelfHost();
+            $hostname = parse_url($baseurl, PHP_URL_HOST);
+            if ($hostname === false) {
+                throw new Error\CriticalConfigurationError("Unable to derive scope from 'baseurlpath'.");
+            }
+            $this->scope = $hostname;
         }
 
         if (array_key_exists('attrib_username', $config)) {
