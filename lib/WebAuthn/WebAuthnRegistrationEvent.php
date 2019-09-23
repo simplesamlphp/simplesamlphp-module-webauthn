@@ -21,7 +21,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
     /**
      * Public key algorithm supported. This is -7 - ECDSA with curve P-256
      */
-    const PK_ALGORITHM = -7;
+    const PK_ALGORITHM = "-7";
     const AAGUID_ASSURANCE_LEVEL_NONE = 0;
     const AAGUID_ASSURANCE_LEVEL_SELF = 1;
     const AAGUID_ASSURANCE_LEVEL_BASIC = 2;
