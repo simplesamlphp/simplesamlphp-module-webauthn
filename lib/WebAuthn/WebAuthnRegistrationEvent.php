@@ -264,13 +264,13 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
          */
         $stmtDecoded = $attestationData['attStmt'];
         if (!isset($stmtDecoded['x5c'])) {
-            fail("FIDO U2F attestation needs to have the 'x5c' key");
+            $this->fail("FIDO U2F attestation needs to have the 'x5c' key");
         }
         /**
          * §8.6 Verification Step 2: extract attCert and sanity check it
          */
         if (count($stmtDecoded['x5c']) != 1) {
-            fail("FIDO U2F attestation requires 'x5c' to have only exactly one key.");
+            $this->fail("FIDO U2F attestation requires 'x5c' to have only exactly one key.");
         }
         $attCert = $this->der2pem($stmtDecoded['x5c'][0]);
         $key = openssl_pkey_get_public($attCert);
