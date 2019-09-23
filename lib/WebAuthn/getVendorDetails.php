@@ -1,6 +1,6 @@
 <?php
 
-require dirname(dirname(__DIR__)) . '/vendor/autoload.php';
+require dirname(dirname(dirname(dirname(__DIR__)))) . '/vendor/autoload.php';
 
 use Lcobucci\JWT\Parser;
 
@@ -45,12 +45,4 @@ $res["6028b017b1d44c02b4b3afcdafc96bb2"] = ["C" => "US", "O" => "Microsoft Corpo
 $res["6e96969ea5cf4aad9b56305fe6c82795"] = ["C" => "US", "O" => "Microsoft Corporation", "model" => "Windows Hello VBS software authenticator", "multi" => null];
 $res["08987058cadc4b81b6e130de50dcbe96"] = ["C" => "US", "O" => "Microsoft Corporation", "model" => "Windows Hello hardware authenticator", "multi" => null];
 $res["9ddd1817af5a4672a2b93e3dd95000a9"] = ["C" => "US", "O" => "Microsoft Corporation", "model" => "Windows Hello VBS hardware authenticator", "multi" => null];
-echo "
-<?php
-namespace SimpleSAML\Module\webauthn\WebAuthn;
-class AAGUID {
-const AAGUID_DICTIONARY = ";
-var_export($res);
-echo ";
-}
-";
+file_put_contents("aaguid.json",json_encode($res, JSON_PRETTY_PRINT));
