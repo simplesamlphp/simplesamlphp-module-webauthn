@@ -3,7 +3,7 @@
 use Exception;
 use SimpleSAML\Auth;
 use SimpleSAML\Configuration;
-use SimpleSAML\Error;
+use SimpleSAML\Error as SspError;
 use SimpleSAML\Logger;
 use SimpleSAML\Module;
 use SimpleSAML\Module\webauthn\WebAuthn\WebAuthnAbstractEvent;
@@ -17,7 +17,7 @@ $globalConfig = Configuration::getInstance();
 Logger::info('FIDO2 - Accessing WebAuthn enrollment validation');
 
 if (!array_key_exists('StateId', $_REQUEST)) {
-    throw new Error\BadRequest(
+    throw new SspError\BadRequest(
         'Missing required StateId query parameter.'
     );
 }
