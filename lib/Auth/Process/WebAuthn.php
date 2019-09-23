@@ -110,13 +110,13 @@ class WebAuthn extends Auth\ProcessingFilter
         if (array_key_exists('attrib_username', $config)) {
             $this->usernameAttrib = $config['attrib_username'];
         } else {
-            Logger::error('webauthn: it is required to set attrib_username in config.');
+            throw new Error\CriticalConfigurationError('webauthn: it is required to set attrib_username in config.');
         }
 
         if (array_key_exists('attrib_displayname', $config)) {
             $this->displaynameAttrib = $config['attrib_displayname'];
         } else {
-            Logger::error('webauthn: it is required to set attrib_displayname in config.');
+            throw new Error\CriticalConfigurationError('webauthn: it is required to set attrib_displayname in config.');
         }
 
         if (array_key_exists('request_tokenmodel', $config)) {
