@@ -70,7 +70,7 @@ abstract class Store
      * @return true
      */
     abstract public function deleteTokenData(string $credentialId) : bool;
-            
+
     /**
      * increment the signature counter after a successful authentication
      *
@@ -132,7 +132,7 @@ abstract class Store
             'WebAuthn\Store',
             '\SimpleSAML\Module\webauthn\Store'
         );
-        unset($config[0]);
+//        unset($config[0]);
 
         /** @psalm-suppress InvalidStringClass */
         return new $className($config);
