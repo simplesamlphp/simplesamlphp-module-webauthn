@@ -89,10 +89,14 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
             case "packed":
                 $this->validateAttestationFormatPacked($attestationArray, $clientDataJSON);
                 break;
+            case "fido-u2f":
+                $this->validateAttestationFormatFidoU2F($attestationArray);
+                break;
+            case "android-safetynet":
+                $this->validateAttestationFormatAndroidSafetyNet($attestationArray);
+                break;
             case "tpm":
             case "android-key":
-            case "android-safetynet":
-            case "fido-u2f":
                 $this->fail("Attestation format " . $attestationArray['fmt'] . " validation not supported right now.");
                 break;
             default:
@@ -216,6 +220,24 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
         }
     }
 
+    /**
+     * support legacy U2F tokens
+     * 
+     * @param array $attestationData the incoming attestation data
+     */
+    private function validateAttestationFormatFidoU2F($attestationData) {
+        
+    }
+    
+    /**
+     * support Android authenticators (fingerprint etc.)
+     * 
+     * @param array $attestationData the incoming attestation data
+     */
+    private function validateAttestationFormatAndroidSafetyNet($attestationData) {
+        
+    }
+    
     /**
      * The registration contains the actual credential. This function parses it.
      * @param string $attData    the attestation data binary blob
