@@ -19,7 +19,8 @@
         "simplesamlphp/composer-module-installer": "~1.0",
         "simplesamlphp/simplesamlphp": "*",
         "spomky-labs/cbor-php": "*",
-        "web-auth/cose-lib": "*"
+        "web-auth/cose-lib": "*",
+        "lcobucci/jwt": "*"
     },
     "require-dev": {
         "lcobucci/jwt": "^3.3",
