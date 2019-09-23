@@ -131,6 +131,12 @@ class WebAuthn extends Auth\ProcessingFilter
         assert(array_key_exists('entityid', $state['Source']));
         assert(array_key_exists('metadata-set', $state['Source']));
 
+        if (!array_key_exists($this->usernameAttrib, $state['Attributes'])) {
+            Logger::warning('webauthn: cannot determine if user needs second factor, missing attribute "'.
+                $this->usernameAttrib.'".');
+            return;
+        }
+
         $idpEntityId = $state['Source']['entityid'];
         if ($this->scope == "NEEDTODERIVE") {
             $protoHostname = substr($idpEntityId, 0, strpos($idpEntityId, '/', 8));
