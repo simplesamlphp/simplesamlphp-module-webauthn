@@ -29,7 +29,7 @@ class AAGUID
     /**
      * The singleton instance.
      *
-     * @var AAGUID|null
+     * @var AAGUID
      */
     protected static $instance;
 
