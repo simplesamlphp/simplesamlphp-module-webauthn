@@ -51,28 +51,28 @@ abstract class WebAuthnAbstractEvent
      *
      * @var int
      */
-    public $counter;
+    protected $counter;
 
     /**
      * extensive debug information collection?
      *
      * @var bool
      */
-    public $debugMode = false;
+    protected $debugMode = false;
 
     /**
      * A string buffer to hold debug information in case we need it.
      *
      * @var string
      */
-    public $debugBuffer = "";
+    protected $debugBuffer = "";
 
     /**
      * A string buffer to hold raw validation data in case we want to look at it.
      *
      * @var string
      */
-    public $validateBuffer = "";
+    protected $validateBuffer = "";
 
     /**
      * the type of event requested. This is to be set in child class constructors
@@ -95,7 +95,7 @@ abstract class WebAuthnAbstractEvent
      *
      * @var string
      */
-    public $credentialId;
+    protected $credentialId;
 
     /**
      * the credential binary data for this event (either the one that gets 
@@ -105,7 +105,7 @@ abstract class WebAuthnAbstractEvent
      *
      * @var string
      */
-    public $credential;
+    protected $credential;
 
     /**
      * Initialize the event object.
