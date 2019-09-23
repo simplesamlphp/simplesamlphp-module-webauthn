@@ -30,9 +30,17 @@ class WebAuthn extends Auth\ProcessingFilter
     /**
      * Scope of the FIDO2 attestation. Can only be in the own domain.
      *
-     * @var string
+     * @var string|null
      */
-    private $scope;
+    private $scope = null;
+
+    /**
+     * The scope derived from the SimpleSAMLphp configuration;
+     * can be null due to misconfiguration, in case we cannot warn the administrator on a mismatching scope
+     *
+     * @var string|null
+     */
+    private $derivedScope = null;
 
     /**
      * attribute to use as username for the FIDO2 attestation.
@@ -82,15 +90,16 @@ class WebAuthn extends Auth\ProcessingFilter
             );
         }
 
+        // Set the optional scope if set by configuration
         if (array_key_exists('scope', $config)) {
             $this->scope = $config['scope'];
-        } else {
-            $baseurl = Utils\HTTP::getSelfHost();
-            $hostname = parse_url($baseurl, PHP_URL_HOST);
-            if ($hostname === null) {
-                throw new Error\CriticalConfigurationError("Unable to derive scope from 'baseurlpath'.");
-            }
-            $this->scope = $hostname;
+        }
+
+        // Set the derived scope so we can compare it to the sent host at a later point
+        $baseurl = Utils\HTTP::getSelfHost();
+        $hostname = parse_url($baseurl, PHP_URL_HOST);
+        if ($hostname !== null) {
+            $this->derivedScope = $hostname;
         }
 
         if (array_key_exists('attrib_username', $config)) {
@@ -154,6 +163,7 @@ class WebAuthn extends Auth\ProcessingFilter
 
         $state['FIDO2Tokens'] = $this->store->getTokenData($state['Attributes'][$this->usernameAttrib][0]);
         $state['FIDO2Scope'] = $this->scope;
+        $state['FIDO2DerivedScope'] = $this->derivedScope;
         $state['FIDO2Username'] = $state['Attributes'][$this->usernameAttrib][0];
         $state['FIDO2Displayname'] = $state['Attributes'][$this->displaynameAttrib][0];
         $state['FIDO2SignupChallenge'] = hash('sha512', random_bytes(64));
