@@ -36,13 +36,13 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * the AAGUID of the newly registered authenticator
      * @var string
      */
-    protected $AAGUID;
+    public $AAGUID;
 
     /**
      * how sure are we about the AAGUID?
      * @var int
      */
-    protected $AAGUIDAssurance;
+    public $AAGUIDAssurance;
 
     /**
      * An array of known hardware tokens
