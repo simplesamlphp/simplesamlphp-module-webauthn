@@ -16,7 +16,8 @@ use SimpleSAML\Utils\Config as SSPConfig;
  * @author Stefan Winter <stefan.winter@restena.lu>
  * @package SimpleSAMLphp
  */
-class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
+class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent 
+{
 
     /**
      * Public key algorithm supported. This is -7 - ECDSA with curve P-256
