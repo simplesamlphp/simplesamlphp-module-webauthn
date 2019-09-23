@@ -79,6 +79,10 @@ class WebAuthn extends Auth\ProcessingFilter
      */
     public function __construct($config, $reserved)
     {
+        /**
+         * Remove annotation + assert as soon as this method can be typehinted (SSP 2.0)
+         * @psalm-suppress RedundantConditionGivenDocblockType
+         */
         assert(is_array($config));
         parent::__construct($config, $reserved);
 
@@ -139,6 +143,10 @@ class WebAuthn extends Auth\ProcessingFilter
      */
     public function process(&$state)
     {
+        /**
+         * Remove annotation + assert as soon as this method can be typehinted (SSP 2.0)
+         * @psalm-suppress RedundantConditionGivenDocblockType
+         */
         assert(is_array($state));
         assert(array_key_exists('UserID', $state));
         assert(array_key_exists('Destination', $state));
