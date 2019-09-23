@@ -190,7 +190,7 @@ an out-of-band registration process (in the same scope).
 
 Device model detection
 ----------------------
-The option request_tokenmodel can be used to get a token's so-called AAGUID
+The option `request_tokenmodel` can be used to get a token's so-called AAGUID
 which uniquely identifies the model and manufacturer (it is not a serial 
 number). 
 
@@ -203,7 +203,19 @@ and indeed, some manufacturers are missing.
 The module contains a full list of AAGUIDs and relevant metadata as pulled from
 the FIDO MDS. It also has a limited amount of manually curated information of
 some AAGUIDs which are not in the FIDO MDS, namely for Yubico products and 
-Microsoft.
+Microsoft. This list is in the `config/webauthn-aaguid.json` file, and this file
+needs to be moved to your SimpleSAMLphp configuration directory.
+
+If you want, you can also manually update this file, if you believe there might
+be new models listed. In order to do that, run the `bin/updateMetadata.php` script
+like this:
+
+```bash
+% php bin/updateMetadata.php <MDS_TOKEN>
+```
+
+where `MDS_TOKEN` is the API token you get after registering
+[here](https://mds2.fidoalliance.org).
 
 As a consequence, depending on the token model the user uses, even if the AAGUID
 is being sent as part of the registration process, it may be that the device is

@@ -3,8 +3,9 @@
 namespace SimpleSAML\Module\webauthn\WebAuthn;
 
 use Cose\Key\Ec2Key;
+use SimpleSAML\Logger;
+use SimpleSAML\Utils\Config as SSPConfig;
 
-include_once 'AAGUID.php';
 
 /**
  * FIDO2/WebAuthn Authentication Processing filter
@@ -27,6 +28,11 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
     const AAGUID_ASSURANCE_LEVEL_ATTCA = 3;
 
     /**
+     * The name of the configuration file where we should expect the AAGUID dictionary.
+     */
+    public const AAGUID_CONFIG_FILE = 'webauthn-aaguid.json';
+
+    /**
      * the AAGUID of the newly registered authenticator
      * @var string
      */
@@ -37,6 +43,15 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
      * @var int
      */
     protected $AAGUIDAssurance;
+
+    /**
+     * An array of known hardware tokens
+     *
+     * @var array
+     */
+    protected $AAGUIDTable;
+
+
 
     /**
      * Initialize the event object.
@@ -70,6 +85,9 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
         $authData = $attestationArray['authData'];
         $this->eventType = "REG";
         parent::__construct($pubkeyCredType, $scope, $challenge, $idpEntityId, $authData, $clientDataJSON, $debugMode);
+
+        $this->AAGUIDTable = $this->loadAAGUIDTable();
+
         // this function extracts the public key
         $this->validateAttestedCredentialData(substr($authData, 37), $responseId);
         // this function may need the public key to have been previously extracted
@@ -77,6 +95,31 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
         // the following function sets the credential properties
         $this->debugBuffer .= "Attestation Data (bin2hex): " . bin2hex(substr($authData, 37)) . "<br/>";
     }
+
+
+    /**
+     * Retrieve the current mappings for vendors and models.
+     *
+     * @return array An array with information for each known token, or an empty array if configuration is missing.
+     */
+    private function loadAAGUIDTable()
+    {
+        $path = SSPConfig::getConfigDir().'/'.self::AAGUID_CONFIG_FILE;
+        if (!file_exists($path)) {
+           Logger::warning('Missing "webauthn_tokens.json" configuration file. No device will be recognized.');
+           return [];
+        }
+
+        $data = file_get_contents($path);
+        $json = json_decode($data, true);
+        if (!is_array($json)) {
+            // there was probably an error decoding the config, log the error and pray for the best
+            Logger::warning('Broken configuration file "'.$path.'": could not JSON-decode it.');
+            return [];
+        }
+        return $json;
+    }
+
 
     /**
      * validate the incoming attestation data CBOR blob and return the embedded authData
@@ -128,9 +171,9 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
          * § 7.1 Step 16 && §8.7 Verification Procedure: stmt must be an empty array
          * § 7.1 Step 17+18 are a NOOP if the format was "none" (which is acceptable as per this RPs policy)
          */
-        if (count($attestationArray['attStmt']) == 0) {
+        if (count($attestationArray['attStmt']) === 0) {
             $this->pass("Attestation format and statement as expected, and no attestation authorities to retrieve.");
-            $this->AAGUIDAssurance = WebAuthnRegistrationEvent::AAGUID_ASSURANCE_LEVEL_NONE;
+            $this->AAGUIDAssurance = self::AAGUID_ASSURANCE_LEVEL_NONE;
             return;
         } else {
             $this->fail("Non-empty attestation authorities are not expected with 'attestationFormat = none'.");
@@ -170,7 +213,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
         /**
          * §8.2 Step 2 Bullet 1: check signature
          */
-        if (openssl_verify($sigdata, $stmtDecoded['sig'], $keyResource, OPENSSL_ALGO_SHA256) != 1) {
+        if (openssl_verify($sigdata, $stmtDecoded['sig'], $keyResource, OPENSSL_ALGO_SHA256) !== 1) {
             $this->fail("x5c attestation failed.");
         }
         $this->pass("x5c sig check passed.");
@@ -180,20 +223,23 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
          */
         $certProps = openssl_x509_parse($this->der2pem($stmtDecoded['x5c'][0]));
         $this->debugBuffer .= "Attestation Certificate:" . print_r($certProps, true) . "<br/>";
-        if ($certProps['version'] != 2 || /** §8.2.1 Bullet 1 */
-                $certProps['subject']['OU'] != "Authenticator Attestation" || /** §8.2.1 Bullet 2 [Subject-OU] */
+        if ($certProps['version'] !== 2 || /** §8.2.1 Bullet 1 */
+                $certProps['subject']['OU'] !== "Authenticator Attestation" || /** §8.2.1 Bullet 2 [Subject-OU] */
                 !isset($certProps['subject']['CN']) || /** §8.2.1 Bullet 2 [Subject-CN] */
                 !isset($certProps['extensions']['basicConstraints']) ||
                 strstr("CA:FALSE", $certProps['extensions']['basicConstraints']) === false /** §8.2.1 Bullet 4 */
         ) {
             $this->fail("Attestation certificate properties are no good.");
         }
-        if (isset(AAGUID::AAGUID_DICTIONARY[strtolower($this->AAGUID)])) {
-            if ($certProps['subject']['O'] != AAGUID::AAGUID_DICTIONARY[strtolower($this->AAGUID)]['O'] || /** §8.2.1 Bullet 2 [Subject-O] */
-                    $certProps['subject']['C'] != AAGUID::AAGUID_DICTIONARY[strtolower($this->AAGUID)]['C']) { /** §8.2.1 Bullet 2 [Subject-C] */
+        if (array_key_exists(strtolower($this->AAGUID), $this->AAGUIDTable)) {
+            if ($certProps['subject']['O'] !== $this->AAGUIDTable[strtolower($this->AAGUID)]['O'] ||
+                // §8.2.1 Bullet 2 [Subject-O]
+                $certProps['subject']['C'] !== $this->AAGUIDTable[strtolower($this->AAGUID)]['C']
+                // §8.2ubject-C]
+            ) {
                 $this->fail("AAGUID does not match vendor data.");
             }
-            if (AAGUID::AAGUID_DICTIONARY[strtolower($this->AAGUID)]['multi'] === true) { // need to check the OID
+            if ($this->AAGUIDTable[strtolower($this->AAGUID)]['multi'] === true) { // need to check the OID
                 if (!isset($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4'])) { /** §8.2.1 Bullet 3 */
                     $this->fail("This vendor uses one cert for multiple authenticator model attestations, but lacks the AAGUID OID.");
                 }
@@ -202,23 +248,23 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
                  */
                 $AAGUIDFromOid = substr(bin2hex($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4']), 4);
                 $this->debugBuffer .= "AAGUID from OID = $AAGUIDFromOid<br/>";
-                if (strtolower($AAGUIDFromOid) != strtolower($this->AAGUID)) {
+                if (strtolower($AAGUIDFromOid) !== strtolower($this->AAGUID)) {
                     $this->fail("AAGUID mismatch between attestation certificate and attestation statement.");
                 }
             }
             // we would need to verify the attestation certificate against a known-good root CA certificate to get more than basic
             /*
-             * §7.1 Step 17 is to look at AAGUID::AAGUID_DICTIONARY[strtolower($this->AAGUID)]['RootPEMs']
+             * §7.1 Step 17 is to look at $this->AAGUIDTable[strtolower($this->AAGUID)]['RootPEMs']
              */
             /*
              * §7.1 Step 18 is skipped, and we unconditionally return "only" Basic.
              */
-            $this->AAGUIDAssurance = WebAuthnRegistrationEvent::AAGUID_ASSURANCE_LEVEL_BASIC;
+            $this->AAGUIDAssurance = self::AAGUID_ASSURANCE_LEVEL_BASIC;
         } else {
             $this->warn("Unknown authenticator model found: " . $this->AAGUID . ".");
             // unable to verify all cert properties, so this is not enough for BASIC.
             // but it's our own fault, we should add the device to our DB.
-            $this->AAGUIDAssurance = WebAuthnRegistrationEvent::AAGUID_ASSURANCE_LEVEL_SELF;
+            $this->AAGUIDAssurance = self::AAGUID_ASSURANCE_LEVEL_SELF;
         }
         $this->pass("x5c attestation passed.");
         return;
@@ -229,7 +275,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
         /**
          * §8.2 Step 4 Bullet 1: check algorithm
          */
-        if ($stmtDecoded['alg'] != WebAuthnRegistrationEvent::PK_ALGORITHM) {
+        if ($stmtDecoded['alg'] !== self::PK_ALGORITHM) {
             $this->fail("Unexpected algorithm type in packed basic attestation: " . $stmtDecoded['alg'] . ".");
         }
         $keyObject = new Ec2Key($this->cborDecode(hex2bin($this->credential)));
@@ -241,12 +287,12 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
         /**
          * §8.2 Step 4 Bullet 2: verify signature
          */
-        if (openssl_verify($sigdata, $stmtDecoded['sig'], $keyResource, OPENSSL_ALGO_SHA256) == 1) {
+        if (openssl_verify($sigdata, $stmtDecoded['sig'], $keyResource, OPENSSL_ALGO_SHA256) === 1) {
             $this->pass("Self-Attestation veried.");
             /**
              * §8.2 Step 4 Bullet 3: return Self level
              */
-            $this->AAGUIDAssurance = WebAuthnRegistrationEvent::AAGUID_ASSURANCE_LEVEL_SELF;
+            $this->AAGUIDAssurance = self::AAGUID_ASSURANCE_LEVEL_SELF;
         } else {
             $this->fail("Self-Attestation failed.");
         }
@@ -254,7 +300,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
 
     /**
      * support legacy U2F tokens
-     * 
+     *
      * @param array $attestationData the incoming attestation data
      */
     private function validateAttestationFormatFidoU2F($attestationData) {
@@ -264,18 +310,18 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
          */
         $stmtDecoded = $attestationData['attStmt'];
         if (!isset($stmtDecoded['x5c'])) {
-            fail("FIDO U2F attestation needs to have the 'x5c' key");
+            $this->fail("FIDO U2F attestation needs to have the 'x5c' key");
         }
         /**
          * §8.6 Verification Step 2: extract attCert and sanity check it
          */
-        if (count($stmtDecoded['x5c']) != 1) {
-            fail("FIDO U2F attestation requires 'x5c' to have only exactly one key.");
+        if (count($stmtDecoded['x5c']) !== 1) {
+            $this->fail("FIDO U2F attestation requires 'x5c' to have only exactly one key.");
         }
         $attCert = $this->der2pem($stmtDecoded['x5c'][0]);
         $key = openssl_pkey_get_public($attCert);
         $keyProps = openssl_pkey_get_details($key);
-        if (!isset($keyProps['ec']['curve_name']) || $keyProps['ec']['curve_name'] != "prime256v1") {
+        if (!isset($keyProps['ec']['curve_name']) || $keyProps['ec']['curve_name'] !== "prime256v1") {
             $this->fail("FIDO U2F attestation public key is not P-256!");
         }
         /**
@@ -289,8 +335,8 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
         /**
          * §8.6 Verification Step 4: encode the public key in ANSI X9.62 format
          */
-        if (isset($this->credential[-2]) && sizeof($this->credential[-2]) == 32 &&
-                isset($this->credential[-3]) && sizeof($this->credential[-3]) == 32) {
+        if (isset($this->credential[-2]) && sizeof($this->credential[-2]) === 32 &&
+                isset($this->credential[-3]) && sizeof($this->credential[-3]) === 32) {
             $publicKeyU2F = chr(4) . $this->credential[-2] . $this->credential[-3];
         } else {
             $publicKeyU2F = FALSE;
@@ -314,16 +360,16 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
         /**
          * §8.6 Verification Step 8: so we always settle for "Basic"
          */
-        $this->AAGUIDAssurance = WebAuthnRegistrationEvent::AAGUID_ASSURANCE_LEVEL_BASIC;
+        $this->AAGUIDAssurance = self::AAGUID_ASSURANCE_LEVEL_BASIC;
     }
 
     /**
      * support Android authenticators (fingerprint etc.)
-     * 
+     *
      * @param array $attestationData the incoming attestation data
      */
     private function validateAttestationFormatAndroidSafetyNet($attestationData) {
-        
+
     }
 
     /**
@@ -342,15 +388,15 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
         $this->debugBuffer .= "Length Raw = " . bin2hex($credIdLenBytes) . "<br/>";
         $this->debugBuffer .= "Credential ID Length (decimal) = " . $credIdLen . "<br/>";
         $this->debugBuffer .= "Credential ID (hex) = " . bin2hex($credId) . "<br/>";
-        if (bin2hex(WebAuthnAbstractEvent::base64url_decode($responseId)) == bin2hex($credId)) {
+        if (bin2hex(WebAuthnAbstractEvent::base64url_decode($responseId)) === bin2hex($credId)) {
             $this->pass("Credential IDs in authenticator response and in attestation data match.");
         } else {
             $this->fail("Mismatch of credentialId (" . bin2hex($credId) . ") vs. response ID (" . bin2hex(WebAuthnAbstractEvent::base64url_decode($responseId)) . ").");
         }
-        // so far so good. Now extract the actual public key from its COSE 
+        // so far so good. Now extract the actual public key from its COSE
         // encoding.
-        // finding out the number of bytes to CBOR decode appears non-trivial. 
-        // The simple case is if no ED is present as the CBOR data then goes to 
+        // finding out the number of bytes to CBOR decode appears non-trivial.
+        // The simple case is if no ED is present as the CBOR data then goes to
         // the end of the byte sequence.
         // Since we made sure above that no ED is in the sequence, take the rest
         // of the sequence in its entirety.
@@ -360,7 +406,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
         /**
          * STEP 13 of the validation procedure in § 7.1 of the spec: is the algorithm the expected one?
          */
-        if ($arrayPK['3'] == WebAuthnRegistrationEvent::PK_ALGORITHM) { // we requested -7, so want to see it here
+        if ($arrayPK['3'] === self::PK_ALGORITHM) { // we requested -7, so want to see it here
             $this->pass("Public Key Algorithm is the expected one (-7, ECDSA).");
         } else {
             $this->fail("Public Key Algorithm mismatch!");
@@ -371,7 +417,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
 
     /**
      * transform DER formatted certificate to PEM format
-     * 
+     *
      * @param string $derData blob of DER data
      * @return string the PEM representation of the certificate
      */
