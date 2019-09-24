@@ -63,11 +63,14 @@
             <!-- ignoring <input type='hidden' id='userhandle' name='userhandle' value='someuser'/> -->
             <input type='hidden' id='type' name='type' value='something'/>
             <input type='hidden' id='operation' name='operation' value='AUTH'/>
-            <input type='checkbox' id='credentialChange' name='credentialChange'>{% if FIDO2Tokens|length < 2 %}
-            {{ '{webauthn:webauthn:wantsAdd}'|trans }}
-        {% else %}
-            {{ '{webauthn:webauthn:wantsModification}'|trans }}
-        {% endif %}</input><br/>
+            <input type='checkbox' id='credentialChange' name='credentialChange'>
+            <label for='credentialChange'>
+                {% if FIDO2Tokens|length < 2 %}
+                    {{ '{webauthn:webauthn:wantsAdd}'|trans }}
+                {% else %}
+                    {{ '{webauthn:webauthn:wantsModification}'|trans }}
+                {% endif %}
+            </label><br/>
         <button type='button' id='authformSubmit'>{{ '{webauthn:webauthn:authTokenButton}'|trans }}</button>
     </form>
     {% endif %}

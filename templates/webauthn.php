@@ -63,11 +63,14 @@
             <!-- ignoring <input type='hidden' id='userhandle' name='userhandle' value='someuser'/> -->
             <input type='hidden' id='type' name='type' value='something'/>
             <input type='hidden' id='operation' name='operation' value='AUTH'/>
-            <input type='checkbox' id='credentialChange' name='credentialChange'><?php if((isset($this->data['FIDO2Tokens'])?((is_array($this->data['FIDO2Tokens']) || $this->data['FIDO2Tokens'] instanceof Countable)?count($this->data['FIDO2Tokens']):strlen($this->data['FIDO2Tokens'])):0) < 2): ?>
-            <?php echo htmlspecialchars($this->t('{webauthn:webauthn:wantsAdd}')); ?>
-        <?php else: ?>
-            <?php echo htmlspecialchars($this->t('{webauthn:webauthn:wantsModification}')); ?>
-        <?php endif; ?></input><br/>
+            <input type='checkbox' id='credentialChange' name='credentialChange'>
+            <label for='credentialChange'>
+                <?php if((isset($this->data['FIDO2Tokens'])?((is_array($this->data['FIDO2Tokens']) || $this->data['FIDO2Tokens'] instanceof Countable)?count($this->data['FIDO2Tokens']):strlen($this->data['FIDO2Tokens'])):0) < 2): ?>
+                    <?php echo htmlspecialchars($this->t('{webauthn:webauthn:wantsAdd}')); ?>
+                <?php else: ?>
+                    <?php echo htmlspecialchars($this->t('{webauthn:webauthn:wantsModification}')); ?>
+                <?php endif; ?>
+            </label><br/>
         <button type='button' id='authformSubmit'><?php echo htmlspecialchars($this->t('{webauthn:webauthn:authTokenButton}')); ?></button>
     </form>
     <?php endif; ?>
