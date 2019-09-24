@@ -280,7 +280,7 @@ abstract class WebAuthnAbstractEvent
          */
         if (bin2hex(substr($authData, 0, 32)) == hash("sha256", $this->scope)) {
             $this->pass("Relying Party hash correct.");
-            $this->rpIdHash = hash("sha256", $finalScope);
+            $this->rpIdHash = hash("sha256", $this->scope);
         } else {
             $this->fail("Mismatching Relying Party hash.");
         }
