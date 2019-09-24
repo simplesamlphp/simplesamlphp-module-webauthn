@@ -31,7 +31,7 @@
             <input type='hidden' id='type' name='type' value='something'/>
             <input type='hidden' id='operation' name='operation' value='REG'/>
             <button type='button' id='regformSubmit'>{{ '{webauthn:webauthn:newTokenButton}'|trans }}</button>
-            {{ '{webauthn:webauthn:newTokenName}'|trans }}
+            <label for='tokenname'>{{ '{webauthn:webauthn:newTokenName}'|trans }}</label>
             <input type='text' id='tokenname' name='tokenname' size='40'
                 value='{{ '{webauthn:webauthn:newTokenDefaultName}'|trans }} {{ "now"|date('Y-m-d') }}' />
         </form>

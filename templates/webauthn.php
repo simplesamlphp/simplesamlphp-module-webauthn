@@ -31,7 +31,7 @@
             <input type='hidden' id='type' name='type' value='something'/>
             <input type='hidden' id='operation' name='operation' value='REG'/>
             <button type='button' id='regformSubmit'><?php echo htmlspecialchars($this->t('{webauthn:webauthn:newTokenButton}')); ?></button>
-            <?php echo htmlspecialchars($this->t('{webauthn:webauthn:newTokenName}')); ?>
+            <label for='tokenname'><?php echo htmlspecialchars($this->t('{webauthn:webauthn:newTokenName}')); ?></label>
             <input type='text' id='tokenname' name='tokenname' size='40'
                 value='<?php echo htmlspecialchars($this->t('{webauthn:webauthn:newTokenDefaultName}')); ?> <?php echo htmlspecialchars((new DateTime("now"))->format('Y-m-d')); ?>' />
         </form>
