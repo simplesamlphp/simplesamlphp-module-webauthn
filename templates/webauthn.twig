@@ -33,7 +33,7 @@
             <button type='button' id='regformSubmit'>{{ '{webauthn:webauthn:newTokenButton}'|trans }}</button>
             {{ '{webauthn:webauthn:newTokenName}'|trans }}
             <input type='text' id='tokenname' name='tokenname' size='40'
-                value='{{ '{webauthn:webauthn:newTokenDefaultName}'|trans }} {{ "now"|date('Y-m-d', timezone="Europe/Luxembourg") }}' />
+                value='{{ '{webauthn:webauthn:newTokenDefaultName}'|trans }} {{ "now"|date('Y-m-d') }}' />
         </form>
         <div class='space'></div>
         {% if FIDO2Tokens|length > 0 %}

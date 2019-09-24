@@ -33,7 +33,7 @@
             <button type='button' id='regformSubmit'><?php echo htmlspecialchars($this->t('{webauthn:webauthn:newTokenButton}')); ?></button>
             <?php echo htmlspecialchars($this->t('{webauthn:webauthn:newTokenName}')); ?>
             <input type='text' id='tokenname' name='tokenname' size='40'
-                value='<?php echo htmlspecialchars($this->t('{webauthn:webauthn:newTokenDefaultName}')); ?> <?php echo htmlspecialchars((new DateTime("now", new DateTimeZone("Europe/Luxembourg")))->format('Y-m-d')); ?>' />
+                value='<?php echo htmlspecialchars($this->t('{webauthn:webauthn:newTokenDefaultName}')); ?> <?php echo htmlspecialchars((new DateTime("now"))->format('Y-m-d')); ?>' />
         </form>
         <div class='space'></div>
         <?php if((isset($this->data['FIDO2Tokens'])?((is_array($this->data['FIDO2Tokens']) || $this->data['FIDO2Tokens'] instanceof Countable)?count($this->data['FIDO2Tokens']):strlen($this->data['FIDO2Tokens'])):0) > 0): ?>
