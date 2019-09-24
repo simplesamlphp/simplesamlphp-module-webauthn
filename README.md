@@ -51,6 +51,11 @@ so that it takes place AFTER the first-factor authentication. E.g. at 100:
      * FIDO2 token can then also be used on other servers in the same domain.
      * If configuring this item, be sure that the authentication server name and
      * the desired scope are a suffix match.
+     * 
+     * If you do not control the entirety of your second-level domain, you must
+     * set the scope here explicitly to your own hostname to prevent some 
+     * contrived attack scenarios with other servers in that same second-level
+     * domain.
      */
     'scope' => 'example.com',
 

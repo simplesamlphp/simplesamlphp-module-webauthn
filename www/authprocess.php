@@ -47,7 +47,7 @@ if ($publicKey === false) {
 
 $authObject = new WebAuthnAuthenticationEvent(
     $_POST['type'],
-    $state['FIDO2Scope'], 
+    ( $state['FIDO2Scope'] === null ? $state['FIDO2DerivedScope'] : $state['FIDO2Scope'] ), 
     $state['FIDO2SignupChallenge'], 
     $state['IdPMetadata']['entityid'], 
     base64_decode($_POST['authenticator_data']), 

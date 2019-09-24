@@ -278,12 +278,7 @@ abstract class WebAuthnAbstractEvent
          * §7.1 STEP 10: compare incoming RpId hash with expected value
          * §7.2 STEP 12: compare incoming RpId hash with expected value
          */
-        if ($this->scope === null) {
-            $finalScope = $this->derivedScope;
-        } else {
-            $finalScope = $this->scope;
-        }
-        if (bin2hex(substr($authData, 0, 32)) == hash("sha256", $finalScope)) {
+        if (bin2hex(substr($authData, 0, 32)) == hash("sha256", $this->scope)) {
             $this->pass("Relying Party hash correct.");
             $this->rpIdHash = hash("sha256", $finalScope);
         } else {
