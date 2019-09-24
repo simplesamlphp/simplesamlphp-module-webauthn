@@ -31,9 +31,9 @@ so that it takes place AFTER the first-factor authentication. E.g. at 100:
 
         'store' => [
             'webauthn:Database',
-            'dsn' => 'mysql:host=db.example.org;dbname=fido2',
-            'username' => 'simplesaml',
-            'password' => 'sdfsdf',
+            'database.dsn' => 'mysql:host=db.example.org;dbname=fido2',
+            'database.username' => 'simplesaml',
+            'database.password' => 'sdfsdf',
         ],
         
     'attrib_username' => 'urn:oid:1.3.6.1.4.1.23735.100.0',
@@ -116,13 +116,13 @@ The `webauthn:Database` backend storage has the following options:
 `class`
 :   Must be set to `webauthn:Database`.
 
-`dsn`
+`database.dsn`
 :   Data Source Name must comply to the syntax for the PHP PDO layer.
 
-`username`
+`database.username`
 :   Username for the database user to be used for the connection.
 
-`password`
+`database.password`
 :   Password for the database user used for the connection.
 
 `timeout`
@@ -135,9 +135,9 @@ Example config using PostgreSQL database:
         'class'	=> 'webauthn:WebAuthn', 
         'store'	=> array(
             'webauthn:Database', 
-            'dsn' => 'pgsql:host=sql.example.org;dbname=fido2',
-            'username' => 'simplesaml',
-            'password' => 'sdfsdf',
+            'database.dsn' => 'pgsql:host=sql.example.org;dbname=fido2',
+            'database.username' => 'simplesaml',
+            'database.password' => 'sdfsdf',
         ),
     ),
 ```
@@ -149,9 +149,9 @@ Example config using MySQL database:
         'class'	=> 'webauthn:WebAuthn', 
         'store'	=> array(
             'webauthn:Database', 
-            'dsn' => 'mysql:host=db.example.org;dbname=fido2',
-            'username' => 'simplesaml',
-            'password' => 'sdfsdf',
+            'database.dsn' => 'mysql:host=db.example.org;dbname=fido2',
+            'database.username' => 'simplesaml',
+            'database.password' => 'sdfsdf',
         ),
     ),
 ```

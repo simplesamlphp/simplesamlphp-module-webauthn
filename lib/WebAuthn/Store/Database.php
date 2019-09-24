@@ -4,6 +4,7 @@ namespace SimpleSAML\Module\webauthn\WebAuthn\Store;
 
 use SimpleSAML\Configuration;
 use SimpleSAML\Logger;
+use SimpleSAML\Module\webauthn\Store;
 
 /**
  * Store FIDO2 information in database.
