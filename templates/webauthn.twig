@@ -10,15 +10,16 @@
     <h1>{{ '{webauthn:webauthn:heading1}'|trans }}</h1>
     <h2>{{ '{webauthn:webauthn:accountEnabled}'|trans }}</h2>
     {% if FIDO2Tokens|length > 0 %}
-        <div id="currentTokens"><span id='tokencaption'>{{ '{webauthn:webauthn:tokenList}'|trans }}</span>
+        <div id="currentTokens">
+            <span id='tokencaption'>{{ '{webauthn:webauthn:tokenList}'|trans }}</span>
             <ul>
                 {% for token in FIDO2Tokens %}
                     {% if FIDO2AuthSuccessful == false or FIDO2AuthSuccessful != token.0 %}
                         <li class='othertoken'>{{ token.3|e }}</li>
-                        {% else %}
+                    {% else %}
                         <li class='currenttoken'>{{ token.3|e }} {{ '{webauthn:webauthn:currentToken}'|trans }}</li>
-                        {% endif %}
-                    {% endfor %}
+                    {% endif %}
+                {% endfor %}
             </ul>
         </div>
     {% endif %}
@@ -30,12 +31,9 @@
             <input type='hidden' id='type' name='type' value='something'/>
             <input type='hidden' id='operation' name='operation' value='REG'/>
             <button type='button' id='regformSubmit'>{{ '{webauthn:webauthn:newTokenButton}'|trans }}</button>
-            {{ '{webauthn:webauthn:newTokenName}'|trans }} <input 
-                type='text' 
-                id='tokenname' 
-                name='tokenname' 
-                size='40' 
-                value='{{ '{webauthn:webauthn:newTokenDefaultName}'|trans }} {{ "now"|date('Y-m-d', timezone="Europe/Luxembourg") }}' />
+            <label for='tokenname'>{{ '{webauthn:webauthn:newTokenName}'|trans }}</label>
+            <input type='text' id='tokenname' name='tokenname' size='40'
+                value='{{ '{webauthn:webauthn:newTokenDefaultName}'|trans }} {{ "now"|date('Y-m-d') }}' />
         </form>
         <div class='space'></div>
         {% if FIDO2Tokens|length > 0 %}
@@ -43,13 +41,17 @@
                 {% if FIDO2AuthSuccessful != token.0 %}
                     <form class='deleteform' id='delete-{{ loop.index }}' method='POST' action='{{ delURL|raw }}'>
                         <input type='hidden' id='credId-{{ loop.index }}' name='credId' value='{{ token.0 }}'/>
-                        <button type='submit' id='submit-{{ loop.index }}' name='submit' value='DELETE'>{{ '{webauthn:webauthn:removePrefix}'|trans }} &quot;{{ token.3 }}&quot;</button>
+                        <button type='submit' id='submit-{{ loop.index }}' name='submit' value='DELETE'>
+                            {{ '{webauthn:webauthn:removePrefix}'|trans }} &quot;{{ token.3 }}&quot;
+                        </button>
                     </form>
                 {% endif %}
             {% endfor %}
             <div class='space'></div>
             <form id='nevermind' method='POST' action='{{ delURL|raw }}'>
-                <button type='submit' id='submit-nevermind' name='submit' value='NEVERMIND'>{{ '{webauthn:webauthn:noChange}'|trans }}</button>
+                <button type='submit' id='submit-nevermind' name='submit' value='NEVERMIND'>
+                    {{ '{webauthn:webauthn:noChange}'|trans }}
+                </button>
             </form>
         {% endif %}
     {% endif %}
@@ -63,13 +65,16 @@
             <!-- ignoring <input type='hidden' id='userhandle' name='userhandle' value='someuser'/> -->
             <input type='hidden' id='type' name='type' value='something'/>
             <input type='hidden' id='operation' name='operation' value='AUTH'/>
-            <input type='checkbox' id='credentialChange' name='credentialChange'>{% if FIDO2Tokens|length < 2 %}
-            {{ '{webauthn:webauthn:wantsAdd}'|trans }}
-        {% else %}
-            {{ '{webauthn:webauthn:wantsModification}'|trans }}
-        {% endif %}</input><br/>
-        <button type='button' id='authformSubmit'>{{ '{webauthn:webauthn:authTokenButton}'|trans }}</button>
-    </form>
+            <input type='checkbox' id='credentialChange' name='credentialChange'>
+            <label for='credentialChange'>
+                {% if FIDO2Tokens|length < 2 %}
+                    {{ '{webauthn:webauthn:wantsAdd}'|trans }}
+                {% else %}
+                    {{ '{webauthn:webauthn:wantsModification}'|trans }}
+                {% endif %}
+            </label><br/>
+            <button type='button' id='authformSubmit'>{{ '{webauthn:webauthn:authTokenButton}'|trans }}</button>
+        </form>
     {% endif %}
     <script src="{{ asset }}assets/js/webauthn.js"></script>
-        {% endblock %}
+{% endblock %}

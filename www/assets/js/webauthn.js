@@ -43,7 +43,7 @@ function registrationButtonClick() {
 function authButtonClick() {
     navigator.credentials.get(publicKeyCredentialRequestOptions)
     .then((cred) => {
-        console.log('NEW CREDENTIAL', cred);
+        console.log('AUTH', cred);
         document.getElementById('resp').value = cred.id;
         var enc = new TextDecoder('utf-8');
         document.getElementById('data_raw_b64').value = btoa(ArrayBufferToString(cred.response.clientDataJSON));
