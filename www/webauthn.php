@@ -45,6 +45,7 @@ foreach ($challenge as $oneChar) {
     $challengeEncoded[] = hexdec($oneChar);
 }
 
+$credentialIdEncoded = [];
 foreach ($state['FIDO2Tokens'] as $number => $token) {
     $idSplit = str_split($token[0], 2);
     $credentialIdEncoded[$number] = [];
