@@ -4,6 +4,7 @@ require_once(dirname(dirname(dirname(__DIR__))) . '/vendor/autoload.php');
 
 use Lcobucci\JWT\Parser;
 use SimpleSAML\Utils\Config as SSPConfig;
+use SimpleSAML\Module\webauthn\WebAuthn\AAGUID;
 use SimpleSAML\Module\webauthn\WebAuthn\WebAuthnRegistrationEvent;
 
 if ($argc < 2) {
@@ -91,6 +92,6 @@ $res["9ddd1817af5a4672a2b93e3dd95000a9"] = [
 ];
 
 file_put_contents(
-    SSPConfig::getConfigDir() . '/' . WebAuthnRegistrationEvent::AAGUID_CONFIG_FILE,
+    SSPConfig::getConfigDir() . '/' . AAGUID::AAGUID_CONFIG_FILE,
     json_encode($res, JSON_PRETTY_PRINT)
 );
