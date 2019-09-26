@@ -11,7 +11,6 @@ use SimpleSAML\Module\webauthn\WebAuthn\WebAuthnAuthenticationEvent;
 if (session_status() != PHP_SESSION_ACTIVE) {
     session_cache_limiter('nocache');
 }
-$globalConfig = Configuration::getInstance();
 
 Logger::info('FIDO2 - Accessing WebAuthn enrollment validation');
 

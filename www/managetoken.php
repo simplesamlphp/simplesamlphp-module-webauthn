@@ -9,7 +9,6 @@ use SimpleSAML\Logger;
 if (session_status() != PHP_SESSION_ACTIVE) {
     session_cache_limiter('nocache');
 }
-$globalConfig = Configuration::getInstance();
 
 Logger::info('FIDO2 - Accessing WebAuthn token management');
 
