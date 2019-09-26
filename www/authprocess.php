@@ -61,12 +61,13 @@ $authObject = new WebAuthnAuthenticationEvent(
 /**
  * §7.2 STEP 18 : detect physical object cloning on the token
  */
-if (($previousCounter != 0 || $authObject->counter != 0) && $authObject->counter > $previousCounter) {
+$counter = $authObject->getCounter();
+if (($previousCounter != 0 || $counter != 0) && $counter > $previousCounter) {
     // Signature counter was incremented compared to last time, good
     $store = $state['webauthn:store'];
-    $store->updateSignCount($oneToken[0], $authObject->counter);
+    $store->updateSignCount($oneToken[0], $counter);
 } else {
-    throw new Exception("Signature counter less or equal to a previous authentication! Token cloning likely (old: $previousCounter, new: $authObject->counter.");
+    throw new Exception("Signature counter less or equal to a previous authentication! Token cloning likely (old: $previousCounter, new: $counter.");
 }
 // THAT'S IT. The user authenticated successfully. Remember the credential ID that was used.
 $state['FIDO2AuthSuccessful'] = $oneToken[0];
@@ -79,8 +80,8 @@ if (isset($_POST['credentialChange']) && $_POST['credentialChange'] == "on") {
 Auth\State::saveState($state, 'webauthn:request');
 
 if ($debugEnabled) {
-    echo $authObject->debugBuffer;
-    echo $authObject->validateBuffer;
+    echo $authObject->getDebugBuffer();
+    echo $authObject->getValidateBuffer();
     echo "Debug mode, not continuing to ". ($state['FIDO2WantsRegister'] ? "credential registration page." : "destination.");
 } else {
     if ($state['FIDO2WantsRegister']) {

@@ -31,13 +31,13 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * the AAGUID of the newly registered authenticator
      * @var string
      */
-    public $AAGUID;
+    protected $AAGUID;
 
     /**
      * how sure are we about the AAGUID?
      * @var int
      */
-    public $AAGUIDAssurance;
+    protected $AAGUIDAssurance;
 
     /**
      * An array of known hardware tokens
@@ -407,4 +407,11 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         return $pem;
     }
 
+    /**
+     * @return string
+     */
+    public function getAAGUID()
+    {
+        return $this->AAGUID;
+    }
 }

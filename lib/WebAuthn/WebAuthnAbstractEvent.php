@@ -18,7 +18,6 @@ use CBOR\StringStream;
  */
 abstract class WebAuthnAbstractEvent
 {
-
     /**
      * Scope of the FIDO2 attestation. Can only be in the own domain.
      *
@@ -52,28 +51,28 @@ abstract class WebAuthnAbstractEvent
      *
      * @var int
      */
-    public $counter;
+    protected $counter;
 
     /**
      * extensive debug information collection?
      *
      * @var bool
      */
-    public $debugMode = false;
+    protected $debugMode = false;
 
     /**
      * A string buffer to hold debug information in case we need it.
      *
      * @var string
      */
-    public $debugBuffer = "";
+    protected $debugBuffer = "";
 
     /**
      * A string buffer to hold raw validation data in case we want to look at it.
      *
      * @var string
      */
-    public $validateBuffer = "";
+    protected $validateBuffer = "";
 
     /**
      * the type of event requested. This is to be set in child class constructors
@@ -96,7 +95,7 @@ abstract class WebAuthnAbstractEvent
      *
      * @var string
      */
-    public $credentialId;
+    protected $credentialId;
 
     /**
      * the credential binary data for this event (either the one that gets 
@@ -106,7 +105,7 @@ abstract class WebAuthnAbstractEvent
      *
      * @var string
      */
-    public $credential;
+    protected $credential;
 
     /**
      * Initialize the event object.
@@ -150,6 +149,46 @@ abstract class WebAuthnAbstractEvent
     }
 
     /**
+     * @return int
+     */
+    public function getCounter() : int
+    {
+        return $this->counter;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCredential() : string
+    {
+        return $this->credential;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCredentialId() : string
+    {
+        return $this->credentialId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDebugBuffer() : string
+    {
+        return $this->debugBuffer;
+    }
+
+    /**
+     * @return string
+     */
+    public function getValidateBuffer() : string
+    {
+        return $this->validateBuffer;
+    }
+
+    /**
      * The base64url decode function differs slightly from base64. Thanks.
      * 
      * taken from https://gist.github.com/nathggns/6652997
@@ -157,7 +196,7 @@ abstract class WebAuthnAbstractEvent
      * @param string $data the base64url-encoded source string
      * @return string the decoded string
      */
-    public static function base64url_decode(string $data): string
+    public static function base64url_decode(string $data) : string
     {
         return base64_decode(strtr($data, '-_', '+/'));
     }
@@ -176,7 +215,7 @@ abstract class WebAuthnAbstractEvent
      *
      * @return string
      */
-    private function verifyClientDataJSON(string $clientDataJSON): string
+    private function verifyClientDataJSON(string $clientDataJSON) : string
     {
         /**
          * §7.1 STEP 2 + 3 : convert to JSON and dissect JSON into PHP associative array
@@ -269,7 +308,7 @@ abstract class WebAuthnAbstractEvent
      *
      * @return int the current counter value of the authenticator
      */
-    private function validateAuthData(string $authData): int
+    private function validateAuthData(string $authData) : int
     {
         $this->debugBuffer .= "AuthData: <pre>";
         $this->debugBuffer .= print_r($authData, true);
@@ -335,7 +374,7 @@ abstract class WebAuthnAbstractEvent
      * @param string $rawData the binary CBOR blob
      * @return array the decoded CBOR data
      */
-    protected function cborDecode(string $rawData): array
+    protected function cborDecode(string $rawData) : array
     {
         $otherObjectManager = new OtherObject\OtherObjectManager();
         $otherObjectManager->add(OtherObject\SimpleObject::class);
@@ -372,7 +411,7 @@ abstract class WebAuthnAbstractEvent
      * @param string $text
      * @return void
      */
-    protected function warn(string $text): void
+    protected function warn(string $text) : void
     {
         $this->validateBuffer .= "<span style='background-color:yellow;'>WARN: $text</span><br/>";
     }
@@ -382,7 +421,7 @@ abstract class WebAuthnAbstractEvent
      * @throws \Exception
      * @return void
      */
-    protected function fail(string $text): void
+    protected function fail(string $text) : void
     {
         $this->validateBuffer .= "<span style='background-color:red;'>FAIL: $text</span><br/>";
         if ($this->debugMode === true) {
@@ -396,7 +435,7 @@ abstract class WebAuthnAbstractEvent
      * @param string $text
      * @return void
      */
-    protected function pass(string $text): void
+    protected function pass(string $text) : void
     {
         $this->validateBuffer .= "<span style='background-color:green; color:white;'>PASS: $text</span><br/>";
     }
@@ -405,7 +444,7 @@ abstract class WebAuthnAbstractEvent
      * @param string $text
      * @return void
      */
-    protected function ignore(string $text): void
+    protected function ignore(string $text) : void
     {
         $this->validateBuffer .= "<span style='background-color:blue; color:white;'>IGNORE: $text</span><br/>";
     }
