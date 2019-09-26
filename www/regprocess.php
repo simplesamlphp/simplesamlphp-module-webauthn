@@ -47,10 +47,10 @@ $regObject = new WebAuthnRegistrationEvent(
  * STEP 19 of the validation procedure in § 7.1 of the spec: see if this credential is already registered
  */
 $store = $state['webauthn:store'];
-if ($store->doesCredentialExist(bin2hex($regObject->credentialId)) === false) {
+if ($store->doesCredentialExist(bin2hex($regObject->getCredentialId())) === false) {
     // credential does not exist yet in database, good.
 } else {
-    throw new Exception("The credential with ID " . $regObject->credentialId . "already exists.");
+    throw new Exception("The credential with ID " . $regObject->getCredentialId() . "already exists.");
 }
 // THAT'S IT. This is a valid credential and can be enrolled to the user.
 $friendlyName = $_POST['tokenname'];
@@ -59,8 +59,8 @@ if ($state['requestTokenModel']) {
     $model = \SimpleSAML\Locale\Translate::noop('unknown model');
     $vendor = \SimpleSAML\Locale\Translate::noop('unknown vendor');
     $aaguiddict = AAGUID::getInstance();
-    if ($aaguiddict->hasToken($regObject->AAGUID)) {
-        $token = $aaguiddict->get($regObject->AAGUID);
+    if ($aaguiddict->hasToken($regObject->getAAGUID())) {
+        $token = $aaguiddict->get($regObject->getAAGUID());
         $model = $token['model'];
         $vendor = $token['O'];
     }
@@ -69,13 +69,13 @@ if ($state['requestTokenModel']) {
 /**
  * STEP 20 of the validation procedure in § 7.1 of the spec: store credentialId, credential, signCount and associate with user
  */
-$store->storeTokenData($state['FIDO2Username'], $regObject->credentialId, $regObject->credential, $regObject->counter, $friendlyName);
+$store->storeTokenData($state['FIDO2Username'], $regObject->getCredentialId(), $regObject->getCredential(), $regObject->getCounter(), $friendlyName);
 // make sure $state gets the news, the token is to be displayed to the user on the next page
-$state['FIDO2Tokens'][] = [0 => $regObject->credentialId, 1 => $regObject->credential, 2 => $regObject->counter, 3 => $friendlyName];
+$state['FIDO2Tokens'][] = [0 => $regObject->getCredentialId(), 1 => $regObject->getCredential(), 2 => $regObject->getCounter(), 3 => $friendlyName];
 Auth\State::saveState($state, 'webauthn:request');
 if ($debugEnabled === true) {
-    echo $regObject->debugBuffer;
-    echo $regObject->validateBuffer;
+    echo $regObject->getDebugBuffer();
+    echo $regObject->getValidateBuffer();
     echo "<form id='regform' method='POST' action='" . Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($id)) . "'>";
     echo "<button type='submit'>Return to previous page.</button>";
 } else {
