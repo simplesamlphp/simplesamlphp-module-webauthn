@@ -26,6 +26,7 @@ if (!array_key_exists('StateId', $_REQUEST)) {
 }
 
 $id = $_REQUEST['StateId'];
+/** @var array $state */
 $state = Auth\State::loadState($id, 'webauthn:request');
 
 // Make, populate and layout consent form
@@ -63,6 +64,7 @@ $frontendData = [];
 $frontendData['challengeEncoded'] = $challengeEncoded;
 $frontendData['state'] = [];
 foreach (['Source','FIDO2Scope','FIDO2Username','FIDO2Displayname','requestTokenModel'] as $stateItem) {
+    Assert::isArray($state[$stateItem]);
     $frontendData['state'][$stateItem] = $state[$stateItem];
 }
 $frontendData['usernameEncoded'] = $usernameEncoded;

@@ -20,6 +20,7 @@ if (!array_key_exists('StateId', $_REQUEST)) {
 }
 
 $id = $_REQUEST['StateId'];
+/** @var array $state */
 $state = Auth\State::loadState($id, 'webauthn:request');
 
 if ($state['FIDO2AuthSuccessful'] === false) {

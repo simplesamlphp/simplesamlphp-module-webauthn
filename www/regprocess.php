@@ -24,6 +24,7 @@ if (!array_key_exists('StateId', $_REQUEST)) {
 $debugEnabled = false;
 
 $id = $_REQUEST['StateId'];
+/** @var array $state */
 $state = Auth\State::loadState($id, 'webauthn:request');
 
 // registering a credential is only allowed for new users or after being authenticated

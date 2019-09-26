@@ -24,6 +24,7 @@ if (!array_key_exists('StateId', $_REQUEST)) {
 $debugEnabled = false;
 
 $id = $_REQUEST['StateId'];
+/** @var array $state */
 $state = Auth\State::loadState($id, 'webauthn:request');
 
 $incomingID = bin2hex(WebAuthnAbstractEvent::base64urlDecode($_POST['response_id']));
