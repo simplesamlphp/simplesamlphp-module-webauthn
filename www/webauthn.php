@@ -14,6 +14,7 @@ use SimpleSAML\Logger;
 use SimpleSAML\Module;
 use SimpleSAML\Utils;
 use SimpleSAML\XHTML\Template;
+use Webmozart\Assert\Assert;
 
 $globalConfig = Configuration::getInstance();
 
