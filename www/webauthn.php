@@ -37,6 +37,7 @@ $t->data['FIDO2Tokens'] = $state['FIDO2Tokens'];
 $challenge = str_split($state['FIDO2SignupChallenge'], 2);
 $username = str_split(hash('sha512', $state['FIDO2Username'] . '|' . Utils\Config::getSecretSalt() . '|' . $state['Source']['entityid']), 2);
 
+$credentialIdEncoded = [];
 $challengeEncoded = [];
 foreach ($challenge as $oneChar) {
     $challengeEncoded[] = hexdec($oneChar);
