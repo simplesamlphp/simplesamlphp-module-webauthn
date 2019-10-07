@@ -98,7 +98,7 @@ class Database extends Store
 
         $c = $st->fetchColumn();
         if ($c == 0) {
-            Logger::warning('User does not exist in DB, returning desired default: ' . $c);
+            Logger::debug('User does not exist in DB, returning desired default.');
             return $defaultIfNx;
         } else {
             $st2 = $this->db->read(
@@ -109,7 +109,7 @@ class Database extends Store
             if ($rowCount2 === 1 /* explicitly disabled user in DB */) {
                 return false;
             }
-            Logger::warning('User exists and is not disabled -> enabled.');
+            Logger::debug('User exists and is not disabled -> enabled.');
             return true;
         }
     }
