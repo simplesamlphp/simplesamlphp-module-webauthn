@@ -31,13 +31,13 @@ if (count($state['FIDO2Tokens']) > 0 && $state['FIDO2AuthSuccessful'] === false)
     throw new Exception("Attempt to register new token in unacceptable context.");
 }
 
-$fido2Scope = ( $state['FIDO2Scope'] === null ? $state['FIDO2DerivedScope'] : $state['FIDO2Scope'] );
+$fido2Scope = ($state['FIDO2Scope'] === null ? $state['FIDO2DerivedScope'] : $state['FIDO2Scope']);
 if ($fido2Scope === NULL) {
     throw new Exception("FIDO2Scope cannot be null!");
 }
 $regObject = new WebAuthnRegistrationEvent(
     $_POST['type'],
-    ( $state['FIDO2Scope'] === null ? $state['FIDO2DerivedScope'] : $state['FIDO2Scope'] ),
+    $fido2Scope,
     $state['FIDO2SignupChallenge'],
     $state['IdPMetadata']['entityid'],
     base64_decode($_POST['attestation_object']),
