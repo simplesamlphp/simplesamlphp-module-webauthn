@@ -63,7 +63,7 @@ class AAGUID
      */
     public static function getInstance()
     {
-        if (self::$instance === null) {
+        if (!isset(self::$instance)) {
             self::$instance = new self();
         }
         return self::$instance;
