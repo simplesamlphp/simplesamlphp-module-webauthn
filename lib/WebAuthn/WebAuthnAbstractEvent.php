@@ -272,7 +272,8 @@ abstract class WebAuthnAbstractEvent
          * §7.1 STEP 6 : check if incoming origin matches our hostname (taken from IdP metadata prefix)
          * §7.2 STEP 10: check if incoming origin matches our hostname (taken from IdP metadata prefix)
          */
-        $expectedOrigin = substr($this->idpEntityId, 0, strpos($this->idpEntityId, '/', 8));
+        $slash = strpos($this->idpEntityId, '/', 8);
+        $expectedOrigin = ($slash !== false) ? substr($this->idpEntityId, 0, $slash) : $slash;
         if ($clientData['origin'] === $expectedOrigin) {
             $this->pass("Origin matches");
         } else {
