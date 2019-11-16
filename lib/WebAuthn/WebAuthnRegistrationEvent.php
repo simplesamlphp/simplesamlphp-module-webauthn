@@ -256,7 +256,8 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * @param array $attestationArray
      * @return void
      */
-    private function validateAttestationFormatPackedSelf(array $attestationArray): void {
+    private function validateAttestationFormatPackedSelf(array $attestationArray): void
+    {
         $stmtDecoded = $attestationArray['attStmt'];
         /**
          * §8.2 Step 4 Bullet 1: check algorithm
@@ -290,7 +291,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * @param array $attestationData the incoming attestation data
      * @return void
      */
-    private function validateAttestationFormatFidoU2F(array $attestationData) : void
+    private function validateAttestationFormatFidoU2F(array $attestationData): void
     {
         /**
          * §8.6 Verification Step 1 is a NOOP: if we're here, the attStmt was
