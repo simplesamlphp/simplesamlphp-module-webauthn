@@ -336,6 +336,8 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         }
         /**
          * §8.6 Verification Step 5: create verificationData
+         *
+         * @psalm-var string $publicKeyU2F
          */
         $verificationData = chr(0) . $this->rpIdHash . $this->clientDataHash . $this->credentialId . $publicKeyU2F;
         /**
