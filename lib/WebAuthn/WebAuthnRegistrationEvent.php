@@ -326,9 +326,9 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
          */
         if (
             isset($this->credential[-2]) &&
-            sizeof($this->credential[-2]) === 32 &&
+            strlen($this->credential[-2]) === 32 &&
             isset($this->credential[-3]) &&
-            sizeof($this->credential[-3]) === 32
+            strlen($this->credential[-3]) === 32
         ) {
             $publicKeyU2F = chr(4) . $this->credential[-2] . $this->credential[-3];
         } else {
