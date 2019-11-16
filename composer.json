@@ -17,13 +17,13 @@
     },
     "require": {
         "ext-pdo": "*",
-        "simplesamlphp/composer-module-installer": "~1.0",
-        "simplesamlphp/simplesamlphp": "*",
-        "spomky-labs/cbor-php": "*",
-        "web-auth/cose-lib": "*"
+        "simplesamlphp/composer-module-installer": "~1.1",
+        "simplesamlphp/simplesamlphp": "^1.18@RC",
+        "spomky-labs/cbor-php": "^1.0",
+        "web-auth/cose-lib": "^2.1"
     },
     "require-dev": {
         "lcobucci/jwt": "^3.3",
-        "simplesamlphp/simplesamlphp-test-framework": "0.0.11"
+        "simplesamlphp/simplesamlphp-test-framework": "0.1.0"
     }
 }
