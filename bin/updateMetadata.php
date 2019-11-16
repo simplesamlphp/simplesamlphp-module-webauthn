@@ -5,7 +5,6 @@ require_once(dirname(dirname(dirname(__DIR__))) . '/vendor/autoload.php');
 use Lcobucci\JWT\Parser;
 use SimpleSAML\Utils\Config as SSPConfig;
 use SimpleSAML\Module\webauthn\WebAuthn\AAGUID;
-use SimpleSAML\Module\webauthn\WebAuthn\WebAuthnRegistrationEvent;
 
 if ($argc < 2) {
     throw new Exception(
