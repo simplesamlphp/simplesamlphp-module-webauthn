@@ -51,6 +51,7 @@ if ($publicKey === false) {
     );
 }
 
+/** @psalm-var array $oneToken */
 $authObject = new WebAuthnAuthenticationEvent(
     $_POST['type'],
     ($state['FIDO2Scope'] === null ? $state['FIDO2DerivedScope'] : $state['FIDO2Scope']),
