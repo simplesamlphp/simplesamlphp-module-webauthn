@@ -21,7 +21,8 @@ function ArrayBufferToString(buffer)
     return BinaryToString(String.fromCharCode.apply(null, Array.prototype.slice.apply(new Uint8Array(buffer))));
 }
 
-function registrationButtonClick() {
+function registrationButtonClick()
+{
     navigator.credentials.create(publicKeyCredentialCreationOptions)
     .then((cred) => {
         console.log('NEW CREDENTIAL', cred);
@@ -40,7 +41,8 @@ function registrationButtonClick() {
     });
 }
 
-function authButtonClick() {
+function authButtonClick()
+{
     navigator.credentials.get(publicKeyCredentialRequestOptions)
     .then((cred) => {
         console.log('AUTH', cred);
@@ -64,30 +66,30 @@ function authButtonClick() {
 var frontendData = JSON.parse(document.getElementById('frontendData').getAttribute('content'));
 var publicKeyCredentialCreationOptions = {
     publicKey: {
-      challenge: new Uint8Array(frontendData['challengeEncoded']).buffer, 
-      rp: {
-          name: frontendData['state']['Source']['entityid'],
-          id: frontendData['FIDO2Scope'],
-      },
-      user: {
-      id: new Uint8Array(frontendData['usernameEncoded']).buffer,
-          name: frontendData['state']['FIDO2Username'],
-          displayName: frontendData['state']['FIDO2Displayname'],
-      },
-      pubKeyCredParams: [{alg: -7, type: 'public-key'}],
-      timeout: 60000,
-      attestation: frontendData['attestation'],
-  }
+        challenge: new Uint8Array(frontendData['challengeEncoded']).buffer,
+        rp: {
+            name: frontendData['state']['Source']['entityid'],
+            id: frontendData['FIDO2Scope'],
+        },
+        user: {
+            id: new Uint8Array(frontendData['usernameEncoded']).buffer,
+            name: frontendData['state']['FIDO2Username'],
+            displayName: frontendData['state']['FIDO2Displayname'],
+        },
+        pubKeyCredParams: [{alg: -7, type: 'public-key'}],
+        timeout: 60000,
+        attestation: frontendData['attestation'],
+    }
 };
 
 const publicKeyCredentialRequestOptions = {
     publicKey: {
         challenge: new Uint8Array(frontendData['challengeEncoded']).buffer,
         rpId: frontendData['state']['FIDO2Scope'],
-        allowCredentials: frontendData['credentialIdEncoded'].map((oneId)=>{
+        timeout: 60000,
+        allowCredentials: frontendData['credentialIdEncoded'].map((oneId) => {
             return {id: new Uint8Array(oneId).buffer, type: 'public-key'};
         }),
-        timeout: 60000,
     }
 };
 
@@ -96,8 +98,8 @@ window.addEventListener('DOMContentLoaded', () => {
     let regform = document.getElementById('regform');
     if (regform !== null) {
         document.getElementById('regformSubmit').addEventListener('click', registrationButtonClick);
-        regform.addEventListener('submit', ()=>false);
-        document.getElementById('tokenname').addEventListener('keydown', (event)=>{
+        regform.addEventListener('submit', () => false);
+        document.getElementById('tokenname').addEventListener('keydown', (event) => {
             if (event.keyCode == 13) {
                 return false;
             }
@@ -106,6 +108,6 @@ window.addEventListener('DOMContentLoaded', () => {
     let authform = document.getElementById('authform');
     if (authform !== null) {
         document.getElementById('authformSubmit').addEventListener('click', authButtonClick);
-        authform.addEventListener('submit', ()=>false);
+        authform.addEventListener('submit', () => false);
     }
 });

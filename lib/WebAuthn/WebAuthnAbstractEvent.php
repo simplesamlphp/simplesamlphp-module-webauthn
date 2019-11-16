@@ -90,7 +90,7 @@ abstract class WebAuthnAbstractEvent
     /**
      * the credential ID for this event (either the one that gets registered, or
      * the one that gets used to authenticate)
-     * 
+     *
      * To be set by the constructors of the child classes.
      *
      * @var string
@@ -98,7 +98,7 @@ abstract class WebAuthnAbstractEvent
     protected $credentialId;
 
     /**
-     * the credential binary data for this event (either the one that gets 
+     * the credential binary data for this event (either the one that gets
      * registered, or the one that gets used to authenticate)
      *
      * To be set by the constructors of the child classes.
@@ -120,8 +120,15 @@ abstract class WebAuthnAbstractEvent
      * @param string $clientDataJSON  the client data JSON string which is present in all types of events
      * @param bool   $debugMode       shall we collect and output some extensive debugging information along the way?
      */
-    public function __construct(string $pubkeyCredType, string $scope, string $challenge, string $idpEntityId, string $authData, string $clientDataJSON, bool $debugMode = false)
-    {
+    public function __construct(
+        string $pubkeyCredType,
+        string $scope,
+        string $challenge,
+        string $idpEntityId,
+        string $authData,
+        string $clientDataJSON,
+        bool $debugMode = false
+    ) {
         $this->scope = $scope;
         $this->challenge = $challenge;
         $this->idpEntityId = $idpEntityId;
@@ -143,7 +150,10 @@ abstract class WebAuthnAbstractEvent
                 break;
         }
 
-        /* eventType is already set by child constructor, otherwise the function will fail because of the missing type) */
+        /**
+         * eventType is already set by child constructor, otherwise the function
+         * will fail because of the missing type)
+         */
         $this->clientDataHash = $this->verifyClientDataJSON($clientDataJSON);
         $this->counter = $this->validateAuthData($authData);
     }
@@ -151,7 +161,7 @@ abstract class WebAuthnAbstractEvent
     /**
      * @return int
      */
-    public function getCounter() : int
+    public function getCounter(): int
     {
         return $this->counter;
     }
@@ -159,7 +169,7 @@ abstract class WebAuthnAbstractEvent
     /**
      * @return string
      */
-    public function getCredential() : string
+    public function getCredential(): string
     {
         return $this->credential;
     }
@@ -167,7 +177,7 @@ abstract class WebAuthnAbstractEvent
     /**
      * @return string
      */
-    public function getCredentialId() : string
+    public function getCredentialId(): string
     {
         return $this->credentialId;
     }
@@ -175,7 +185,7 @@ abstract class WebAuthnAbstractEvent
     /**
      * @return string
      */
-    public function getDebugBuffer() : string
+    public function getDebugBuffer(): string
     {
         return $this->debugBuffer;
     }
@@ -183,39 +193,39 @@ abstract class WebAuthnAbstractEvent
     /**
      * @return string
      */
-    public function getValidateBuffer() : string
+    public function getValidateBuffer(): string
     {
         return $this->validateBuffer;
     }
 
     /**
      * The base64url decode function differs slightly from base64. Thanks.
-     * 
+     *
      * taken from https://gist.github.com/nathggns/6652997
-     * 
+     *
      * @param string $data the base64url-encoded source string
      * @return string the decoded string
      */
-    public static function base64url_decode(string $data) : string
+    public static function base64urlDecode(string $data): string
     {
         return base64_decode(strtr($data, '-_', '+/'));
     }
 
     /**
      * this function validates the content of clientDataJSON.
-     * I.e. it performs 
+     * I.e. it performs
      *   - for a REGistration session
      *     - the validation steps 2 through 8 of the validation
      *     - the parts of step 14 that relate to clientDataJSON
      *   - for a AUTHentication session
      *     - the validation steps 6 through 11 of the validation
      *     - the parts of step 15 that relate to clientDataJSON
-     * 
+     *
      * @param string $clientDataJSON the incoming data
      *
      * @return string
      */
-    private function verifyClientDataJSON(string $clientDataJSON) : string
+    private function verifyClientDataJSON(string $clientDataJSON): string
     {
         /**
          * §7.1 STEP 2 + 3 : convert to JSON and dissect JSON into PHP associative array
@@ -253,7 +263,7 @@ abstract class WebAuthnAbstractEvent
          * §7.1 STEP 5 : check if incoming challenge matches issued challenge
          * §7.2 STEP 9 : check if incoming challenge matches issued challenge
          */
-        if ($this->challenge == bin2hex(WebAuthnAbstractEvent::base64url_decode($clientData['challenge']))) {
+        if ($this->challenge == bin2hex(WebAuthnAbstractEvent::base64urlDecode($clientData['challenge']))) {
             $this->pass("Challenge matches");
         } else {
             $this->fail("Challenge does not match");
@@ -295,20 +305,20 @@ abstract class WebAuthnAbstractEvent
 
     /**
      * This function performs the required checks on the authData (REG) or authenticatorData (AUTH) structure
-     * 
-     * I.e. it performs 
+     *
+     * I.e. it performs
      *   - for a REGistration session
      *     - the validation steps 10-12 of the validation
      *     - the parts of step 14 that relate to authData
      *   - for a AUTHentication session
      *     - the validation steps 12-14 of the validation
      *     - the parts of step 15 that relate to authData
-     * 
+     *
      * @param string $authData           the authData / authenticatorData binary blob
      *
      * @return int the current counter value of the authenticator
      */
-    private function validateAuthData(string $authData) : int
+    private function validateAuthData(string $authData): int
     {
         $this->debugBuffer .= "AuthData: <pre>";
         $this->debugBuffer .= print_r($authData, true);
@@ -374,7 +384,7 @@ abstract class WebAuthnAbstractEvent
      * @param string $rawData the binary CBOR blob
      * @return array the decoded CBOR data
      */
-    protected function cborDecode(string $rawData) : array
+    protected function cborDecode(string $rawData): array
     {
         $otherObjectManager = new OtherObject\OtherObjectManager();
         $otherObjectManager->add(OtherObject\SimpleObject::class);
@@ -411,7 +421,7 @@ abstract class WebAuthnAbstractEvent
      * @param string $text
      * @return void
      */
-    protected function warn(string $text) : void
+    protected function warn(string $text): void
     {
         $this->validateBuffer .= "<span style='background-color:yellow;'>WARN: $text</span><br/>";
     }
@@ -421,7 +431,7 @@ abstract class WebAuthnAbstractEvent
      * @throws \Exception
      * @return void
      */
-    protected function fail(string $text) : void
+    protected function fail(string $text): void
     {
         $this->validateBuffer .= "<span style='background-color:red;'>FAIL: $text</span><br/>";
         if ($this->debugMode === true) {
@@ -435,7 +445,7 @@ abstract class WebAuthnAbstractEvent
      * @param string $text
      * @return void
      */
-    protected function pass(string $text) : void
+    protected function pass(string $text): void
     {
         $this->validateBuffer .= "<span style='background-color:green; color:white;'>PASS: $text</span><br/>";
     }
@@ -444,9 +454,8 @@ abstract class WebAuthnAbstractEvent
      * @param string $text
      * @return void
      */
-    protected function ignore(string $text) : void
+    protected function ignore(string $text): void
     {
         $this->validateBuffer .= "<span style='background-color:blue; color:white;'>IGNORE: $text</span><br/>";
     }
-
 }

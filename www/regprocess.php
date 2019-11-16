@@ -67,16 +67,31 @@ if ($state['requestTokenModel']) {
     $friendlyName .= " ($model [$vendor])";
 }
 /**
- * STEP 20 of the validation procedure in § 7.1 of the spec: store credentialId, credential, signCount and associate with user
+ * STEP 20 of the validation procedure in § 7.1 of the spec: store credentialId, credential,
+ * signCount and associate with user
  */
-$store->storeTokenData($state['FIDO2Username'], $regObject->getCredentialId(), $regObject->getCredential(), $regObject->getCounter(), $friendlyName);
+$store->storeTokenData(
+    $state['FIDO2Username'],
+    $regObject->getCredentialId(),
+    $regObject->getCredential(),
+    $regObject->getCounter(),
+    $friendlyName
+);
+
 // make sure $state gets the news, the token is to be displayed to the user on the next page
-$state['FIDO2Tokens'][] = [0 => $regObject->getCredentialId(), 1 => $regObject->getCredential(), 2 => $regObject->getCounter(), 3 => $friendlyName];
+$state['FIDO2Tokens'][] = [
+    0 => $regObject->getCredentialId(),
+    1 => $regObject->getCredential(),
+    2 => $regObject->getCounter(),
+    3 => $friendlyName
+];
+
 Auth\State::saveState($state, 'webauthn:request');
 if ($debugEnabled === true) {
     echo $regObject->getDebugBuffer();
     echo $regObject->getValidateBuffer();
-    echo "<form id='regform' method='POST' action='" . Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($id)) . "'>";
+    echo "<form id='regform' method='POST' action='" .
+        Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($id)) . "'>";
     echo "<button type='submit'>Return to previous page.</button>";
 } else {
     Auth\ProcessingChain::resumeProcessing($state);

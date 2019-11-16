@@ -1,7 +1,5 @@
 <?php
 
-namespace SimpleSAML\Module\webauthn\Auth\Process;
-
 /**
  * FIDO2/WebAuthn Authentication Processing filter
  *
@@ -11,6 +9,9 @@ namespace SimpleSAML\Module\webauthn\Auth\Process;
  * @author Stefan Winter <stefan.winter@restena.lu>
  * @package SimpleSAMLphp
  */
+
+namespace SimpleSAML\Module\webauthn\Auth\Process;
+
 use SimpleSAML\Auth;
 use SimpleSAML\Error;
 use SimpleSAML\Logger;
@@ -85,7 +86,7 @@ class WebAuthn extends Auth\ProcessingFilter
             $this->store = Store::parseStoreConfig($config['store']);
         } catch (\Exception $e) {
             Logger::error(
-                'webauthn: Could not create storage: '.
+                'webauthn: Could not create storage: ' .
                 $e->getMessage()
             );
         }
@@ -147,8 +148,8 @@ class WebAuthn extends Auth\ProcessingFilter
         assert(array_key_exists('metadata-set', $state['Source']));
 
         if (!array_key_exists($this->usernameAttrib, $state['Attributes'])) {
-            Logger::warning('webauthn: cannot determine if user needs second factor, missing attribute "'.
-                $this->usernameAttrib.'".');
+            Logger::warning('webauthn: cannot determine if user needs second factor, missing attribute "' .
+                $this->usernameAttrib . '".');
             return;
         }
 

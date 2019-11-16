@@ -13,7 +13,7 @@ use SimpleSAML\Error as SspError;
 use SimpleSAML\Logger;
 use SimpleSAML\Module;
 use SimpleSAML\Utils;
-use SimpleSAML\XHTML\Template;;
+use SimpleSAML\XHTML\Template;
 
 $globalConfig = Configuration::getInstance();
 
@@ -35,7 +35,10 @@ $t->data['UserID'] = $state['FIDO2Username'];
 $t->data['FIDO2Tokens'] = $state['FIDO2Tokens'];
 
 $challenge = str_split($state['FIDO2SignupChallenge'], 2);
-$username = str_split(hash('sha512', $state['FIDO2Username'] . '|' . Utils\Config::getSecretSalt() . '|' . $state['Source']['entityid']), 2);
+$username = str_split(
+    hash('sha512', $state['FIDO2Username'] . '|' . Utils\Config::getSecretSalt() . '|' . $state['Source']['entityid']),
+    2
+);
 
 $challengeEncoded = [];
 foreach ($challenge as $oneChar) {
@@ -67,13 +70,19 @@ $frontendData['credentialIdEncoded'] = $credentialIdEncoded;
 $t->data['frontendData'] = json_encode($frontendData);
 
 $t->data['FIDO2AuthSuccessful'] = $state['FIDO2AuthSuccessful'];
-if (count($state['FIDO2Tokens']) == 0 || ($state['FIDO2WantsRegister'] === true && $state['FIDO2AuthSuccessful'] !== false)) {
+if (
+    count($state['FIDO2Tokens']) == 0 ||
+    ($state['FIDO2WantsRegister'] === true && $state['FIDO2AuthSuccessful'] !== false)
+) {
     $t->data['regURL'] = Module::getModuleURL('webauthn/regprocess.php?StateId=' . urlencode($id));
     $t->data['delURL'] = Module::getModuleURL('webauthn/managetoken.php?StateId=' . urlencode($id));
 }
 
 $t->data['authForm'] = "";
-if (count($state['FIDO2Tokens']) > 0 && ($state['FIDO2WantsRegister'] !== true || $state['FIDO2AuthSuccessful'] === false)) {
+if (
+    count($state['FIDO2Tokens']) > 0 &&
+    ($state['FIDO2WantsRegister'] !== true || $state['FIDO2AuthSuccessful'] === false)
+) {
     $t->data['authURL'] = Module::getModuleURL('webauthn/authprocess.php?StateId=' . urlencode($id));
 }
 

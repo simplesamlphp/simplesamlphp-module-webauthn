@@ -40,4 +40,3 @@ switch ($_POST['submit']) {
     default:
         throw new Exception("Unknown submit button state.");
 }
-

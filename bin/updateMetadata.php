@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(dirname(dirname(__DIR__))).'/vendor/autoload.php');
+require_once(dirname(dirname(dirname(__DIR__))) . '/vendor/autoload.php');
 
 use Lcobucci\JWT\Parser;
 use SimpleSAML\Utils\Config as SSPConfig;
@@ -12,7 +12,7 @@ if ($argc < 2) {
     );
 }
 
-$toc = file_get_contents('https://mds2.fidoalliance.org/?token='.$argv[1]);
+$toc = file_get_contents('https://mds2.fidoalliance.org/?token=' . $argv[1]);
 
 const YUBICO_CA = "MIIDHjCCAgagAwIBAgIEG0BT9zANBgkqhkiG9w0BAQsFADAuMSwwKgYDVQQDEyNZdWJpY28gVTJGIFJvb3QgQ0EgU2VyaWFsIDQ1NzIwMDYzMTAgFw0xNDA4MDEwMDAwMDBaGA8yMDUwMDkwNDAwMDAwMFowLjEsMCoGA1UEAxMjWXViaWNvIFUyRiBSb290IENBIFNlcmlhbCA0NTcyMDA2MzEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC/jwYuhBVlqaiYWEMsrWFisgJ+PtM91eSrpI4TK7U53mwCIawSDHy8vUmk5N2KAj9abvT9NP5SMS1hQi3usxoYGonXQgfO6ZXyUA9a+KAkqdFnBnlyugSeCOep8EdZFfsaRFtMjkwz5Gcz2Py4vIYvCdMHPtwaz0bVuzneueIEz6TnQjE63Rdt2zbwnebwTG5ZybeWSwbzy+BJ34ZHcUhPAY89yJQXuE0IzMZFcEBbPNRbWECRKgjq//qT9nmDOFVlSRCt2wiqPSzluwn+v+suQEBsUjTGMEd25tKXXTkNW21wIWbxeSyUoTXwLvGS6xlwQSgNpk2qXYwf8iXg7VWZAgMBAAGjQjBAMB0GA1UdDgQWBBQgIvz0bNGJhjgpToksyKpP9xv9oDAPBgNVHRMECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjANBgkqhkiG9w0BAQsFAAOCAQEAjvjuOMDSa+JXFCLyBKsycXtBVZsJ4Ue3LbaEsPY4MYN/hIQ5ZM5p7EjfcnMG4CtYkNsfNHc0AhBLdq45rnT87q/6O3vUEtNMafbhU6kthX7Y+9XFN9NpmYxr+ekVY5xOxi8h9JDIgoMP4VB1uS0aunL1IGqrNooL9mmFnL2kLVVee6/VR6C5+KSTCMCWppMuJIZII2v9o4dkoZ8Y7QRjQlLfYzd3qGtKbw7xaF1UsG/5xUb/Btwb2X2g4InpiB/yt/3CpQXpiWX/K4mBvUKiGn05ZsqeY1gx4g0xLBqcU9psmyPzK+Vsgw2jeRQ5JlKDyqE0hebfC1tvFu0CCrJFcw==";
 
@@ -20,13 +20,13 @@ $token = (new Parser())->parse($toc); // Parses from a string
 
 $res = [];
 foreach ($token->getClaim('entries') as $oneEntryObject) {
-    $thisUrl = $oneEntryObject->url."?token=".$argv[1];
+    $thisUrl = $oneEntryObject->url . "?token=" . $argv[1];
     $mdB64 = file_get_contents($thisUrl);
     $mdArray = json_decode(base64_decode($mdB64), true);
     if (isset($mdArray['aaguid']) && isset($mdArray['attestationRootCertificates'][0])) {
         $compressedAaguid = strtolower(str_replace('-', '', $mdArray['aaguid']));
         // we need C and O values for the attestation certificates. Extract those from the first root
-        $x509 = openssl_x509_parse("-----BEGIN CERTIFICATE-----\n".$mdArray['attestationRootCertificates'][0]."\n-----END CERTIFICATE-----");
+        $x509 = openssl_x509_parse("-----BEGIN CERTIFICATE-----\n" . $mdArray['attestationRootCertificates'][0] . "\n-----END CERTIFICATE-----");
         // print_r($x509);
         if (isset($x509['subject']['C']) && isset($x509['subject']['O'])) {
             $res[$compressedAaguid] = [
@@ -91,6 +91,6 @@ $res["9ddd1817af5a4672a2b93e3dd95000a9"] = [
 ];
 
 file_put_contents(
-    SSPConfig::getConfigDir().'/'.WebAuthnRegistrationEvent::AAGUID_CONFIG_FILE,
+    SSPConfig::getConfigDir() . '/' . WebAuthnRegistrationEvent::AAGUID_CONFIG_FILE,
     json_encode($res, JSON_PRETTY_PRINT)
 );
