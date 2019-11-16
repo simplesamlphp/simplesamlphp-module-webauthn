@@ -21,7 +21,8 @@ if (!array_key_exists('StateId', $_REQUEST)) {
     );
 }
 
-$debugEnabled = false;
+$config = Configuration::getInstance();
+$debugEnabled = $config->getValue('logging.level', Logger::NOTICE) === Logger::DEBUG;
 
 $id = $_REQUEST['StateId'];
 /** @var array $state */
