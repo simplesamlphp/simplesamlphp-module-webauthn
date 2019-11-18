@@ -219,7 +219,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
                 $this->fail("AAGUID does not match vendor data.");
             }
             if ($token['multi'] === true) { // need to check the OID
-                if (!isset($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4']) && !empty($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4'])) { /** §8.2.1 Bullet 3 */
+                if (!isset($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4']) || empty($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4'])) { /** §8.2.1 Bullet 3 */
                     $this->fail(
                         "This vendor uses one cert for multiple authenticator model attestations, but lacks the AAGUID OID."
                     );
