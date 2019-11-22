@@ -34,7 +34,7 @@ if (count($state['FIDO2Tokens']) > 0 && $state['FIDO2AuthSuccessful'] === false)
 
 $regObject = new WebAuthnRegistrationEvent(
     $_POST['type'],
-    ( $state['FIDO2Scope'] === null ? $state['FIDO2DerivedScope'] : $state['FIDO2Scope'] ),
+    ($state['FIDO2Scope'] === null ? $state['FIDO2DerivedScope'] : $state['FIDO2Scope']),
     $state['FIDO2SignupChallenge'],
     $state['IdPMetadata']['entityid'],
     base64_decode($_POST['attestation_object']),
