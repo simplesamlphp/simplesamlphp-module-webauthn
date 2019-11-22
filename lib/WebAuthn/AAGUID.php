@@ -5,7 +5,6 @@ namespace SimpleSAML\Module\webauthn\WebAuthn;
 use SimpleSAML\Logger;
 use SimpleSAML\Utils\Config as SSPConfig;
 
-
 /**
  * Class AAGUID
  *
@@ -13,7 +12,6 @@ use SimpleSAML\Utils\Config as SSPConfig;
  */
 class AAGUID
 {
-
     /**
      * The actual dictionary containing all known tokens.
      *
@@ -31,7 +29,7 @@ class AAGUID
     /**
      * The singleton instance.
      *
-     * @var AAGUID|null
+     * @var AAGUID
      */
     protected static $instance;
 
@@ -41,7 +39,7 @@ class AAGUID
      */
     protected function __construct()
     {
-        $path = SSPConfig::getConfigDir().'/'.self::AAGUID_CONFIG_FILE;
+        $path = SSPConfig::getConfigDir() . '/' . self::AAGUID_CONFIG_FILE;
         if (!file_exists($path)) {
             Logger::warning('Missing "webauthn_tokens.json" configuration file. No device will be recognized.');
             return null;
@@ -51,7 +49,7 @@ class AAGUID
         $json = json_decode($data, true);
         if (!is_array($json)) {
             // there was probably an error decoding the config, log the error and pray for the best
-            Logger::warning('Broken configuration file "'.$path.'": could not JSON-decode it.');
+            Logger::warning('Broken configuration file "' . $path . '": could not JSON-decode it.');
         } else {
             $this->dictionary = $json;
         }
@@ -65,7 +63,7 @@ class AAGUID
      */
     public static function getInstance()
     {
-        if (self::$instance === null) {
+        if (!isset(self::$instance)) {
             self::$instance = new self();
         }
         return self::$instance;

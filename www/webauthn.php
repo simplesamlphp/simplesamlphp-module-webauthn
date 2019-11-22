@@ -13,7 +13,8 @@ use SimpleSAML\Error as SspError;
 use SimpleSAML\Logger;
 use SimpleSAML\Module;
 use SimpleSAML\Utils;
-use SimpleSAML\XHTML\Template;;
+use SimpleSAML\XHTML\Template;
+use Webmozart\Assert\Assert;
 
 $globalConfig = Configuration::getInstance();
 
@@ -26,6 +27,7 @@ if (!array_key_exists('StateId', $_REQUEST)) {
 }
 
 $id = $_REQUEST['StateId'];
+/** @var array $state */
 $state = Auth\State::loadState($id, 'webauthn:request');
 
 // Make, populate and layout consent form
@@ -35,7 +37,10 @@ $t->data['UserID'] = $state['FIDO2Username'];
 $t->data['FIDO2Tokens'] = $state['FIDO2Tokens'];
 
 $challenge = str_split($state['FIDO2SignupChallenge'], 2);
-$username = str_split(hash('sha512', $state['FIDO2Username'] . '|' . Utils\Config::getSecretSalt() . '|' . $state['Source']['entityid']), 2);
+$username = str_split(
+    hash('sha512', $state['FIDO2Username'] . '|' . Utils\Config::getSecretSalt() . '|' . $state['Source']['entityid']),
+    2
+);
 
 $credentialIdEncoded = [];
 $challengeEncoded = [];
@@ -43,6 +48,7 @@ foreach ($challenge as $oneChar) {
     $challengeEncoded[] = hexdec($oneChar);
 }
 
+$credentialIdEncoded = [];
 foreach ($state['FIDO2Tokens'] as $number => $token) {
     $idSplit = str_split($token[0], 2);
     $credentialIdEncoded[$number] = [];
@@ -59,7 +65,8 @@ foreach ($username as $oneChar) {
 $frontendData = [];
 $frontendData['challengeEncoded'] = $challengeEncoded;
 $frontendData['state'] = [];
-foreach (['Source','FIDO2Scope','FIDO2Username','FIDO2Displayname','requestTokenModel'] as $stateItem) {
+foreach (['Source', 'FIDO2Scope','FIDO2Username','FIDO2Displayname','requestTokenModel'] as $stateItem) {
+    Assert::isArray($state[$stateItem]);
     $frontendData['state'][$stateItem] = $state[$stateItem];
 }
 $frontendData['usernameEncoded'] = $usernameEncoded;
@@ -68,13 +75,19 @@ $frontendData['credentialIdEncoded'] = $credentialIdEncoded;
 $t->data['frontendData'] = json_encode($frontendData);
 
 $t->data['FIDO2AuthSuccessful'] = $state['FIDO2AuthSuccessful'];
-if (count($state['FIDO2Tokens']) == 0 || ($state['FIDO2WantsRegister'] === true && $state['FIDO2AuthSuccessful'] !== false)) {
+if (
+    count($state['FIDO2Tokens']) == 0 ||
+    ($state['FIDO2WantsRegister'] === true && $state['FIDO2AuthSuccessful'] !== false)
+) {
     $t->data['regURL'] = Module::getModuleURL('webauthn/regprocess.php?StateId=' . urlencode($id));
     $t->data['delURL'] = Module::getModuleURL('webauthn/managetoken.php?StateId=' . urlencode($id));
 }
 
 $t->data['authForm'] = "";
-if (count($state['FIDO2Tokens']) > 0 && ($state['FIDO2WantsRegister'] !== true || $state['FIDO2AuthSuccessful'] === false)) {
+if (
+    count($state['FIDO2Tokens']) > 0 &&
+    ($state['FIDO2WantsRegister'] !== true || $state['FIDO2AuthSuccessful'] === false)
+) {
     $t->data['authURL'] = Module::getModuleURL('webauthn/authprocess.php?StateId=' . urlencode($id));
 }
 

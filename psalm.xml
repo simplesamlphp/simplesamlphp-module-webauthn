@@ -27,5 +27,11 @@
         <MissingParamType errorLevel="info" />
         <UnusedClass errorLevel="info" />
         <PossiblyUnusedMethod errorLevel="info" />
+
+        <ParadoxicalCondition>
+            <errorLevel type="suppress">
+                <file name="lib/WebAuthn/WebAuthnAbstractEvent.php" />
+            </errorLevel>
+        </ParadoxicalCondition>
     </issueHandlers>
 </psalm>

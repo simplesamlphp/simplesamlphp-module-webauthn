@@ -1,7 +1,5 @@
 <?php
 
-namespace SimpleSAML\Module\webauthn\Auth\Process;
-
 /**
  * FIDO2/WebAuthn Authentication Processing filter
  *
@@ -11,6 +9,9 @@ namespace SimpleSAML\Module\webauthn\Auth\Process;
  * @author Stefan Winter <stefan.winter@restena.lu>
  * @package SimpleSAMLphp
  */
+
+namespace SimpleSAML\Module\webauthn\Auth\Process;
+
 use SimpleSAML\Auth;
 use SimpleSAML\Error;
 use SimpleSAML\Logger;
@@ -78,6 +79,10 @@ class WebAuthn extends Auth\ProcessingFilter
      */
     public function __construct($config, $reserved)
     {
+        /**
+         * Remove annotation + assert as soon as this method can be typehinted (SSP 2.0)
+         * @psalm-suppress RedundantConditionGivenDocblockType
+         */
         assert(is_array($config));
         parent::__construct($config, $reserved);
 
@@ -85,7 +90,7 @@ class WebAuthn extends Auth\ProcessingFilter
             $this->store = Store::parseStoreConfig($config['store']);
         } catch (\Exception $e) {
             Logger::error(
-                'webauthn: Could not create storage: '.
+                'webauthn: Could not create storage: ' .
                 $e->getMessage()
             );
         }
@@ -105,13 +110,13 @@ class WebAuthn extends Auth\ProcessingFilter
         if (array_key_exists('attrib_username', $config)) {
             $this->usernameAttrib = $config['attrib_username'];
         } else {
-            Logger::error('webauthn: it is required to set attrib_username in config.');
+            throw new Error\CriticalConfigurationError('webauthn: it is required to set attrib_username in config.');
         }
 
         if (array_key_exists('attrib_displayname', $config)) {
             $this->displaynameAttrib = $config['attrib_displayname'];
         } else {
-            Logger::error('webauthn: it is required to set attrib_displayname in config.');
+            throw new Error\CriticalConfigurationError('webauthn: it is required to set attrib_displayname in config.');
         }
 
         if (array_key_exists('request_tokenmodel', $config)) {
@@ -138,6 +143,10 @@ class WebAuthn extends Auth\ProcessingFilter
      */
     public function process(&$state)
     {
+        /**
+         * Remove annotation + assert as soon as this method can be typehinted (SSP 2.0)
+         * @psalm-suppress RedundantConditionGivenDocblockType
+         */
         assert(is_array($state));
         assert(array_key_exists('UserID', $state));
         assert(array_key_exists('Destination', $state));
@@ -147,8 +156,8 @@ class WebAuthn extends Auth\ProcessingFilter
         assert(array_key_exists('metadata-set', $state['Source']));
 
         if (!array_key_exists($this->usernameAttrib, $state['Attributes'])) {
-            Logger::warning('webauthn: cannot determine if user needs second factor, missing attribute "'.
-                $this->usernameAttrib.'".');
+            Logger::warning('webauthn: cannot determine if user needs second factor, missing attribute "' .
+                $this->usernameAttrib . '".');
             return;
         }
 

@@ -9,7 +9,6 @@ use SimpleSAML\Logger;
 if (session_status() != PHP_SESSION_ACTIVE) {
     session_cache_limiter('nocache');
 }
-$globalConfig = Configuration::getInstance();
 
 Logger::info('FIDO2 - Accessing WebAuthn token management');
 
@@ -20,6 +19,7 @@ if (!array_key_exists('StateId', $_REQUEST)) {
 }
 
 $id = $_REQUEST['StateId'];
+/** @var array $state */
 $state = Auth\State::loadState($id, 'webauthn:request');
 
 if ($state['FIDO2AuthSuccessful'] === false) {
@@ -40,4 +40,3 @@ switch ($_POST['submit']) {
     default:
         throw new Exception("Unknown submit button state.");
 }
-

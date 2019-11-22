@@ -61,7 +61,7 @@ class Database extends Store
      *
      * @return array The variables which should be serialized.
      */
-    public function __sleep() : array
+    public function __sleep(): array
     {
         return [
             'config',
@@ -71,8 +71,9 @@ class Database extends Store
 
     /**
      * Called after unserialization.
+     * @return void
      */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         $this->db = \SimpleSAML\Database::getInstance(Configuration::loadFromArray($this->config));
     }
@@ -84,17 +85,14 @@ class Database extends Store
      * This function checks whether a given user has been enabled for WebAuthn.
      *
      * @param string $userId        The hash identifying the user at an IdP.
-     * @param bool   $defaultIfNx   if not found in the DB, should the user be considered enabled (true) or disabled(false)
+     * @param bool   $defaultIfNx   if not found in the DB, should the user be considered enabled (true)
+     *                              or disabled(false)
      *
      * @return bool True if the user is enabled for 2FA, false if not
      */
-    public function is2FAEnabled(string $userId, bool $defaultIfNx) : bool
+    public function is2FAEnabled(string $userId, bool $defaultIfNx): bool
     {
         $st = $this->db->read('SELECT COUNT(*) FROM userstatus WHERE user_id = :userId', ['userId' => $userId]);
-
-        if ($st === false) {
-            return false;
-        }
 
         $c = $st->fetchColumn();
         if ($c == 0) {
@@ -124,16 +122,12 @@ class Database extends Store
      *
      * @return bool True if the credential exists, false if not
      */
-    public function doesCredentialExist(string $credIdHex) : bool
+    public function doesCredentialExist(string $credIdHex): bool
     {
         $st = $this->db->read(
             'SELECT COUNT(*) FROM credentials WHERE credentialId = :credentialId',
             ['credentialId' => $credIdHex]
         );
-
-        if ($st === false) {
-            return false;
-        }
 
         $rowCount = $st->fetchColumn();
         if (!$rowCount) {
@@ -157,24 +151,25 @@ class Database extends Store
      *
      * @return true
      */
-    public function storeTokenData(string $userId, string $credentialId, string $credential, int $signCounter, string $friendlyName) : bool
-    {
+    public function storeTokenData(
+        string $userId,
+        string $credentialId,
+        string $credential,
+        int $signCounter,
+        string $friendlyName
+    ): bool {
         $st = $this->db->write(
-                'INSERT INTO credentials ' .
-                '(user_id, credentialId, credential, signCounter, friendlyName) VALUES (:userId,:credentialId,'.
-                ':credential,:signCounter,:friendlyName)',
-                [
-                    'userId' => $userId,
-                    'credentialId' => $credentialId,
-                    'credential' => $credential,
-                    'signCounter' => $signCounter,
-                    'friendlyName' => $friendlyName
-                ]
+            'INSERT INTO credentials ' .
+            '(user_id, credentialId, credential, signCounter, friendlyName) VALUES (:userId,:credentialId,' .
+            ':credential,:signCounter,:friendlyName)',
+            [
+                'userId' => $userId,
+                'credentialId' => $credentialId,
+                'credential' => $credential,
+                'signCounter' => $signCounter,
+                'friendlyName' => $friendlyName
+            ]
         );
-
-        if ($st === false) {
-            throw new \Exception("Unable to save new token in database!");
-        }
 
         return true;
     }
@@ -186,18 +181,15 @@ class Database extends Store
      * @param string $credentialId the credential
      * @return true
      */
-    public function deleteTokenData(string $credentialId) : bool
+    public function deleteTokenData(string $credentialId): bool
     {
         $st = $this->db->write(
-                'DELETE FROM credentials WHERE credentialId = :credentialId',
-                ['credentialId' => $credentialId]
+            'DELETE FROM credentials WHERE credentialId = :credentialId',
+            ['credentialId' => $credentialId]
         );
 
-        if ($st !== false) {
-            Logger::debug('webauthn:Database - DELETED credential.');
-        } else {
-            throw new \Exception("Database execution did not work.");
-        }
+        Logger::debug('webauthn:Database - DELETED credential.');
+
         return true;
     }
 
@@ -209,18 +201,15 @@ class Database extends Store
      * @param int    $signCounter  the new counter value
      * @return true
      */
-    public function updateSignCount(string $credentialId, int $signCounter) : bool
+    public function updateSignCount(string $credentialId, int $signCounter): bool
     {
         $st = $this->db->write(
-                'UPDATE credentials SET signCounter = :signCounter WHERE credentialId = :credentialId',
-                ['signCounter' => $signCounter, 'credentialId' => $credentialId]
+            'UPDATE credentials SET signCounter = :signCounter WHERE credentialId = :credentialId',
+            ['signCounter' => $signCounter, 'credentialId' => $credentialId]
         );
 
-        if ($st !== false) {
-            Logger::debug('webauthn:Database - UPDATED signature counter.');
-        } else {
-            throw new \Exception("Database execution did not work.");
-        }
+        Logger::debug('webauthn:Database - UPDATED signature counter.');
+
         return true;
     }
 
@@ -231,18 +220,14 @@ class Database extends Store
      * @param string $userId the username
      * @return array Array of all crypto data we have on file.
      */
-    public function getTokenData(string $userId) : array
+    public function getTokenData(string $userId): array
     {
         $ret = [];
 
         $st = $this->db->read(
-                'SELECT credentialId, credential, signCounter, friendlyName FROM credentials WHERE user_id = :userId',
-                ['userId' => $userId]
+            'SELECT credentialId, credential, signCounter, friendlyName FROM credentials WHERE user_id = :userId',
+            ['userId' => $userId]
         );
-
-        if ($st === false) {
-            return [];
-        }
 
         while ($row = $st->fetch(\PDO::FETCH_NUM)) {
             $ret[] = $row;
