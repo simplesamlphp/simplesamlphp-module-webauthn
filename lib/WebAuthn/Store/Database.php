@@ -94,10 +94,6 @@ class Database extends Store
     {
         $st = $this->db->read('SELECT fido2Status FROM userstatus WHERE user_id = :userId', ['userId' => $userId]);
 
-        if ($st === false) {
-            return false;
-        }
-
         $rowCount = $st->rowCount();
         if ($rowCount === 0) {
             Logger::debug('User does not exist in DB, returning desired default.');
@@ -132,10 +128,6 @@ class Database extends Store
             'SELECT credentialId FROM credentials WHERE credentialId = :credentialId',
             ['credentialId' => $credIdHex]
         );
-
-        if ($st === false) {
-            return false;
-        }
 
         $rowCount = $st->rowCount();
         if ($rowCount === 0) {
@@ -179,10 +171,6 @@ class Database extends Store
             ]
         );
 
-        if ($st === false) {
-            throw new \Exception("Unable to save new token in database!");
-        }
-
         return true;
     }
 
@@ -200,11 +188,8 @@ class Database extends Store
             ['credentialId' => $credentialId]
         );
 
-        if ($st !== false) {
-            Logger::debug('webauthn:Database - DELETED credential.');
-        } else {
-            throw new \Exception("Database execution did not work.");
-        }
+        Logger::debug('webauthn:Database - DELETED credential.');
+
         return true;
     }
 
@@ -223,11 +208,8 @@ class Database extends Store
             ['signCounter' => $signCounter, 'credentialId' => $credentialId]
         );
 
-        if ($st !== false) {
-            Logger::debug('webauthn:Database - UPDATED signature counter.');
-        } else {
-            throw new \Exception("Database execution did not work.");
-        }
+        Logger::debug('webauthn:Database - UPDATED signature counter.');
+
         return true;
     }
 
@@ -246,10 +228,6 @@ class Database extends Store
             'SELECT credentialId, credential, signCounter, friendlyName FROM credentials WHERE user_id = :userId',
             ['userId' => $userId]
         );
-
-        if ($st === false) {
-            return [];
-        }
 
         while ($row = $st->fetch(\PDO::FETCH_NUM)) {
             $ret[] = $row;
