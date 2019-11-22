@@ -133,9 +133,11 @@ abstract class Store
             'WebAuthn\Store',
             '\SimpleSAML\Module\webauthn\Store'
         );
-//        unset($config[0]);
 
-        /** @psalm-suppress InvalidStringClass */
+        /**
+         * @psalm-suppress InvalidStringClass
+         * @var \SimpleSAML\Module\webauthn\Store
+         */
         return new $className($config);
     }
 }

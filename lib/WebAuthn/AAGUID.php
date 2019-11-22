@@ -29,7 +29,7 @@ class AAGUID
     /**
      * The singleton instance.
      *
-     * @var AAGUID|null
+     * @var AAGUID
      */
     protected static $instance;
 
@@ -63,7 +63,7 @@ class AAGUID
      */
     public static function getInstance()
     {
-        if (self::$instance === null) {
+        if (!isset(self::$instance)) {
             self::$instance = new self();
         }
         return self::$instance;

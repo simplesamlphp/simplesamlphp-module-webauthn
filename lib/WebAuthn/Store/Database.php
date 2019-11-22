@@ -71,6 +71,7 @@ class Database extends Store
 
     /**
      * Called after unserialization.
+     * @return void
      */
     public function __wakeup(): void
     {

@@ -79,6 +79,10 @@ class WebAuthn extends Auth\ProcessingFilter
      */
     public function __construct($config, $reserved)
     {
+        /**
+         * Remove annotation + assert as soon as this method can be typehinted (SSP 2.0)
+         * @psalm-suppress RedundantConditionGivenDocblockType
+         */
         assert(is_array($config));
         parent::__construct($config, $reserved);
 
@@ -106,13 +110,13 @@ class WebAuthn extends Auth\ProcessingFilter
         if (array_key_exists('attrib_username', $config)) {
             $this->usernameAttrib = $config['attrib_username'];
         } else {
-            Logger::error('webauthn: it is required to set attrib_username in config.');
+            throw new Error\CriticalConfigurationError('webauthn: it is required to set attrib_username in config.');
         }
 
         if (array_key_exists('attrib_displayname', $config)) {
             $this->displaynameAttrib = $config['attrib_displayname'];
         } else {
-            Logger::error('webauthn: it is required to set attrib_displayname in config.');
+            throw new Error\CriticalConfigurationError('webauthn: it is required to set attrib_displayname in config.');
         }
 
         if (array_key_exists('request_tokenmodel', $config)) {
@@ -139,6 +143,10 @@ class WebAuthn extends Auth\ProcessingFilter
      */
     public function process(&$state)
     {
+        /**
+         * Remove annotation + assert as soon as this method can be typehinted (SSP 2.0)
+         * @psalm-suppress RedundantConditionGivenDocblockType
+         */
         assert(is_array($state));
         assert(array_key_exists('UserID', $state));
         assert(array_key_exists('Destination', $state));

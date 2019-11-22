@@ -7,11 +7,11 @@ use SimpleSAML\Logger;
 use SimpleSAML\Module;
 use SimpleSAML\Module\webauthn\WebAuthn\WebAuthnAbstractEvent;
 use SimpleSAML\Module\webauthn\WebAuthn\WebAuthnAuthenticationEvent;
+use Webmozart\Assert\Assert;
 
 if (session_status() != PHP_SESSION_ACTIVE) {
     session_cache_limiter('nocache');
 }
-$globalConfig = Configuration::getInstance();
 
 Logger::info('FIDO2 - Accessing WebAuthn enrollment validation');
 
@@ -21,9 +21,11 @@ if (!array_key_exists('StateId', $_REQUEST)) {
     );
 }
 
-$debugEnabled = false;
+$config = Configuration::getInstance();
+$debugEnabled = $config->getValue('logging.level', Logger::NOTICE) === Logger::DEBUG;
 
 $id = $_REQUEST['StateId'];
+/** @var array $state */
 $state = Auth\State::loadState($id, 'webauthn:request');
 
 $incomingID = bin2hex(WebAuthnAbstractEvent::base64urlDecode($_POST['response_id']));
@@ -33,6 +35,7 @@ $incomingID = bin2hex(WebAuthnAbstractEvent::base64urlDecode($_POST['response_id
  */
 $publicKey = false;
 $previousCounter = -1;
+
 foreach ($state['FIDO2Tokens'] as $oneToken) {
     if ($oneToken[0] == $incomingID) {
         // Credential ID is eligible for user $state['FIDO2Username'];
@@ -48,9 +51,10 @@ if ($publicKey === false) {
     );
 }
 
+/** @psalm-var array $oneToken */
 $authObject = new WebAuthnAuthenticationEvent(
     $_POST['type'],
-    ( $state['FIDO2Scope'] === null ? $state['FIDO2DerivedScope'] : $state['FIDO2Scope'] ),
+    ($state['FIDO2Scope'] === null ? $state['FIDO2DerivedScope'] : $state['FIDO2Scope']),
     $state['FIDO2SignupChallenge'],
     $state['IdPMetadata']['entityid'],
     base64_decode($_POST['authenticator_data']),

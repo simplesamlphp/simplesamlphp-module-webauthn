@@ -11,7 +11,6 @@ use SimpleSAML\Module\webauthn\WebAuthn\WebAuthnRegistrationEvent;
 if (session_status() != PHP_SESSION_ACTIVE) {
     session_cache_limiter('nocache');
 }
-$globalConfig = Configuration::getInstance();
 
 Logger::info('FIDO2 - Accessing WebAuthn enrollment validation');
 
@@ -21,9 +20,11 @@ if (!array_key_exists('StateId', $_REQUEST)) {
     );
 }
 
-$debugEnabled = false;
+$config = Configuration::getInstance();
+$debugEnabled = $config->getValue('logging.level', Logger::NOTICE) === Logger::DEBUG;
 
 $id = $_REQUEST['StateId'];
+/** @var array $state */
 $state = Auth\State::loadState($id, 'webauthn:request');
 
 // registering a credential is only allowed for new users or after being authenticated
