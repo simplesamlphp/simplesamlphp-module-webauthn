@@ -33,7 +33,7 @@ if (count($state['FIDO2Tokens']) > 0 && $state['FIDO2AuthSuccessful'] === false)
 }
 
 $fido2Scope = ($state['FIDO2Scope'] === null ? $state['FIDO2DerivedScope'] : $state['FIDO2Scope']);
-if ($fido2Scope === NULL) {
+if ($fido2Scope === null) {
     throw new Exception("FIDO2Scope cannot be null!");
 }
 $regObject = new WebAuthnRegistrationEvent(
