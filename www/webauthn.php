@@ -64,7 +64,7 @@ foreach ($username as $oneChar) {
 $frontendData = [];
 $frontendData['challengeEncoded'] = $challengeEncoded;
 $frontendData['state'] = [];
-foreach (['Source','FIDO2Scope','FIDO2Username','FIDO2Displayname','requestTokenModel'] as $stateItem) {
+foreach (['Source', 'FIDO2Scope','FIDO2Username','FIDO2Displayname','requestTokenModel'] as $stateItem) {
     Assert::isArray($state[$stateItem]);
     $frontendData['state'][$stateItem] = $state[$stateItem];
 }
