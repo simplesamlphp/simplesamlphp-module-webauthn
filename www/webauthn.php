@@ -42,6 +42,7 @@ $username = str_split(
     2
 );
 
+$credentialIdEncoded = [];
 $challengeEncoded = [];
 foreach ($challenge as $oneChar) {
     $challengeEncoded[] = hexdec($oneChar);

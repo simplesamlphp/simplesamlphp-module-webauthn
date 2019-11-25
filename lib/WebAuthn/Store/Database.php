@@ -92,18 +92,18 @@ class Database extends Store
      */
     public function is2FAEnabled(string $userId, bool $defaultIfNx): bool
     {
-        $st = $this->db->read('SELECT fido2Status FROM userstatus WHERE user_id = :userId', ['userId' => $userId]);
+        $st = $this->db->read('SELECT COUNT(*) FROM userstatus WHERE user_id = :userId', ['userId' => $userId]);
 
-        $rowCount = $st->rowCount();
-        if ($rowCount === 0) {
+        $c = $st->fetchColumn();
+        if ($c == 0) {
             Logger::debug('User does not exist in DB, returning desired default.');
             return $defaultIfNx;
         } else {
             $st2 = $this->db->read(
-                'SELECT fido2Status FROM userstatus WHERE user_id = :userId AND fido2Status = "FIDO2Disabled"',
+                'SELECT COUNT(*) FROM userstatus WHERE user_id = :userId AND fido2Status = "FIDO2Disabled"',
                 ['userId' => $userId]
             );
-            $rowCount2 = $st2->rowCount();
+            $rowCount2 = $st2->fetchColumn();
             if ($rowCount2 === 1 /* explicitly disabled user in DB */) {
                 return false;
             }
@@ -125,12 +125,12 @@ class Database extends Store
     public function doesCredentialExist(string $credIdHex): bool
     {
         $st = $this->db->read(
-            'SELECT credentialId FROM credentials WHERE credentialId = :credentialId',
+            'SELECT COUNT(*) FROM credentials WHERE credentialId = :credentialId',
             ['credentialId' => $credIdHex]
         );
 
-        $rowCount = $st->rowCount();
-        if ($rowCount === 0) {
+        $rowCount = $st->fetchColumn();
+        if (!$rowCount) {
             Logger::debug('Credential does not exist yet.');
             return false;
         } else {

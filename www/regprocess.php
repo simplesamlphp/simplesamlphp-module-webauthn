@@ -32,9 +32,13 @@ if (count($state['FIDO2Tokens']) > 0 && $state['FIDO2AuthSuccessful'] === false)
     throw new Exception("Attempt to register new token in unacceptable context.");
 }
 
+$fido2Scope = ($state['FIDO2Scope'] === null ? $state['FIDO2DerivedScope'] : $state['FIDO2Scope']);
+if ($fido2Scope === null) {
+    throw new Exception("FIDO2Scope cannot be null!");
+}
 $regObject = new WebAuthnRegistrationEvent(
     $_POST['type'],
-    ($state['FIDO2Scope'] === null ? $state['FIDO2DerivedScope'] : $state['FIDO2Scope']),
+    $fido2Scope,
     $state['FIDO2SignupChallenge'],
     $state['IdPMetadata']['entityid'],
     base64_decode($_POST['attestation_object']),
@@ -51,7 +55,7 @@ $store = $state['webauthn:store'];
 if ($store->doesCredentialExist(bin2hex($regObject->getCredentialId())) === false) {
     // credential does not exist yet in database, good.
 } else {
-    throw new Exception("The credential with ID " . $regObject->getCredentialId() . "already exists.");
+    throw new Exception("The credential with ID " . $regObject->getCredentialId() . " already exists.");
 }
 // THAT'S IT. This is a valid credential and can be enrolled to the user.
 $friendlyName = $_POST['tokenname'];
@@ -71,6 +75,7 @@ if ($state['requestTokenModel']) {
  * STEP 20 of the validation procedure in § 7.1 of the spec: store credentialId, credential,
  * signCount and associate with user
  */
+
 $store->storeTokenData(
     $state['FIDO2Username'],
     $regObject->getCredentialId(),
