@@ -18,7 +18,7 @@
     "require": {
         "ext-pdo": "*",
         "simplesamlphp/composer-module-installer": "~1.1",
-        "simplesamlphp/simplesamlphp": "^1.18@RC",
+        "simplesamlphp/simplesamlphp": "^1.18.2",
         "spomky-labs/cbor-php": "^1.0",
         "web-auth/cose-lib": "^2.1"
     },
