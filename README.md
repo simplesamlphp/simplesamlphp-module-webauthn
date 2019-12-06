@@ -79,6 +79,27 @@ so that it takes place AFTER the first-factor authentication. E.g. at 100:
      */
     'default_enable' => false,
 
+    /* this parameter is used only if "use_database" is false. If the value of
+     * "force" is true then we trigger WebAuthn only if "attrib_toggle" from the
+     * user is not empty. If the value of "force" is false then we switch the value of
+     * "default_enable" only if "attrib_toggle" from the user is not empty.
+     * Default falue is true.
+     */
+     'force' => true,
+
+    /* this parameter stores the name of the attribute that is sent with user and which
+     * determines whether to trigger WebAuthn.
+     * Default value is 'toggle'
+     */
+     'attrib_toggle' => 'toggle',
+
+    /* this parameter determines if the database will be used to check
+     * whether to trigger second factor authentication or use the "attrib_toggle" instead. 
+     * Default value of this attribute is true
+     */
+    'use_database' => true,
+
+
     ],
 ```
 
@@ -167,6 +188,15 @@ Options
 `default_enable`
 :    Should WebAuthn be enabled by default for all users? If not, users need to be white-listed in the database - other users simply pass through the filter without being subjected to 2FA. Defaults to "disabled by default" === false    
 
+`force`
+:    This parameter is used only if "use_database" is false. If the value of "force" is true then we trigger WebAuthn only if "attrib_toggle" from the user is not empty. If the value of "force" is false then we switch the value of "default_enable" only if "attrib_toggle" from the user is not empty. Default value is true.
+
+`attrib_toggle`
+:    This parameter stores the name of the attribute that is sent with user and which determines whether to trigger WebAuthn. Default value is 'toggle'.
+
+`use_database`
+:    This parameter determines if the database will be used to check whether to trigger second factor authentication or use the "attrib_toggle" instead. Default value of this attribute is true.
+
 User Experience / Workflow
 --------------------------
 Users for which WebAuthn is enabled cannot continue without a FIDO2 token. The
@@ -236,11 +266,14 @@ You can disable the module entirely by not listing it as an authprocfilter.
 
 You can disable the module by default by setting default_enable = false. You can
 then enable WebAuthn second-factor authentication for individual users by adding
-them with status "FIDO2Enabled" to the `userstatus` table.
+them with status "FIDO2Enabled" to the `userstatus` table or if you don't want to
+use the `userstatus` table, you can send an attribute whose name is stored in `attrib_toggle`
+for this.
 
 If the module is enabled by default, you can selectively disable WebAuthn 
 second-factor authentication by adding the username with status FIDO2Disabled to
-the `userstatus` table.
+the `userstatus` table or if you don't want to use the `userstatus` table, you can
+send an attribute whose name is stored in `attrib_toggle` for this.
 
 Limitations / Design Decisions
 ------------------------------
