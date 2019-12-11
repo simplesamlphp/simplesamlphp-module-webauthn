@@ -68,6 +68,12 @@ class WebAuthn extends Auth\ProcessingFilter
     private $defaultEnabled;
 
     /**
+     * @var string|null AuthnContextClassRef
+     */
+    private $authnContextClassRef = null;
+
+
+    /**
      * Initialize filter.
      *
      * Validates and parses the configuration.
@@ -129,6 +135,10 @@ class WebAuthn extends Auth\ProcessingFilter
         } else {
             $this->defaultEnabled = false;
         }
+
+        if (array_key_exists('authnContextClassRef', $config)) {
+            $this->authnContextClassRef = $config['authnContextClassRef'];
+        }
     }
 
     /**
@@ -163,6 +173,8 @@ class WebAuthn extends Auth\ProcessingFilter
 
         $state['requestTokenModel'] = $this->requestTokenModel;
         $state['webauthn:store'] = $this->store;
+        $state['saml:AuthnContextClassRef'] = $this->authnContextClassRef ?? 'urn:rsa:names:tc:SAML:2.0:ac:classes:FIDO';
+
         Logger::debug('webauthn: userid: ' . $state['Attributes'][$this->usernameAttrib][0]);
 
         if ($this->store->is2FAEnabled($state['Attributes'][$this->usernameAttrib][0], $this->defaultEnabled) === false) {
