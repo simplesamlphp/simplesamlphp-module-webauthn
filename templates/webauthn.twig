@@ -2,7 +2,7 @@
 {% extends "base.twig" %}
 
 {% block preload %}
-    <link rel="stylesheet" type="text/css" href="{{ asset }}assets/css/webauthn.css" />
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/webauthn.css', 'webauthn') }}" />
     <meta name="frontendData" id="frontendData" content="{{ frontendData }}" />
 {% endblock %}
 
@@ -76,5 +76,5 @@
             <button type='button' id='authformSubmit'>{{ '{webauthn:webauthn:authTokenButton}'|trans }}</button>
         </form>
     {% endif %}
-    <script src="{{ asset }}assets/js/webauthn.js"></script>
+    <script src="{{ asset('js/webauthn.js', 'webauthn') }}"></script>
 {% endblock %}
