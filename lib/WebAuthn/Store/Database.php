@@ -96,8 +96,13 @@ class Database extends Store
      *
      * @return bool True if the user is enabled for 2FA, false if not
      */
-    public function is2FAEnabled(string $userId, bool $defaultIfNx, bool $useDatabase = true, bool $toggle = false, bool $force = true): bool
-    {
+    public function is2FAEnabled(
+        string $userId,
+        bool $defaultIfNx,
+        bool $useDatabase = true,
+        bool $toggle = false,
+        bool $force = true
+    ): bool {
         if (!$useDatabase) {
             if ($force) {
                 return $toggle;

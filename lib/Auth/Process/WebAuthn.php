@@ -161,7 +161,7 @@ class WebAuthn extends Auth\ProcessingFilter
         if (array_key_exists('use_database', $config)) {
             $this->useDatabase = $config['use_database'];
         } else {
-            $this->useDatabase= true;
+            $this->useDatabase = true;
         }
     }
 
@@ -199,9 +199,18 @@ class WebAuthn extends Auth\ProcessingFilter
         $state['webauthn:store'] = $this->store;
         Logger::debug('webauthn: userid: ' . $state['Attributes'][$this->usernameAttrib][0]);
 
-        $localToggle = !empty($state['Attributes'][$this->toggleAttrib]) && !empty($state['Attributes'][$this->toggleAttrib][0]);
+        $localToggle = !empty($state['Attributes'][$this->toggleAttrib])
+            && !empty($state['Attributes'][$this->toggleAttrib][0]);
 
-        if ($this->store->is2FAEnabled($state['Attributes'][$this->usernameAttrib][0], $this->defaultEnabled, $this->useDatabase, $localToggle, $this->force) === false) {
+        if (
+            $this->store->is2FAEnabled(
+                $state['Attributes'][$this->usernameAttrib][0],
+                $this->defaultEnabled,
+                $this->useDatabase,
+                $localToggle,
+                $this->force
+            ) === false
+        ) {
             // nothing to be done here, end authprocfilter processing
             return;
         }

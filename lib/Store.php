@@ -44,7 +44,13 @@ abstract class Store
      *
      * @return bool True if the user is enabled for 2FA, false if not
      */
-    abstract public function is2FAEnabled(string $userId, bool $defaultIfNx, bool $useDatabase = true, bool $toggle = false, bool $force = true): bool;
+    abstract public function is2FAEnabled(
+        string $userId,
+        bool $defaultIfNx,
+        bool $useDatabase = true,
+        bool $toggle = false,
+        bool $force = true
+    ): bool;
 
     /**
      * does a given credentialID already exist?
@@ -68,7 +74,13 @@ abstract class Store
      *
      * @return bool
      */
-    abstract public function storeTokenData(string $userId, string $credentialId, string $credential, int $signCounter, string $friendlyName): bool;
+    abstract public function storeTokenData(
+        string $userId,
+        string $credentialId,
+        string $credential,
+        int $signCounter,
+        string $friendlyName
+    ): bool;
 
     /**
      * remove an existing credential from the database
