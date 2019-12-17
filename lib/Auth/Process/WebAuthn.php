@@ -68,6 +68,25 @@ class WebAuthn extends Auth\ProcessingFilter
     private $defaultEnabled;
 
     /**
+     * @var boolean switch that determines how $toggle will be used, if true then value of $toggle
+     *              will mean whether to trigger (true) or not (false) the webauthn authentication,
+     *              if false then $toggle means whether to switch the value of $defaultEnabled and then use that
+     */
+    private $force;
+
+    /**
+     * @var boolean an attribute which is associated with $force because it determines its meaning,
+     *              it either simply means whether to trigger webauthn authentication or switch the default settings,
+     *              if null (was not sent as attribute) then the information from database is used
+     */
+    private $toggleAttrib;
+
+    /**
+     * @var bool a bool that determines whether to use local database or not
+     */
+    private $useDatabase;
+
+    /**
      * Initialize filter.
      *
      * Validates and parses the configuration.
@@ -129,6 +148,21 @@ class WebAuthn extends Auth\ProcessingFilter
         } else {
             $this->defaultEnabled = false;
         }
+        if (array_key_exists('force', $config)) {
+            $this->force = $config['force'];
+        } else {
+            $this->force = true;
+        }
+        if (array_key_exists('attrib_toggle', $config)) {
+            $this->toggleAttrib = $config['attrib_toggle'];
+        } else {
+            $this->toggleAttrib = 'toggle';
+        }
+        if (array_key_exists('use_database', $config)) {
+            $this->useDatabase = $config['use_database'];
+        } else {
+            $this->useDatabase = true;
+        }
     }
 
     /**
@@ -165,7 +199,18 @@ class WebAuthn extends Auth\ProcessingFilter
         $state['webauthn:store'] = $this->store;
         Logger::debug('webauthn: userid: ' . $state['Attributes'][$this->usernameAttrib][0]);
 
-        if ($this->store->is2FAEnabled($state['Attributes'][$this->usernameAttrib][0], $this->defaultEnabled) === false) {
+        $localToggle = !empty($state['Attributes'][$this->toggleAttrib])
+            && !empty($state['Attributes'][$this->toggleAttrib][0]);
+
+        if (
+            $this->store->is2FAEnabled(
+                $state['Attributes'][$this->usernameAttrib][0],
+                $this->defaultEnabled,
+                $this->useDatabase,
+                $localToggle,
+                $this->force
+            ) === false
+        ) {
             // nothing to be done here, end authprocfilter processing
             return;
         }
