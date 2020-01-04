@@ -87,6 +87,11 @@ class WebAuthn extends Auth\ProcessingFilter
     private $useDatabase;
 
     /**
+     * @var string|null AuthnContextClassRef
+     */
+    private $authnContextClassRef = null;
+
+    /**
      * Initialize filter.
      *
      * Validates and parses the configuration.
@@ -148,6 +153,7 @@ class WebAuthn extends Auth\ProcessingFilter
         } else {
             $this->defaultEnabled = false;
         }
+
         if (array_key_exists('force', $config)) {
             $this->force = $config['force'];
         } else {
@@ -162,6 +168,10 @@ class WebAuthn extends Auth\ProcessingFilter
             $this->useDatabase = $config['use_database'];
         } else {
             $this->useDatabase = true;
+        }
+        if (array_key_exists('authnContextClassRef', $config)) {
+            $this->authnContextClassRef = $config['authnContextClassRef'];
+
         }
     }
 
@@ -197,6 +207,8 @@ class WebAuthn extends Auth\ProcessingFilter
 
         $state['requestTokenModel'] = $this->requestTokenModel;
         $state['webauthn:store'] = $this->store;
+        $state['saml:AuthnContextClassRef'] = $this->authnContextClassRef ?? 'urn:rsa:names:tc:SAML:2.0:ac:classes:FIDO';
+
         Logger::debug('webauthn: userid: ' . $state['Attributes'][$this->usernameAttrib][0]);
 
         $localToggle = !empty($state['Attributes'][$this->toggleAttrib])
