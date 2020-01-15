@@ -66,7 +66,7 @@ $frontendData = [];
 $frontendData['challengeEncoded'] = $challengeEncoded;
 $frontendData['state'] = [];
 foreach (['Source', 'FIDO2Scope','FIDO2Username','FIDO2Displayname','requestTokenModel'] as $stateItem) {
-    Assert::isArray($state[$stateItem]);
+    Assert::string($state[$stateItem]);
     $frontendData['state'][$stateItem] = $state[$stateItem];
 }
 $frontendData['usernameEncoded'] = $usernameEncoded;
