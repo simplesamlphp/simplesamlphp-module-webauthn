@@ -75,7 +75,7 @@ class WebAuthn extends Auth\ProcessingFilter
     private $force;
 
     /**
-     * @var boolean an attribute which is associated with $force because it determines its meaning,
+     * @var string an attribute which is associated with $force because it determines its meaning,
      *              it either simply means whether to trigger webauthn authentication or switch the default settings,
      *              if null (was not sent as attribute) then the information from database is used
      */
