@@ -41,7 +41,7 @@ class AAGUID
     {
         $path = SSPConfig::getConfigDir() . '/' . self::AAGUID_CONFIG_FILE;
         if (!file_exists($path)) {
-            Logger::warning('Missing "'.AAGUID::AAGUID_CONFIG_FILE.'" configuration file. No device will be recognized.');
+            Logger::warning("Missing AAGUID configuration file ($path). No device will be recognized.");
             return null;
         }
 
