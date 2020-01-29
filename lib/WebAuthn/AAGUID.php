@@ -79,7 +79,13 @@ class AAGUID
      */
     public function hasToken(string $aaguid): bool
     {
-        return array_key_exists(strtolower($aaguid), $this->dictionary);
+        $lowerAaguid = strtolower($aaguid);
+        if (array_key_exists($lowerAaguid, $this->dictionary)) {
+            return true;
+        } else {
+            Logger::info("AAGUID $lowerAaguid not found in dictionary, device is unknown.");
+            return false;
+        }
     }
 
 
