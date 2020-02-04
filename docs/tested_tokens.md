@@ -11,6 +11,7 @@ Attestation modes (None, Indirect)
   * [Feitian BioPass FIDO2](https://www.ftsafe.com/Products/FIDO/Bio)
   * [Solo - FIDO2 security key (USB only)](https://solokeys.com/collections/all/products/solo)
   * [Solo Tap - FIDO2 security key (USB + NFC)](https://solokeys.com/collections/all/products/solo-tap)
+  * TouchID (tested on Macbook Pro 2019, macOS 10.15.3, Google Chrome) - AAGUID not in database yet
 
 Attestation mode None
 ---------------------
