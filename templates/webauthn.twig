@@ -47,12 +47,14 @@
                     </form>
                 {% endif %}
             {% endfor %}
-            <div class='space'></div>
-            <form id='nevermind' method='POST' action='{{ delURL|raw }}'>
-                <button type='submit' id='submit-nevermind' name='submit' value='NEVERMIND'>
-                    {{ '{webauthn:webauthn:noChange}'|trans }}
-                </button>
-            </form>
+            {% if showExitButton %}
+                <div class='space'></div>
+                <form id='nevermind' method='POST' action='{{ delURL|raw }}'>
+                    <button type='submit' id='submit-nevermind' name='submit' value='NEVERMIND'>
+                        {{ '{webauthn:webauthn:noChange}'|trans }}
+                    </button>
+                </form>
+            {% endif %}
         {% endif %}
     {% endif %}
     {% if authURL|length > 0 %}

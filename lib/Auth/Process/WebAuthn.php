@@ -92,6 +92,14 @@ class WebAuthn extends Auth\ProcessingFilter
     private $authnContextClassRef = null;
 
     /**
+     * @var bool an attribute which determines whether you will be able to register and manage tokens
+     *           while authenticating or you want to use the standalone registration page for these
+     *           purposes. If set to false => standalone registration page, if false => inflow registration.
+     *           If parameter from configuration is not explicitly set, it is set to true.
+     */
+    private $useInflowRegistration;
+
+    /**
      * Initialize filter.
      *
      * Validates and parses the configuration.
@@ -173,6 +181,11 @@ class WebAuthn extends Auth\ProcessingFilter
             $this->authnContextClassRef = $config['authnContextClassRef'];
 
         }
+        if (array_key_exists('use_inflow_registration', $config)) {
+            $this->useInflowRegistration = $config['use_inflow_registration'];
+        } else {
+            $this->useInflowRegistration = true;
+        }
     }
 
     /**
@@ -235,6 +248,7 @@ class WebAuthn extends Auth\ProcessingFilter
         $state['FIDO2SignupChallenge'] = hash('sha512', random_bytes(64));
         $state['FIDO2WantsRegister'] = false;
         $state['FIDO2AuthSuccessful'] = false;
+        $state['UseInflowRegistration'] = $this->useInflowRegistration;
 
         // Save state and redirect
         $id = Auth\State::saveState($state, 'webauthn:request');

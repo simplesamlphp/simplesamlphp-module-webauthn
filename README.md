@@ -99,7 +99,12 @@ so that it takes place AFTER the first-factor authentication. E.g. at 100:
      */
     'use_database' => true,
 
-
+    /* optional parameter which determines whether you will be able to register and manage tokens
+     * while authenticating or you want to use the standalone registration page for these
+     * purposes. If set to false => standalone registration page, if false => inflow registration.
+     * If this parameter is not explicitly set, the value is considered to be true.
+     */
+    'use_inflow_registration' => true,
     ],
 ```
 
@@ -197,6 +202,9 @@ Options
 `use_database`
 :    This parameter determines if the database will be used to check whether to trigger second factor authentication or use the "attrib_toggle" instead. Default value of this attribute is true.
 
+`use_inflow_registration`
+:    Optional parameter which determines whether you will be able to register and manage tokens while authenticating or you want to use the standalone registration page for these purposes. If set to false => standalone registration page, if false => inflow registration. If this parameter is not explicitly set, the value is considered to be true.
+
 User Experience / Workflow
 --------------------------
 Users for which WebAuthn is enabled cannot continue without a FIDO2 token. The
@@ -222,6 +230,10 @@ As long as a user account has 0 tokens there is no benefit yet; it's effectively
 still single factor authentication because anyone with the user's password can 
 register any token. That is in the nature of things. It could be avoided with
 an out-of-band registration process (in the same scope).
+
+If the standalone registration page is used, the user can't optionally enroll and manage tokens while logging in.
+The standalone registration page can be found under webauthn/registration.php, it requires authentication
+and after that you are redirected to a page where you can manage tokens.
 
 Device model detection
 ----------------------
