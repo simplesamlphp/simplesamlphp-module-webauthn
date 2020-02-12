@@ -32,13 +32,25 @@ abstract class Store
      *
      * This function checks whether a given user has been enabled for WebAuthn.
      *
-     * @param string $userId        The hash identifying the user at an IdP.
-     * @param bool   $defaultIfNx   if not found in the DB, should the user be considered enabled (true)
+     * @param string $userId The hash identifying the user at an IdP.
+     * @param bool $defaultIfNx if not found in the DB, should the user be considered enabled (true)
      *                              or disabled(false)
+     * @param bool $useDatabase a bool that determines whether to use local database or not
+     * @param bool $toggle variable which is associated with $force because it determines its meaning, it either
+     *                     simply means whether to trigger webauthn authentication or switch the default settings,
+     * @param bool $force switch that determines how $toggle will be used, if true then value of $toggle
+     *                    will mean whether to trigger (true) or not (false) the webauthn authentication,
+     *                    if false then $toggle means whether to switch the value of $defaultEnabled and then use that
      *
      * @return bool True if the user is enabled for 2FA, false if not
      */
-    abstract public function is2FAEnabled(string $userId, bool $defaultIfNx): bool;
+    abstract public function is2FAEnabled(
+        string $userId,
+        bool $defaultIfNx,
+        bool $useDatabase = true,
+        bool $toggle = false,
+        bool $force = true
+    ): bool;
 
     /**
      * does a given credentialID already exist?
@@ -62,7 +74,13 @@ abstract class Store
      *
      * @return bool
      */
-    abstract public function storeTokenData(string $userId, string $credentialId, string $credential, int $signCounter, string $friendlyName): bool;
+    abstract public function storeTokenData(
+        string $userId,
+        string $credentialId,
+        string $credential,
+        int $signCounter,
+        string $friendlyName
+    ): bool;
 
     /**
      * remove an existing credential from the database
