@@ -71,7 +71,9 @@ foreach (['Source', 'FIDO2Scope','FIDO2Username','FIDO2Displayname','requestToke
     $frontendData['state'][$stateItem] = $state[$stateItem];
 }
 
-$t->data['showExitButton'] = array_key_exists('Registration', $state) ? false : true;
+
+
+$t->data['showExitButton'] = !array_key_exists('Registration', $state);
 $frontendData['usernameEncoded'] = $usernameEncoded;
 $frontendData['attestation'] = $state['requestTokenModel'] ? "indirect" : "none";
 $frontendData['credentialIdEncoded'] = $credentialIdEncoded;

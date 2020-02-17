@@ -101,11 +101,9 @@ if ($debugEnabled === true) {
     echo "<form id='regform' method='POST' action='" .
         Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($id)) . "'>";
     echo "<button type='submit'>Return to previous page.</button>";
+} elseif (array_key_exists('Registration', $state)) {
+    $url = Module::getModuleURL('webauthn/webauthn.php');
+    Utils\HTTP::redirectTrustedURL($url, ['StateId' => $id]);
 } else {
-    if (array_key_exists('Registration', $state)) {
-        $url = Module::getModuleURL('webauthn/webauthn.php');
-        Utils\HTTP::redirectTrustedURL($url, ['StateId' => $id]);
-    } else {
-        Auth\ProcessingChain::resumeProcessing($state);
-    }   
+    Auth\ProcessingChain::resumeProcessing($state);
 }
