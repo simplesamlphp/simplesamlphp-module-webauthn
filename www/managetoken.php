@@ -5,6 +5,7 @@ use SimpleSAML\Auth;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error as SspError;
 use SimpleSAML\Logger;
+use SimpleSAML\Module\webauthn\WebAuthn\StaticProcessHelper;
 use SimpleSAML\Utils;
 use SimpleSAML\Module;
 
@@ -45,10 +46,8 @@ switch ($_POST['submit']) {
                     break;
                 }            
             }
-            
-            $id = Auth\State::saveState($state, 'webauthn:request');
-            $url = Module::getModuleURL('webauthn/webauthn.php');
-            Utils\HTTP::redirectTrustedURL($url, ['StateId' => $id]);
+
+            StaticProcessHelper::saveStateAndRedirect($state);
         } else {
             Auth\ProcessingChain::resumeProcessing($state);
         }

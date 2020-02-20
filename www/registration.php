@@ -9,6 +9,7 @@
 
 use SimpleSAML\Auth\Simple;
 use SimpleSAML\Configuration;
+use SimpleSAML\Logger;
 use SimpleSAML\Metadata\MetaDataStorageHandler;
 use SimpleSAML\Module\webauthn\Store;
 use SimpleSAML\Module\webauthn\WebAuthn\StateData;
@@ -16,25 +17,33 @@ use SimpleSAML\Module\webauthn\WebAuthn\StaticProcessHelper;
 use SimpleSAML\Utils;
 use Webmozart\Assert\Assert;
 
-$config = Configuration::getOptionalConfig('module_webauthn.php')->toArray();
-assert(is_array($config));
-$as = new Simple('default-sp');
+$config = Configuration::getOptionalConfig('module_webauthn.php');
+$registrationAuthSource = $config->getString('registration_auth_source', 'default-sp');
+
+$as = new Simple($registrationAuthSource);
 $stateData = new StateData();
 $as->requireAuth();
 $attrs = $as->getAttributes();
 
 $state['Attributes'] = $attrs;
 
-$stateData->requestTokenModel = $config['request_tokenmodel'];
-$stateData->store = Store::parseStoreConfig($config['store']); // exception
-$stateData->scope = $config['scope'];
+$stateData->requestTokenModel = $config->getBoolean('request_tokenmodel', false);
+try {
+    $stateData->store = Store::parseStoreConfig($config->getArray('store'));
+} catch (\Exception $e) {
+    Logger::error(
+        'webauthn: Could not create storage: ' .
+        $e->getMessage()
+    );
+}
+$stateData->scope = $config->getString('scope', null);
 $baseurl = Utils\HTTP::getSelfHost();
 $hostname = parse_url($baseurl, PHP_URL_HOST);
 if ($hostname !== null) {
     $stateData->derivedScope = $hostname;
 }
-$stateData->usernameAttrib = $config['attrib_username'];
-$stateData->displaynameAttrib = $config['attrib_displayname'];
+$stateData->usernameAttrib = $config->getString('attrib_username');
+$stateData->displaynameAttrib = $config->getString('attrib_displayname');
 $stateData->useInflowRegistration = true;
 
 StaticProcessHelper::prepareState($stateData, $state);

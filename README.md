@@ -21,7 +21,9 @@ You can install this module with composer:
 How to setup the webauthn module
 -----------------------------------------
 You need to enable the module's authprocfilter at a priority level
-so that it takes place AFTER the first-factor authentication. E.g. at 100:
+so that it takes place AFTER the first-factor authentication. E.g. at 100 and
+if standalone registration and name2oid are used together, then the WebAuthn
+ auth proc filter has to run after name2oid.
 
 ```php
 100 => [

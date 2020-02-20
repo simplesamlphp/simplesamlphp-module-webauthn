@@ -23,7 +23,7 @@ class StaticProcessHelper
         $state['FIDO2Scope'] = $stateData->scope;
         $state['FIDO2DerivedScope'] = $stateData->derivedScope;
         $state['FIDO2Username'] = $state['Attributes'][$stateData->usernameAttrib][0];
-        $state['FIDO2Displayname'] = $state['Attributes'][$stateData->displaynameAttrib][0]; //NEBUDE FUNGOVAT KVŮLI DVĚMA DRUHŮM JMEN
+        $state['FIDO2Displayname'] = $state['Attributes'][$stateData->displaynameAttrib][0];
         $state['FIDO2SignupChallenge'] = hash('sha512', random_bytes(64));
         $state['FIDO2WantsRegister'] = false;
         $state['FIDO2AuthSuccessful'] = false;

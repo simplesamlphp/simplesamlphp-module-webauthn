@@ -78,4 +78,9 @@ $config = [
      * Defaults to true.
      */
     'use_inflow_registration' => true,
+
+    /* optional parameter that determines what auth source will be used in standalone registration page.
+     * Defaults to 'default-sp'.
+     */
+    'registration_auth_source' => 'default-sp',
 ];
