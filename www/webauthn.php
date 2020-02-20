@@ -30,8 +30,10 @@ $id = $_REQUEST['StateId'];
 /** @var array $state */
 $state = Auth\State::loadState($id, 'webauthn:request');
 
+$templateFile = $state['UseInflowRegistration'] ? 'webauthn:webauthn.php' : 'webauthn:authentication.twig';
+
 // Make, populate and layout consent form
-$t = new Template($globalConfig, 'webauthn:webauthn.php');
+$t = new Template($globalConfig, $templateFile);
 $translator = $t->getTranslator();
 $t->data['UserID'] = $state['FIDO2Username'];
 $t->data['FIDO2Tokens'] = $state['FIDO2Tokens'];
@@ -66,9 +68,10 @@ $frontendData = [];
 $frontendData['challengeEncoded'] = $challengeEncoded;
 $frontendData['state'] = [];
 foreach (['Source', 'FIDO2Scope','FIDO2Username','FIDO2Displayname','requestTokenModel'] as $stateItem) {
-    Assert::string($state[$stateItem]);
     $frontendData['state'][$stateItem] = $state[$stateItem];
 }
+
+$t->data['showExitButton'] = !array_key_exists('Registration', $state);
 $frontendData['usernameEncoded'] = $usernameEncoded;
 $frontendData['attestation'] = $state['requestTokenModel'] ? "indirect" : "none";
 $frontendData['credentialIdEncoded'] = $credentialIdEncoded;

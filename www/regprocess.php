@@ -7,6 +7,7 @@ use SimpleSAML\Module;
 use SimpleSAML\Auth;
 use SimpleSAML\Module\webauthn\WebAuthn\AAGUID;
 use SimpleSAML\Module\webauthn\WebAuthn\WebAuthnRegistrationEvent;
+use SimpleSAML\Utils;
 
 if (session_status() != PHP_SESSION_ACTIVE) {
     session_cache_limiter('nocache');
@@ -36,6 +37,7 @@ $fido2Scope = ($state['FIDO2Scope'] === null ? $state['FIDO2DerivedScope'] : $st
 if ($fido2Scope === null) {
     throw new Exception("FIDO2Scope cannot be null!");
 }
+
 $regObject = new WebAuthnRegistrationEvent(
     $_POST['type'],
     $fido2Scope,
@@ -92,13 +94,16 @@ $state['FIDO2Tokens'][] = [
     3 => $friendlyName
 ];
 
-Auth\State::saveState($state, 'webauthn:request');
+$id = Auth\State::saveState($state, 'webauthn:request');
 if ($debugEnabled === true) {
     echo $regObject->getDebugBuffer();
     echo $regObject->getValidateBuffer();
     echo "<form id='regform' method='POST' action='" .
         Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($id)) . "'>";
     echo "<button type='submit'>Return to previous page.</button>";
+} elseif (array_key_exists('Registration', $state)) {
+    $url = Module::getModuleURL('webauthn/webauthn.php');
+    Utils\HTTP::redirectTrustedURL($url, ['StateId' => $id]);
 } else {
     Auth\ProcessingChain::resumeProcessing($state);
 }

@@ -5,6 +5,9 @@ use SimpleSAML\Auth;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error as SspError;
 use SimpleSAML\Logger;
+use SimpleSAML\Module\webauthn\WebAuthn\StaticProcessHelper;
+use SimpleSAML\Utils;
+use SimpleSAML\Module;
 
 if (session_status() != PHP_SESSION_ACTIVE) {
     session_cache_limiter('nocache');
@@ -35,7 +38,19 @@ switch ($_POST['submit']) {
         }
         $store = $state['webauthn:store'];
         $store->deleteTokenData($_POST['credId']);
-        Auth\ProcessingChain::resumeProcessing($state);
+        if (array_key_exists('Registration', $state)) {
+            
+            foreach ($state['FIDO2Tokens'] as $key => $value) {
+                if ($state['FIDO2Tokens'][$key][0] == $_POST['credId']) {
+                    unset($state['FIDO2Tokens'][$key]);
+                    break;
+                }            
+            }
+
+            StaticProcessHelper::saveStateAndRedirect($state);
+        } else {
+            Auth\ProcessingChain::resumeProcessing($state);
+        }
         break;
     default:
         throw new Exception("Unknown submit button state.");
