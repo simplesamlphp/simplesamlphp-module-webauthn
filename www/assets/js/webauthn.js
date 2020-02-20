@@ -69,7 +69,7 @@ var publicKeyCredentialCreationOptions = {
         challenge: new Uint8Array(frontendData['challengeEncoded']).buffer,
         rp: {
             name: frontendData['state']['Source']['entityid'],
-            id: frontendData['FIDO2Scope'],
+            id: frontendData['state']['FIDO2Scope'],
         },
         user: {
             id: new Uint8Array(frontendData['usernameEncoded']).buffer,

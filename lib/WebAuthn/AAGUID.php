@@ -41,7 +41,7 @@ class AAGUID
     {
         $path = SSPConfig::getConfigDir() . '/' . self::AAGUID_CONFIG_FILE;
         if (!file_exists($path)) {
-            Logger::warning('Missing "webauthn_tokens.json" configuration file. No device will be recognized.');
+            Logger::warning("Missing AAGUID configuration file ($path). No device will be recognized.");
             return null;
         }
 
@@ -79,7 +79,13 @@ class AAGUID
      */
     public function hasToken(string $aaguid): bool
     {
-        return array_key_exists(strtolower($aaguid), $this->dictionary);
+        $lowerAaguid = strtolower($aaguid);
+        if (array_key_exists($lowerAaguid, $this->dictionary)) {
+            return true;
+        } else {
+            Logger::info("AAGUID $lowerAaguid not found in dictionary, device is unknown.");
+            return false;
+        }
     }
 
 
