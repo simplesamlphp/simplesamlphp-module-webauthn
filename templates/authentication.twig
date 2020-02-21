@@ -1,0 +1,25 @@
+{% set pagetitle = '{webauthn:webauthn:page_title}'|trans %}
+{% extends "base.twig" %}
+
+{% block preload %}
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/webauthn.css', 'webauthn') }}" />
+    <meta name="frontendData" id="frontendData" content="{{ frontendData }}" />
+{% endblock %}
+
+{% block content %}
+    <h1>{{ '{webauthn:webauthn:heading1}'|trans }}</h1>
+    {% if authURL|length > 0 %}
+        <form id='authform' method='POST' action='{{ authURL|raw }}'>
+            <input type='hidden' id='resp' name='response_id' value='0'/>
+            <input type='hidden' id='data' name='attestation_client_data_json' value='nix'/>
+            <input type='hidden' id='authdata' name='authenticator_data' value='mehrnix'/>
+            <input type='hidden' id='sigdata' name='signature' value='evenmorenix'/>
+            <input type='hidden' id='data_raw_b64' name='client_data_raw' value='garnix'/>
+            <input type='hidden' id='type' name='type' value='something'/>
+            <input type='hidden' id='operation' name='operation' value='AUTH'/>
+            <button type='button' id='authformSubmit'>{{ '{webauthn:webauthn:authTokenButton}'|trans }}</button>
+        </form>
+    {% endif %}
+    <script src="{{ asset('js/webauthn.js', 'webauthn') }}"></script>
+    <script src="{{ asset('js/authentication.js', 'webauthn') }}"></script>
+{% endblock %}
