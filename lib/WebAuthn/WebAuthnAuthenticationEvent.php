@@ -51,6 +51,7 @@ class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent
         $this->validateSignature($authData . $this->clientDataHash, $signature);
     }
 
+
     /**
      * @param string $sigData
      * @param string $signature

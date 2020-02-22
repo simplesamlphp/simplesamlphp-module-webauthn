@@ -25,6 +25,7 @@ $stateData = new StateData();
 $as->requireAuth();
 $attrs = $as->getAttributes();
 
+$state = [];
 $state['Attributes'] = $attrs;
 
 $stateData->requestTokenModel = $config->getBoolean('request_tokenmodel', false);

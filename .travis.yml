@@ -120,5 +120,4 @@ jobs:
       before_script:
         - composer update
       script:
-        - vendor/bin/phpcs bin/ lib/ templates/ tests/ www/
-
+        - vendor/bin/phpcs

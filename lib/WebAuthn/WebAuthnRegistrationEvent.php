@@ -88,6 +88,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         $this->debugBuffer .= "Attestation Data (bin2hex): " . bin2hex(substr($authData, 37)) . "<br/>";
     }
 
+
     /**
      * Validate the incoming attestation data CBOR blob and return the embedded authData
      * @param string $attestationData
@@ -129,6 +130,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         }
     }
 
+
     /**
      * @param array $attestationArray
      * @return void
@@ -148,6 +150,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
             $this->fail("Non-empty attestation authorities are not expected with 'attestationFormat = none'.");
         }
     }
+
 
     /**
      * @param array $attestationArray
@@ -169,6 +172,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
             $this->validateAttestationFormatPackedSelf($attestationArray);
         }
     }
+
 
     /**
      * @param array $attestationArray
@@ -252,6 +256,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         return;
     }
 
+
     /**
      * @param array $attestationArray
      * @return void
@@ -284,6 +289,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
             $this->fail("Self-Attestation failed.");
         }
     }
+
 
     /**
      * support legacy U2F tokens
@@ -358,6 +364,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         $this->AAGUIDAssurance = self::AAGUID_ASSURANCE_LEVEL_BASIC;
     }
 
+
     /**
      * support Android authenticators (fingerprint etc.)
      *
@@ -367,6 +374,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
     private function validateAttestationFormatAndroidSafetyNet(array $attestationData): void
     {
     }
+
 
     /**
      * The registration contains the actual credential. This function parses it.
@@ -415,6 +423,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         $this->credential = bin2hex($pubKeyCBOR);
     }
 
+
     /**
      * transform DER formatted certificate to PEM format
      *
@@ -428,10 +437,11 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         return $pem;
     }
 
+
     /**
      * @return string
      */
-    public function getAAGUID()
+    public function getAAGUID(): string
     {
         return $this->AAGUID;
     }

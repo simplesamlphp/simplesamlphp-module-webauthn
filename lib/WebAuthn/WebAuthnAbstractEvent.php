@@ -107,6 +107,7 @@ abstract class WebAuthnAbstractEvent
      */
     protected $credential;
 
+
     /**
      * Initialize the event object.
      *
@@ -158,6 +159,7 @@ abstract class WebAuthnAbstractEvent
         $this->counter = $this->validateAuthData($authData);
     }
 
+
     /**
      * @return int
      */
@@ -165,6 +167,7 @@ abstract class WebAuthnAbstractEvent
     {
         return $this->counter;
     }
+
 
     /**
      * @return string
@@ -174,6 +177,7 @@ abstract class WebAuthnAbstractEvent
         return $this->credential;
     }
 
+
     /**
      * @return string
      */
@@ -181,6 +185,7 @@ abstract class WebAuthnAbstractEvent
     {
         return $this->credentialId;
     }
+
 
     /**
      * @return string
@@ -190,6 +195,7 @@ abstract class WebAuthnAbstractEvent
         return $this->debugBuffer;
     }
 
+
     /**
      * @return string
      */
@@ -197,6 +203,7 @@ abstract class WebAuthnAbstractEvent
     {
         return $this->validateBuffer;
     }
+
 
     /**
      * The base64url decode function differs slightly from base64. Thanks.
@@ -210,6 +217,7 @@ abstract class WebAuthnAbstractEvent
     {
         return base64_decode(strtr($data, '-_', '+/'));
     }
+
 
     /**
      * this function validates the content of clientDataJSON.
@@ -304,6 +312,7 @@ abstract class WebAuthnAbstractEvent
         return hash("sha256", $clientDataJSON, true);
     }
 
+
     /**
      * This function performs the required checks on the authData (REG) or authenticatorData (AUTH) structure
      *
@@ -379,6 +388,7 @@ abstract class WebAuthnAbstractEvent
         return $counterDec;
     }
 
+
     /**
      * this function takes a binary CBOR blob and decodes it into an associative PHP array.
      *
@@ -418,6 +428,7 @@ abstract class WebAuthnAbstractEvent
         return $finalData;
     }
 
+
     /**
      * @param string $text
      * @return void
@@ -426,6 +437,7 @@ abstract class WebAuthnAbstractEvent
     {
         $this->validateBuffer .= "<span style='background-color:yellow;'>WARN: $text</span><br/>";
     }
+
 
     /**
      * @param string $text
@@ -442,6 +454,7 @@ abstract class WebAuthnAbstractEvent
         throw new \Exception($text);
     }
 
+
     /**
      * @param string $text
      * @return void
@@ -450,6 +463,7 @@ abstract class WebAuthnAbstractEvent
     {
         $this->validateBuffer .= "<span style='background-color:green; color:white;'>PASS: $text</span><br/>";
     }
+
 
     /**
      * @param string $text

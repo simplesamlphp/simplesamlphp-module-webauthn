@@ -8,14 +8,24 @@ use SimpleSAML\Utils;
 
 class StaticProcessHelper
 {
-    public static function saveStateAndRedirect(&$state)
+    /**
+     * @param array &$state
+     * @return void
+     */
+    public static function saveStateAndRedirect(array &$state): void
     {
         $id = Auth\State::saveState($state, 'webauthn:request');
         $url = Module::getModuleURL('webauthn/webauthn.php');
         Utils\HTTP::redirectTrustedURL($url, ['StateId' => $id]);
     }
 
-    public static function prepareState($stateData, &$state)
+
+    /**
+     * @param \SimpleSAML\Module\webauthn\WebAuthn\StateData $stateData
+     * @param array &$state
+     * @return void
+     */
+    public static function prepareState(StateData $stateData, array &$state): void
     {
         $state['requestTokenModel'] = $stateData->requestTokenModel;
         $state['webauthn:store'] = $stateData->store;

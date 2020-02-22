@@ -19,19 +19,17 @@ class AAGUID
      */
     protected $dictionary = [];
 
-
     /**
      * The name of the configuration file where we should expect the AAGUID dictionary.
      */
     public const AAGUID_CONFIG_FILE = 'webauthn-aaguid.json';
 
-
     /**
      * The singleton instance.
      *
-     * @var AAGUID
+     * @var \SimpleSAML\Module\webauthn\WebAuthn\AAGUID|null
      */
-    protected static $instance;
+    protected static $instance = null;
 
 
     /**
@@ -61,7 +59,7 @@ class AAGUID
      *
      * @return AAGUID
      */
-    public static function getInstance()
+    public static function getInstance(): AAGUID
     {
         if (!isset(self::$instance)) {
             self::$instance = new self();

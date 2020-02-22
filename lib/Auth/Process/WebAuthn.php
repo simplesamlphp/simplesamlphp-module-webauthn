@@ -20,6 +20,7 @@ use SimpleSAML\Module;
 use SimpleSAML\Module\webauthn\Store;
 use SimpleSAML\Module\webauthn\WebAuthn\StaticProcessHelper;
 use SimpleSAML\Utils;
+use Webmozart\Assert\Assert;
 
 class WebAuthn extends Auth\ProcessingFilter
 {
@@ -69,13 +70,8 @@ class WebAuthn extends Auth\ProcessingFilter
      *
      * @throws \SimpleSAML\Error\Exception if the configuration is not valid.
      */
-    public function __construct($config, $reserved)
+    public function __construct(array $config, $reserved)
     {
-        /**
-         * Remove annotation + assert as soon as this method can be typehinted (SSP 2.0)
-         * @psalm-suppress RedundantConditionGivenDocblockType
-         */
-        assert(is_array($config));
         parent::__construct($config, $reserved);
 
         $this->stateData = new Module\webauthn\WebAuthn\StateData();
@@ -160,19 +156,15 @@ class WebAuthn extends Auth\ProcessingFilter
      *
      * @return void
      */
-    public function process(&$state)
+    public function process(array &$state): void
     {
-        /**
-         * Remove annotation + assert as soon as this method can be typehinted (SSP 2.0)
-         * @psalm-suppress RedundantConditionGivenDocblockType
-         */
-        assert(is_array($state));
-        assert(array_key_exists('UserID', $state));
-        assert(array_key_exists('Destination', $state));
-        assert(array_key_exists('entityid', $state['Destination']));
-        assert(array_key_exists('metadata-set', $state['Destination']));
-        assert(array_key_exists('entityid', $state['Source']));
-        assert(array_key_exists('metadata-set', $state['Source']));
+        Assert::keyExists($state, 'UserID');
+        Assert::keyExists($state, 'Destination');
+        Assert::keyExists($state['Destination'], 'entityid');
+        Assert::keyExists($state['Destination'], 'metadata-set');
+        Assert::keyExists($state['Source'], 'entityid');
+        Assert::keyExists($state['Source'], 'metadata-set');
+
         if (!array_key_exists($this->stateData->usernameAttrib, $state['Attributes'])) {
             Logger::warning('webauthn: cannot determine if user needs second factor, missing attribute "' .
                 $this->stateData->usernameAttrib . '".');

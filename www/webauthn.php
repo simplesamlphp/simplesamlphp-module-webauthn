@@ -30,11 +30,8 @@ $id = $_REQUEST['StateId'];
 /** @var array $state */
 $state = Auth\State::loadState($id, 'webauthn:request');
 
-$templateFile = $state['UseInflowRegistration'] ? 'webauthn:webauthn.php' : 'webauthn:authentication.twig';
-
 // Make, populate and layout consent form
-$t = new Template($globalConfig, $templateFile);
-$translator = $t->getTranslator();
+$t = new Template($globalConfig, 'webauthn:authentication.twig');
 $t->data['UserID'] = $state['FIDO2Username'];
 $t->data['FIDO2Tokens'] = $state['FIDO2Tokens'];
 
@@ -96,4 +93,4 @@ if (
 
 // dynamically generate the JS code needed for token registration
 
-$t->show();
+$t->send();

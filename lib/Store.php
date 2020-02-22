@@ -138,6 +138,7 @@ abstract class Store
             $config = Utils\Arrays::arrayize($config);
         }
 
+        /** @psalm-var mixed $config */
         if (!is_array($config)) {
             throw new Exception('Invalid configuration for consent store option: ' . var_export($config, true));
         }

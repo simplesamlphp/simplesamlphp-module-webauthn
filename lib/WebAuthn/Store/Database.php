@@ -31,7 +31,6 @@ class Database extends Store
      */
     private $db;
 
-
     /**
      * The configuration for our database store.
      *
@@ -55,6 +54,7 @@ class Database extends Store
         $this->config = $config;
         $this->db = \SimpleSAML\Database::getInstance(Configuration::loadFromArray($config));
     }
+
 
     /**
      * Called before serialization.
