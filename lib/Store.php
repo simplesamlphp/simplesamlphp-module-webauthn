@@ -108,9 +108,9 @@ abstract class Store
     abstract public function getTokenData(string $userId): array;
 
     /**
-     * Get statistics for all consent given in the consent store
+     * Get statistics for all tokens given in the Webauthn token store
      *
-     * @return mixed Statistics from the consent store
+     * @return mixed Statistics from the Webauthn token store
      *
      * @throws \Exception
      */
@@ -121,9 +121,9 @@ abstract class Store
 
 
     /**
-     * Parse consent storage configuration.
+     * Parse Webauthn token storage configuration.
      *
-     * This function parses the configuration for a consent storage method. An exception will be thrown if
+     * This function parses the configuration for a Webauthn token storage method. An exception will be thrown if
      * configuration parsing fails.
      *
      * @param mixed $config The configuration.
@@ -140,11 +140,11 @@ abstract class Store
 
         /** @psalm-var mixed $config */
         if (!is_array($config)) {
-            throw new Exception('Invalid configuration for consent store option: ' . var_export($config, true));
+            throw new Exception('Invalid configuration for Webauthn token store option: ' . var_export($config, true));
         }
 
         if (!array_key_exists(0, $config)) {
-            throw new Exception('Consent store without name given.');
+            throw new Exception('Webauthn token store without name given.');
         }
 
         $className = Module::resolveClass(
