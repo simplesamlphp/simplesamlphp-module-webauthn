@@ -84,7 +84,7 @@ class WebAuthnTest extends TestCase
                     'FIDO2Displayname' => 'Donald Duck',
                     'FIDO2Username' => 'dduck',
                     'FIDO2Scope' => 'Ducktown',
-                    'FIDO2Tokens' => [0 => 'x', 1 => 'y'],
+                    'FIDO2Tokens' => [0 => 'A1B2C3', 1 => 'D4E5F6'],
                     'FIDO2SignupChallenge' => 'A1B2C3',
                     'FIDO2WantsRegister' => false,
                     'FIDO2AuthSuccessful' => false,
