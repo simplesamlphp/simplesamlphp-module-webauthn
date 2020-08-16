@@ -109,7 +109,6 @@ class ManageToken
         switch ($request->request->get('submit')) {
             case "NEVERMIND":
                 return new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
-                break;
             case "DELETE":
                 $credId = $request->request->get('credId');
                 if ($state['FIDO2AuthSuccessful'] == $credId) {
@@ -127,11 +126,11 @@ class ManageToken
                         }
                     }
 
-                    return new RunnableResponse([StaticProcessHelper::class, 'saveStateAndRedirect'], [$state]);
+                    $response = new RunnableResponse([StaticProcessHelper::class, 'saveStateAndRedirect'], [$state]);
                 } else {
-                    return new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
+                    $response = new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
                 }
-                break;
+                return $response;
             default:
                 throw new Exception("Unknown submit button state.");
         }

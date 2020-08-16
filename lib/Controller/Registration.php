@@ -107,7 +107,7 @@ class Registration
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @return \SimpleSAML\HTTP\RunnableResponse  A Symfony Response-object.
      */
-    public function main(Request $request): RunnableResponse
+    public function main(/** @scrutinizer ignore-unused */ Request $request): RunnableResponse
     {
         $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php');
         $registrationAuthSource = $moduleConfig->getString('registration_auth_source', 'default-sp');

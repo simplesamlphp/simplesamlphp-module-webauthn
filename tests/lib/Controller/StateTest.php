@@ -26,6 +26,9 @@ class StateTest extends TestCase
     /** @var \SimpleSAML\Configuration */
     protected $config;
 
+    /** @var \SimpleSAML\Logger */
+    protected $logger;
+
     /** @var \SimpleSAML\Session */
     protected $session;
 
@@ -63,7 +66,8 @@ class StateTest extends TestCase
      * @dataProvider stateTestsProvider
      *
      * @param string $controllerEndpoint The name of the endpoint of the controller to test
-     * @param class-string $controllerClass The name of the controller class to test
+     * @param string $controllerClass The name of the controller class to test
+     * @psalm-param class-string $controllerClass
      * @param string $controllerMethod The name of the controller method to test
      */
     public function testMissingState(string $controllerEndpoint, string $controllerClass, string $controllerMethod): void
@@ -88,7 +92,8 @@ class StateTest extends TestCase
      * @dataProvider stateTestsProvider
      *
      * @param string $controllerEndpoint The name of the endpoint of the controller to test
-     * @param class-string $controllerClass The name of the controller class to test
+     * @param string $controllerClass The name of the controller class to test
+     * @psalm-param class-string $controllerClass
      * @param string $controllerMethod The name of the controller method to test
      */
     public function testNoState(string $controllerEndpoint, string $controllerClass, string $controllerMethod): void

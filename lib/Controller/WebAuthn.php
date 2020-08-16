@@ -107,7 +107,6 @@ class WebAuthn
             2
         );
 
-        $credentialIdEncoded = [];
         $challengeEncoded = [];
         foreach ($challenge as $oneChar) {
             $challengeEncoded[] = hexdec($oneChar);

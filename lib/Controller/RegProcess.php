@@ -183,16 +183,16 @@ class RegProcess
         $id = $this->authState::saveState($state, 'webauthn:request');
         if ($debugEnabled === true) {
             $response = new StreamedResponse();
-            $response->setCallback(function ($regObject, $stateId) {
+            $response->setCallback(function ($regObject, $id) {
                 echo $regObject->getDebugBuffer();
                 echo $regObject->getValidateBuffer();
                 echo "<form id='regform' method='POST' action='" .
-                    Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($stateId)) . "'>";
+                    Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($id)) . "'>";
                 echo "<button type='submit'>Return to previous page.</button>";
             });
             return $response;
         } elseif (array_key_exists('Registration', $state)) {
-            return new RedirectResponse(Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($stateId)));
+            return new RedirectResponse(Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($id)));
         } else {
             return new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
         }

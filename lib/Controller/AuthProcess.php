@@ -2,6 +2,7 @@
 
 namespace SimpleSAML\Module\webauthn\Controller;
 
+use Exception;
 use SimpleSAML\Auth;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error;
@@ -175,7 +176,7 @@ class AuthProcess
 
         if ($debugEnabled) {
             $response = new StreamedResponse();
-            $response->setCallback(function () {
+            $response->setCallback(function ($authObject, $state) {
                 echo $authObject->getDebugBuffer();
                 echo $authObject->getValidateBuffer();
                 echo "Debug mode, not continuing to " . ($state['FIDO2WantsRegister'] ? "credential registration page." : "destination.");
