@@ -4,7 +4,7 @@ namespace SimpleSAML\Module\webauthn\WebAuthn;
 
 use Cose\Key\Ec2Key;
 use SimpleSAML\Logger;
-use SimpleSAML\Utils\Config as SSPConfig;
+use SimpleSAML\Utils;
 
 /**
  * FIDO2/WebAuthn Authentication Processing filter
@@ -185,7 +185,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
          * §8.2 Step 2: check x5c attestation
          */
         $sigdata = $attestationArray['authData'] . $this->clientDataHash;
-        $keyResource = openssl_pkey_get_public($this->der2pem($stmtDecoded['x5c'][0]));
+        $keyResource = openssl_pkey_get_public(Utils\Crypto::der2pem($stmtDecoded['x5c'][0]));
         if ($keyResource === false) {
             $this->fail("Unable to construct public key resource from PEM.");
         }
@@ -200,7 +200,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         /**
          * §8.2 Step 2 Bullet 2: check certificate properties listed in §8.2.1
          */
-        $certProps = openssl_x509_parse($this->der2pem($stmtDecoded['x5c'][0]));
+        $certProps = openssl_x509_parse(Utils\Crypto::der2pem($stmtDecoded['x5c'][0]));
         $this->debugBuffer .= "Attestation Certificate:" . print_r($certProps, true) . "<br/>";
         if (
             $certProps['version'] !== 2 || /** §8.2.1 Bullet 1 */
@@ -313,7 +313,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         if (count($stmtDecoded['x5c']) !== 1) {
             $this->fail("FIDO U2F attestation requires 'x5c' to have only exactly one key.");
         }
-        $attCert = $this->der2pem($stmtDecoded['x5c'][0]);
+        $attCert = Utils\Crypto::der2pem($stmtDecoded['x5c'][0]);
         $key = openssl_pkey_get_public($attCert);
         $keyProps = openssl_pkey_get_details($key);
         if (!isset($keyProps['ec']['curve_name']) || $keyProps['ec']['curve_name'] !== "prime256v1") {
@@ -421,20 +421,6 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         }
         $this->credentialId = bin2hex($credId);
         $this->credential = bin2hex($pubKeyCBOR);
-    }
-
-
-    /**
-     * transform DER formatted certificate to PEM format
-     *
-     * @param string $derData blob of DER data
-     * @return string the PEM representation of the certificate
-     */
-    private function der2pem(string $derData): string
-    {
-        $pem = chunk_split(base64_encode($derData), 64, "\n");
-        $pem = "-----BEGIN CERTIFICATE-----\n" . $pem . "-----END CERTIFICATE-----\n";
-        return $pem;
     }
 
 
