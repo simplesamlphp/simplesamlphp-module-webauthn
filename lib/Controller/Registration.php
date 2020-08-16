@@ -39,6 +39,12 @@ class Registration
     protected $authState = Auth\State::class;
 
     /**
+     * @var \SimpleSAML\Auth\Simple|string
+     * @psalm-var \SimpleSAML\Auth\Simple|class-string
+     */
+    protected $authSimple = Auth\Simple::class;
+
+    /**
      * @var \SimpleSAML\Logger|string
      * @psalm-var \SimpleSAML\Logger|class-string
      */
@@ -76,6 +82,17 @@ class Registration
 
 
     /**
+     * Inject the \SimpleSAML\Auth\Simple dependency.
+     *
+     * @param \SimpleSAML\Auth\Simple $authSimple
+     */
+    public function setAuthSimple(Auth\Simple $authSimple): void
+    {
+        $this->authSimple = $authSimple;
+    }
+
+
+    /**
      * Inject the \SimpleSAML\Logger dependency.
      *
      * @param \SimpleSAML\Logger $logger
@@ -92,9 +109,10 @@ class Registration
      */
     public function main(Request $request): RunnableResponse
     {
-        $registrationAuthSource = $this->config->getString('registration_auth_source', 'default-sp');
+        $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php');
+        $registrationAuthSource = $moduleConfig->getString('registration_auth_source', 'default-sp');
 
-        $as = new Auth\Simple($registrationAuthSource);
+        $as = new $this->authSimple($registrationAuthSource);
         $as->requireAuth();
         $attrs = $as->getAttributes();
 
@@ -102,23 +120,23 @@ class Registration
         $state['Attributes'] = $attrs;
 
         $stateData = new StateData();
-        $stateData->requestTokenModel = $this->config->getBoolean('request_tokenmodel', false);
+        $stateData->requestTokenModel = $moduleConfig->getBoolean('request_tokenmodel', false);
         try {
-            $stateData->store = Store::parseStoreConfig($this->config->getArray('store'));
+            $stateData->store = Store::parseStoreConfig($moduleConfig->getArray('store'));
         } catch (Exception $e) {
             $this->logger::error(
                 'webauthn: Could not create storage: ' . $e->getMessage()
             );
         }
 
-        $stateData->scope = $this->config->getString('scope', null);
+        $stateData->scope = $moduleConfig->getString('scope', null);
         $baseurl = Utils\HTTP::getSelfHost();
         $hostname = parse_url($baseurl, PHP_URL_HOST);
         if ($hostname !== null) {
             $stateData->derivedScope = $hostname;
         }
-        $stateData->usernameAttrib = $this->config->getString('attrib_username');
-        $stateData->displaynameAttrib = $this->config->getString('attrib_displayname');
+        $stateData->usernameAttrib = $moduleConfig->getString('attrib_username');
+        $stateData->displaynameAttrib = $moduleConfig->getString('attrib_displayname');
         $stateData->useInflowRegistration = true;
 
         StaticProcessHelper::prepareState($stateData, $state);
