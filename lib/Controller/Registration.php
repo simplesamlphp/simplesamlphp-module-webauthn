@@ -112,7 +112,8 @@ class Registration
         $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php');
         $registrationAuthSource = $moduleConfig->getString('registration_auth_source', 'default-sp');
 
-        $as = new $this->authSimple($registrationAuthSource);
+        $authSimple = $this->authSimple;
+        $as = new $authSimple($registrationAuthSource);
         $as->requireAuth();
         $attrs = $as->getAttributes();
 

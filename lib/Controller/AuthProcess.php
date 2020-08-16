@@ -108,6 +108,7 @@ class AuthProcess
 
         $debugEnabled = $this->config->getValue('logging.level', Logger::NOTICE) === Logger::DEBUG;
 
+        /** @var array $state */
         $state = Auth\State::loadState($stateId, 'webauthn:request');
 
         $incomingID = bin2hex(WebAuthnAbstractEvent::base64urlDecode($request->request->get('response_id')));

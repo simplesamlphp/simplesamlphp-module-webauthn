@@ -100,6 +100,7 @@ class ManageToken
             throw new Error\BadRequest('Missing required StateId query parameter.');
         }
 
+        /** @var array $state */
         $state = $this->authState::loadState($stateId, 'webauthn:request');
 
         if ($state['FIDO2AuthSuccessful'] === false) {

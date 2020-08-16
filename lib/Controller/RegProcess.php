@@ -109,6 +109,7 @@ class RegProcess
 
         $debugEnabled = $this->config->getValue('logging.level', Logger::NOTICE) === Logger::DEBUG;
 
+        /** @var array $state */
         $state = $this->authState::loadState($stateId, 'webauthn:request');
 
         // registering a credential is only allowed for new users or after being authenticated
