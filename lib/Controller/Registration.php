@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @package SimpleSAML\Module\webauthn
  */
-class WebAuthn
+class Registration
 {
     /** @var \SimpleSAML\Configuration */
     protected $config;
