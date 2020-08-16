@@ -183,11 +183,11 @@ class RegProcess
         $id = $this->authState::saveState($state, 'webauthn:request');
         if ($debugEnabled === true) {
             $response = new StreamedResponse();
-            $response->setCallback(function () {
+            $response->setCallback(function ($regObject, $stateId) {
                 echo $regObject->getDebugBuffer();
                 echo $regObject->getValidateBuffer();
                 echo "<form id='regform' method='POST' action='" .
-                    Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($id)) . "'>";
+                    Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($stateId)) . "'>";
                 echo "<button type='submit'>Return to previous page.</button>";
             });
             return $response;
