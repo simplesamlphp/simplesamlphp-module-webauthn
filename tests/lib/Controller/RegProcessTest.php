@@ -72,8 +72,14 @@ class RegProcessTest extends TestCase
         $_SERVER['REQUEST_URI'] = '/module.php/webauthn/regprocess';
         $request = Request::create(
             '/regprocess',
-            'GET',
-            ['StateId' => 'someStateId']
+            'POST',
+            [
+                'StateId' => 'someStateId',
+                'attestation_object' => 'some object',
+                'type' => 'public-key',
+                'response_id' => 'abc123',
+                'attestation_client_data_json' => 'test',
+            ]
         );
 
 
@@ -83,16 +89,13 @@ class RegProcessTest extends TestCase
             public static function loadState(string $id, string $stage, bool $allowMissing = false): ?array
             {
                 return [
-//                    'FIDO2Displayname' => 'Donald Duck',
-//                    'FIDO2Username' => 'dduck',
-//                    'FIDO2Scope' => 'Ducktown',
-//                    'FIDO2Tokens' => [],
-//                    'FIDO2SignupChallenge' => 'abc123',
-//                    'FIDO2AuthSuccessful' => true,
-//                    'requestTokenModel' => 'something',
-//                    'Source' => [
-//                        'entityid' => 'https://idp.example.com',
-//                    ],
+                    'FIDO2Scope' => 'Ducktown',
+                    'FIDO2Tokens' => [0 => 'A1B2C3', 1 => 'D4E5F6'],
+                    'FIDO2SignupChallenge' => 'abc123',
+                    'FIDO2AuthSuccessful' => true,
+                    'IdPMetadata' => [
+                        'entityid' => 'https://idp.example.com',
+                    ],
                 ];
             }
         });

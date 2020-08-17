@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SimpleSAML\Test\Module\webauthn\Controller;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
 use SimpleSAML\Auth\State;
 use SimpleSAML\Configuration;
@@ -65,15 +66,13 @@ class AuthProcessTest extends TestCase
     /**
      * @return void
      */
-    public function testAuthProcess(): void
+    public function testAuthProcessWithoutProperTokenRaisesException(): void
     {
-        $this->markTestSkipped('Breaks testsuite');
-
         $_SERVER['REQUEST_URI'] = '/module.php/webauthn/authprocess';
         $request = Request::create(
             '/authprocess',
-            'GET',
-            ['StateId' => 'someStateId']
+            'POST',
+            ['StateId'=> 'someStateId', 'response_id' => 'abc123']
         );
 
 
@@ -97,8 +96,8 @@ class AuthProcessTest extends TestCase
             }
         });
 
-        $response = $c->main($request);
-
-        $this->assertTrue($response->isSuccessful());
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("User attempted to authenticate with an unknown credential ID. This should already have been prevented by the browser!");
+        $c->main($request);
     }
 }

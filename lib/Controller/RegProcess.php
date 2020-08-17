@@ -103,7 +103,7 @@ class RegProcess
 
         $this->logger::info('FIDO2 - Accessing WebAuthn enrollment validation');
 
-        $stateId = $request->query->get('StateId');
+        $stateId = $request->request->get('StateId');
         if ($stateId === null) {
             throw new Error\BadRequest('Missing required StateId query parameter.');
         }
@@ -128,7 +128,7 @@ class RegProcess
             $fido2Scope,
             $state['FIDO2SignupChallenge'],
             $state['IdPMetadata']['entityid'],
-            base64_decode($_POST['attestation_object']),
+            base64_decode($request->request->get('attestation_object')),
             $request->request->get('response_id'),
             $request->request->get('attestation_client_data_json'),
             $debugEnabled

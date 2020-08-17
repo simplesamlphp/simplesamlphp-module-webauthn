@@ -70,7 +70,7 @@ class WebAuthnTest extends TestCase
         $_SERVER['REQUEST_URI'] = '/module.php/webauthn/webauthn';
         $request = Request::create(
             '/webauthn',
-            'GET',
+            'POST',
             ['StateId' => 'someStateId']
         );
 

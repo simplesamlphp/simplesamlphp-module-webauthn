@@ -96,13 +96,9 @@ class AuthProcess
      */
     public function main(Request $request): Response
     {
-//        if (session_status() != PHP_SESSION_ACTIVE) {
-//            session_cache_limiter('nocache');
-//        }
-
         $this->logger::info('FIDO2 - Accessing WebAuthn enrollment validation');
 
-        $stateId = $request->query->get('StateId');
+        $stateId = $request->request->get('StateId');
         if ($stateId === null) {
             throw new Error\BadRequest('Missing required StateId query parameter.');
         }
@@ -110,7 +106,7 @@ class AuthProcess
         $debugEnabled = $this->config->getValue('logging.level', Logger::NOTICE) === Logger::DEBUG;
 
         /** @var array $state */
-        $state = Auth\State::loadState($stateId, 'webauthn:request');
+        $state = $this->authState::loadState($stateId, 'webauthn:request');
 
         $incomingID = bin2hex(WebAuthnAbstractEvent::base64urlDecode($request->request->get('response_id')));
 

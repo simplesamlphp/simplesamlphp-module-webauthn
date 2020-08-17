@@ -65,17 +65,18 @@ class StateTest extends TestCase
     /**
      * @dataProvider stateTestsProvider
      *
+     * @param string $method The method to be used for the test
      * @param string $controllerEndpoint The name of the endpoint of the controller to test
      * @param string $controllerClass The name of the controller class to test
      * @psalm-param class-string $controllerClass
      * @param string $controllerMethod The name of the controller method to test
      */
-    public function testMissingState(string $controllerEndpoint, string $controllerClass, string $controllerMethod): void
+    public function testMissingState(string $method, string $controllerEndpoint, string $controllerClass, string $controllerMethod): void
     {
         $_SERVER['REQUEST_URI'] = '/module.php/webauthn/' . $controllerEndpoint;
         $request = Request::create(
             '/' . $controllerEndpoint,
-            'GET'
+            $method
         );
 
         $c = new $controllerClass($this->config, $this->session);
@@ -91,17 +92,18 @@ class StateTest extends TestCase
     /**
      * @dataProvider stateTestsProvider
      *
+     * @param string $method The method to be used for the test
      * @param string $controllerEndpoint The name of the endpoint of the controller to test
      * @param string $controllerClass The name of the controller class to test
      * @psalm-param class-string $controllerClass
      * @param string $controllerMethod The name of the controller method to test
      */
-    public function testNoState(string $controllerEndpoint, string $controllerClass, string $controllerMethod): void
+    public function testNoState(string $method, string $controllerEndpoint, string $controllerClass, string $controllerMethod): void
     {
         $_SERVER['REQUEST_URI'] = '/module.php/webauthn/' . $controllerEndpoint;
         $request = Request::create(
             '/' . $controllerEndpoint,
-            'GET',
+            $method,
             ['StateId' => 'someStateId']
         );
 
@@ -121,10 +123,10 @@ class StateTest extends TestCase
     public function stateTestsProvider(): array
     {
         return [
-//            ['authprocess', Controller\AuthProcess::class, 'main'],
-//            ['managetoken', Controller\ManageToken::class, 'main'],
-//            ['regprocess', Controller\RegProcess::class, 'main'],
-            ['webauthn', Controller\WebAuthn::class, 'main'],
+            ['POST', 'authprocess', Controller\AuthProcess::class, 'main'],
+            ['POST', 'managetoken', Controller\ManageToken::class, 'main'],
+            ['POST', 'regprocess', Controller\RegProcess::class, 'main'],
+            ['POST', 'webauthn', Controller\WebAuthn::class, 'main'],
         ];
     }
 }

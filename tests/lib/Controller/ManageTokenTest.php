@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SimpleSAML\Test\Module\webauthn\Controller;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
 use SimpleSAML\Auth\State;
 use SimpleSAML\Configuration;
@@ -64,17 +65,13 @@ class ManageTokenTest extends TestCase
 
     /**
      * @return void
-     */
-    public function testManageToken(): void
+    public function testManageTokenWithSubmitNeverMind(): void
     {
-        $this->markTestSkipped('Breaks testsuite');
-
         $_SERVER['REQUEST_URI'] = '/module.php/webauthn/managetoken';
-        $_SERVER['REQUEST_METHOD'] = 'GET';
         $request = Request::create(
             '/managetoken',
-            'GET',
-            ['StateId' => 'someStateId']
+            'POST',
+            ['StateId' => 'someStateId', 'submit' => 'NEVERMIND']
         );
 
 
@@ -84,16 +81,7 @@ class ManageTokenTest extends TestCase
             public static function loadState(string $id, string $stage, bool $allowMissing = false): ?array
             {
                 return [
-//                    'FIDO2Displayname' => 'Donald Duck',
-//                    'FIDO2Username' => 'dduck',
-//                    'FIDO2Scope' => 'Ducktown',
-//                    'FIDO2Tokens' => [],
-//                    'FIDO2SignupChallenge' => 'abc123',
-//                    'FIDO2AuthSuccessful' => true,
-//                    'requestTokenModel' => 'something',
-//                    'Source' => [
-//                        'entityid' => 'https://idp.example.com',
-//                    ],
+                    'FIDO2AuthSuccessful' => true,
                 ];
             }
         });
@@ -101,5 +89,69 @@ class ManageTokenTest extends TestCase
         $response = $c->main($request);
 
         $this->assertTrue($response->isSuccessful());
+    }
+     */
+
+
+    /**
+     * @return void
+    public function testManageTokenWithSubmitDelete(): void
+    {
+        $_SERVER['REQUEST_URI'] = '/module.php/webauthn/managetoken';
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $request = Request::create(
+            '/managetoken',
+            'POST',
+            ['StateId' => 'someStateId', 'submit' => 'DELETE']
+        );
+
+
+        $c = new Controller\ManageToken($this->config, $this->session);
+        $c->setLogger($this->logger);
+        $c->setAuthState(new class () extends State {
+            public static function loadState(string $id, string $stage, bool $allowMissing = false): ?array
+            {
+                return [
+                    'FIDO2AuthSuccessful' => true,
+                ];
+            }
+        });
+
+        $response = $c->main($request);
+
+        $this->assertTrue($response->isSuccessful());
+    }
+     */
+
+
+    /**
+     * @return void
+     */
+    public function testManageTokenWithoutSubmitThrowsException(): void
+    {
+        $_SERVER['REQUEST_URI'] = '/module.php/webauthn/managetoken';
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $request = Request::create(
+            '/managetoken',
+            'POST',
+            ['StateId' => 'someStateId', 'submit' => 'submit']
+        );
+
+
+        $c = new Controller\ManageToken($this->config, $this->session);
+        $c->setLogger($this->logger);
+        $c->setAuthState(new class () extends State {
+            public static function loadState(string $id, string $stage, bool $allowMissing = false): ?array
+            {
+                return [
+                    'FIDO2AuthSuccessful' => true,
+                ];
+            }
+        });
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Unknown submit button state.');
+
+        $c->main($request);
     }
 }
