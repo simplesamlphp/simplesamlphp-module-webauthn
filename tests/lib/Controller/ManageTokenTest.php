@@ -65,6 +65,7 @@ class ManageTokenTest extends TestCase
 
     /**
      * @return void
+     */
     public function testManageTokenWithSubmitNeverMind(): void
     {
         $_SERVER['REQUEST_URI'] = '/module.php/webauthn/managetoken';
@@ -90,7 +91,6 @@ class ManageTokenTest extends TestCase
 
         $this->assertTrue($response->isSuccessful());
     }
-     */
 
 
     /**
@@ -151,6 +151,38 @@ class ManageTokenTest extends TestCase
 
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('Unknown submit button state.');
+
+        $c->main($request);
+    }
+
+
+    /**
+     * @return void
+     */
+    public function testManageTokenWithoutAuthenticationThrowsException(): void
+    {
+        $_SERVER['REQUEST_URI'] = '/module.php/webauthn/managetoken';
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $request = Request::create(
+            '/managetoken',
+            'POST',
+            ['StateId' => 'someStateId', 'submit' => 'submit']
+        );
+
+
+        $c = new Controller\ManageToken($this->config, $this->session);
+        $c->setLogger($this->logger);
+        $c->setAuthState(new class () extends State {
+            public static function loadState(string $id, string $stage, bool $allowMissing = false): ?array
+            {
+                return [
+                    'FIDO2AuthSuccessful' => false,
+                ];
+            }
+        });
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Attempt to access the token management page unauthenticated.');
 
         $c->main($request);
     }

@@ -138,6 +138,12 @@ class ManageToken
                 throw new Exception("Unknown submit button state.");
         }
 
+        $response->headers->set('Expires', 'Thu, 19 Nov 1981 08:52:00 GMT');
+        $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+        $response->headers->set('Pragma', 'no-cache');
+
+        /** Symfony 5 style */
+        /**
         $response->setCache([
             'must_revalidate'  => true,
             'no_cache'         => true,
@@ -147,6 +153,7 @@ class ManageToken
             'private'          => false,
         ]);
         $response->setExpires(new DateTime('Thu, 19 Nov 1981 08:52:00 GMT'));
+        */
 
         return $response;
     }
