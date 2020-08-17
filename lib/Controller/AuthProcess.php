@@ -95,9 +95,9 @@ class AuthProcess
      */
     public function main(Request $request): Response
     {
-        if (session_status() != PHP_SESSION_ACTIVE) {
-            session_cache_limiter('nocache');
-        }
+//        if (session_status() != PHP_SESSION_ACTIVE) {
+//            session_cache_limiter('nocache');
+//        }
 
         $this->logger::info('FIDO2 - Accessing WebAuthn enrollment validation');
 
@@ -182,13 +182,24 @@ class AuthProcess
                 echo $authObject->getValidateBuffer();
                 echo "Debug mode, not continuing to " . ($state['FIDO2WantsRegister'] ? "credential registration page." : "destination.");
             });
-            return $response;
         } else {
             if ($state['FIDO2WantsRegister']) {
-                return new RedirectResponse(Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($stateId)));
+                $response = new RedirectResponse(Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($stateId)));
             } else {
-                return new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
+                $response = new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
             }
         }
+
+        $response->setCache([
+            'must_revalidate'  => true,
+            'no_cache'         => true,
+            'no_store'         => true,
+            'no_transform'     => false,
+            'public'           => false,
+            'private'          => false,
+        ]);
+        $response->setExpires(new DateTime('Thu, 19 Nov 1981 08:52:00 GMT'));
+
+        return $response;
     }
 }

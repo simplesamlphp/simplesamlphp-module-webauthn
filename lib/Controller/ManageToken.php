@@ -89,9 +89,9 @@ class ManageToken
      */
     public function main(Request $request): RunnableResponse
     {
-        if (session_status() != PHP_SESSION_ACTIVE) {
-            session_cache_limiter('nocache');
-        }
+//        if (session_status() != PHP_SESSION_ACTIVE) {
+//            session_cache_limiter('nocache');
+//        }
 
         $this->logger::info('FIDO2 - Accessing WebAuthn token management');
 
@@ -109,7 +109,7 @@ class ManageToken
 
         switch ($request->request->get('submit')) {
             case "NEVERMIND":
-                return new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
+                $response = new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
             case "DELETE":
                 $credId = $request->request->get('credId');
                 if ($state['FIDO2AuthSuccessful'] == $credId) {
@@ -131,9 +131,20 @@ class ManageToken
                 } else {
                     $response = new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
                 }
-                return $response;
             default:
                 throw new Exception("Unknown submit button state.");
         }
+
+        $response->setCache([
+            'must_revalidate'  => true,
+            'no_cache'         => true,
+            'no_store'         => true,
+            'no_transform'     => false,
+            'public'           => false,
+            'private'          => false,
+        ]);
+        $response->setExpires(new DateTime('Thu, 19 Nov 1981 08:52:00 GMT'));
+
+        return $response;
     }
 }

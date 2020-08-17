@@ -96,9 +96,9 @@ class RegProcess
      */
     public function main(Request $request): Response
     {
-        if (session_status() != PHP_SESSION_ACTIVE) {
-            session_cache_limiter('nocache');
-        }
+//        if (session_status() != PHP_SESSION_ACTIVE) {
+//            session_cache_limiter('nocache');
+//        }
 
         $this->logger::info('FIDO2 - Accessing WebAuthn enrollment validation');
 
@@ -191,11 +191,22 @@ class RegProcess
                     Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($id)) . "'>";
                 echo "<button type='submit'>Return to previous page.</button>";
             });
-            return $response;
         } elseif (array_key_exists('Registration', $state)) {
-            return new RedirectResponse(Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($id)));
+            $response = new RedirectResponse(Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($id)));
         } else {
-            return new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
+            $response = new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
         }
+
+        $response->setCache([
+            'must_revalidate'  => true,
+            'no_cache'         => true,
+            'no_store'         => true,
+            'no_transform'     => false,
+            'public'           => false,
+            'private'          => false,
+        ]);
+        $response->setExpires(new DateTime('Thu, 19 Nov 1981 08:52:00 GMT'));
+
+        return $response;
     }
 }
