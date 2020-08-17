@@ -99,7 +99,7 @@ class RegistrationTest extends TestCase
         $c = new Controller\Registration($this->config, $this->session);
         $c->setLogger($this->logger);
 
-        $c->setAuthSimple(new class () extends Auth\Simple {
+        $c->setAuthSimple(new class ('default-sp') extends Auth\Simple {
             public function requireAuth(array $params = []): void
             {
             }
