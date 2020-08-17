@@ -72,7 +72,7 @@ class AuthProcessTest extends TestCase
         $request = Request::create(
             '/authprocess',
             'POST',
-            ['StateId'=> 'someStateId', 'response_id' => 'abc123']
+            ['StateId' => 'someStateId', 'response_id' => 'abc123']
         );
 
 
