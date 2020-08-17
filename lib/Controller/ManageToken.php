@@ -2,6 +2,7 @@
 
 namespace SimpleSAML\Module\webauthn\Controller;
 
+use Datetime;
 use Exception;
 use SimpleSAML\Auth;
 use SimpleSAML\Configuration;
@@ -110,6 +111,7 @@ class ManageToken
         switch ($request->request->get('submit')) {
             case "NEVERMIND":
                 $response = new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
+                break;
             case "DELETE":
                 $credId = $request->request->get('credId');
                 if ($state['FIDO2AuthSuccessful'] == $credId) {
@@ -131,6 +133,7 @@ class ManageToken
                 } else {
                     $response = new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
                 }
+                break;
             default:
                 throw new Exception("Unknown submit button state.");
         }
