@@ -13,7 +13,6 @@ use CBOR\StringStream;
  * Filter for registering or authenticating with a FIDO2/WebAuthn token after
  * having authenticated with the primary authsource.
  *
- * @author Stefan Winter <stefan.winter@restena.lu>
  * @package SimpleSAMLphp
  */
 abstract class WebAuthnAbstractEvent

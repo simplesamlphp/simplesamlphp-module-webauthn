@@ -18,7 +18,6 @@ use SimpleSAML\Module\webauthn\Store;
  * - username: The username used for database connection.
  * - password: The password used for database connection.
  *
- * @author Stefan Winter <stefan.winter@restena.lu>
  * @package SimpleSAMLphp
  */
 
