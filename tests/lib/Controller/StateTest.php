@@ -71,8 +71,12 @@ class StateTest extends TestCase
      * @psalm-param class-string $controllerClass
      * @param string $controllerMethod The name of the controller method to test
      */
-    public function testMissingState(string $method, string $controllerEndpoint, string $controllerClass, string $controllerMethod): void
-    {
+    public function testMissingState(
+        string $method,
+        string $controllerEndpoint,
+        string $controllerClass,
+        string $controllerMethod
+    ): void {
         $_SERVER['REQUEST_URI'] = '/module.php/webauthn/' . $controllerEndpoint;
         $request = Request::create(
             '/' . $controllerEndpoint,
@@ -98,8 +102,12 @@ class StateTest extends TestCase
      * @psalm-param class-string $controllerClass
      * @param string $controllerMethod The name of the controller method to test
      */
-    public function testNoState(string $method, string $controllerEndpoint, string $controllerClass, string $controllerMethod): void
-    {
+    public function testNoState(
+        string $method,
+        string $controllerEndpoint,
+        string $controllerClass,
+        string $controllerMethod
+    ): void {
         $_SERVER['REQUEST_URI'] = '/module.php/webauthn/' . $controllerEndpoint;
         $request = Request::create(
             '/' . $controllerEndpoint,

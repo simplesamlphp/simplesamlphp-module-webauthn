@@ -112,6 +112,7 @@ class Registration
         $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php');
         $registrationAuthSource = $moduleConfig->getString('registration_auth_source', 'default-sp');
 
+        /** @psalm-var class-string $authSimple */
         $authSimple = $this->authSimple;
         $as = new $authSimple($registrationAuthSource);
         $as->requireAuth();

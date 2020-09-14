@@ -6,6 +6,7 @@ use CBOR\Decoder;
 use CBOR\OtherObject;
 use CBOR\Tag;
 use CBOR\StringStream;
+use Exception;
 
 /**
  * FIDO2/WebAuthn Authentication Processing filter
@@ -424,6 +425,7 @@ abstract class WebAuthnAbstractEvent
         if ($finalData === null) {
             $this->fail("CBOR data decoding failed.");
         }
+        /** @psalm-var array $finalData */
         return $finalData;
     }
 
@@ -450,7 +452,7 @@ abstract class WebAuthnAbstractEvent
             echo $this->debugBuffer;
             echo $this->validateBuffer;
         }
-        throw new \Exception($text);
+        throw new Exception($text);
     }
 
 
