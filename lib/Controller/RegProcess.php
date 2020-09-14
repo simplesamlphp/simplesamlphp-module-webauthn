@@ -165,12 +165,25 @@ class RegProcess
          * STEP 20 of the validation procedure in § 7.1 of the spec: store credentialId, credential,
          * signCount and associate with user
          */
-
+        
+        /*
+         * Observed with YubiKey 5: the transaction counter is 0 if the key has NEVER been used, but
+         * the first transaction is also transaction #0.
+         * i.e. 0 means "before first transaction OR the very first transaction has already taken place"
+         * 
+         * The very first use of a key should not trigger the physical object cloning alert, so a
+         * transaction counter == 0 should be allowed for the first authentication of a new key. 
+         * The best way to do this is to set the current counter value to -1 when registering a key 
+         * with a transaction counter of 0.
+         */
+        $currentCounterValue = -1;
+        if ($regObject->getCounter() > 0) $currentCounterValue = $regObject->getCounter();
+        
         $store->storeTokenData(
             $state['FIDO2Username'],
             $regObject->getCredentialId(),
             $regObject->getCredential(),
-            $regObject->getCounter(),
+            $currentCounterValue,
             $friendlyName
         );
 
@@ -178,7 +191,7 @@ class RegProcess
         $state['FIDO2Tokens'][] = [
             0 => $regObject->getCredentialId(),
             1 => $regObject->getCredential(),
-            2 => $regObject->getCounter(),
+            2 => $currentCounterValue,
             3 => $friendlyName
         ];
 
