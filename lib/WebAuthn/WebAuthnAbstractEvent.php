@@ -432,7 +432,6 @@ abstract class WebAuthnAbstractEvent
 
     /**
      * @param string $text
-     * @return void
      */
     protected function warn(string $text): void
     {
@@ -443,7 +442,6 @@ abstract class WebAuthnAbstractEvent
     /**
      * @param string $text
      * @throws \Exception
-     * @return void
      */
     protected function fail(string $text): void
     {
@@ -458,7 +456,6 @@ abstract class WebAuthnAbstractEvent
 
     /**
      * @param string $text
-     * @return void
      */
     protected function pass(string $text): void
     {
@@ -468,7 +465,6 @@ abstract class WebAuthnAbstractEvent
 
     /**
      * @param string $text
-     * @return void
      */
     protected function ignore(string $text): void
     {

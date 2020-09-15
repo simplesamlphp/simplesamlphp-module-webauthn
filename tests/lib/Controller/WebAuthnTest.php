@@ -35,7 +35,6 @@ class WebAuthnTest extends TestCase
 
     /**
      * Set up for each test.
-     * @return void
      */
     protected function setUp(): void
     {
@@ -63,7 +62,6 @@ class WebAuthnTest extends TestCase
 
 
     /**
-     * @return void
      */
     public function testWebAuthn(): void
     {

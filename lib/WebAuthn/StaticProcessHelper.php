@@ -10,7 +10,6 @@ class StaticProcessHelper
 {
     /**
      * @param array &$state
-     * @return void
      */
     public static function saveStateAndRedirect(array &$state): void
     {
@@ -23,7 +22,6 @@ class StaticProcessHelper
     /**
      * @param \SimpleSAML\Module\webauthn\WebAuthn\StateData $stateData
      * @param array &$state
-     * @return void
      */
     public static function prepareState(StateData $stateData, array &$state): void
     {

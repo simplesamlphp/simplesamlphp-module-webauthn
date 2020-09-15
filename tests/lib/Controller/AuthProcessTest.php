@@ -36,7 +36,6 @@ class AuthProcessTest extends TestCase
 
     /**
      * Set up for each test.
-     * @return void
      */
     protected function setUp(): void
     {
@@ -64,7 +63,6 @@ class AuthProcessTest extends TestCase
 
 
     /**
-     * @return void
      */
     public function testAuthProcessWithoutProperTokenRaisesException(): void
     {

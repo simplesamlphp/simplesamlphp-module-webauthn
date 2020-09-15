@@ -153,7 +153,6 @@ class WebAuthn extends Auth\ProcessingFilter
      *
      * @param array &$state The state of the response.
      *
-     * @return void
      */
     public function process(array &$state): void
     {

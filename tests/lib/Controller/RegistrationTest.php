@@ -35,7 +35,6 @@ class RegistrationTest extends TestCase
 
     /**
      * Set up for each test.
-     * @return void
      */
     protected function setUp(): void
     {
@@ -82,7 +81,6 @@ class RegistrationTest extends TestCase
 
 
     /**
-     * @return void
      */
     public function testRegistration(): void
     {

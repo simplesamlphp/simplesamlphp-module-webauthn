@@ -91,7 +91,6 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
     /**
      * Validate the incoming attestation data CBOR blob and return the embedded authData
      * @param string $attestationData
-     * @return void
      */
     private function validateAttestationData(string $attestationData): void
     {
@@ -132,7 +131,6 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
 
     /**
      * @param array $attestationArray
-     * @return void
      */
     private function validateAttestationFormatNone(array $attestationArray): void
     {
@@ -153,7 +151,6 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
 
     /**
      * @param array $attestationArray
-     * @return void
      */
     private function validateAttestationFormatPacked(array $attestationArray): void
     {
@@ -175,7 +172,6 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
 
     /**
      * @param array $attestationArray
-     * @return void
      */
     private function validateAttestationFormatPackedX5C(array $attestationArray): void
     {
@@ -261,7 +257,6 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
 
     /**
      * @param array $attestationArray
-     * @return void
      */
     private function validateAttestationFormatPackedSelf(array $attestationArray): void
     {
@@ -297,7 +292,6 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * support legacy U2F tokens
      *
      * @param array $attestationData the incoming attestation data
-     * @return void
      */
     private function validateAttestationFormatFidoU2F(array $attestationData): void
     {
@@ -371,7 +365,6 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * support Android authenticators (fingerprint etc.)
      *
      * @param array $attestationData the incoming attestation data
-     * @return void
      */
     private function validateAttestationFormatAndroidSafetyNet(array $attestationData): void
     {
@@ -382,7 +375,6 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * The registration contains the actual credential. This function parses it.
      * @param string $attData    the attestation data binary blob
      * @param string $responseId the response ID
-     * @return void
      */
     private function validateAttestedCredentialData(string $attData, string $responseId): void
     {

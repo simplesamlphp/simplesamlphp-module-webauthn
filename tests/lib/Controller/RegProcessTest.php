@@ -35,7 +35,6 @@ class RegProcessTest extends TestCase
 
     /**
      * Set up for each test.
-     * @return void
      */
     protected function setUp(): void
     {
@@ -63,7 +62,6 @@ class RegProcessTest extends TestCase
 
 
     /**
-     * @return void
      */
     public function testRegProcess(): void
     {

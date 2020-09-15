@@ -36,7 +36,6 @@ class ManageTokenTest extends TestCase
 
     /**
      * Set up for each test.
-     * @return void
      */
     protected function setUp(): void
     {
@@ -64,7 +63,6 @@ class ManageTokenTest extends TestCase
 
 
     /**
-     * @return void
      */
     public function testManageTokenWithSubmitNeverMind(): void
     {
@@ -94,7 +92,6 @@ class ManageTokenTest extends TestCase
 
 
     /**
-     * @return void
     public function testManageTokenWithSubmitDelete(): void
     {
         $_SERVER['REQUEST_URI'] = '/module.php/webauthn/managetoken';
@@ -125,7 +122,6 @@ class ManageTokenTest extends TestCase
 
 
     /**
-     * @return void
      */
     public function testManageTokenWithoutSubmitThrowsException(): void
     {
@@ -157,7 +153,6 @@ class ManageTokenTest extends TestCase
 
 
     /**
-     * @return void
      */
     public function testManageTokenWithoutAuthenticationThrowsException(): void
     {
