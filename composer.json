@@ -16,7 +16,7 @@
         }
     },
     "require": {
-        "php": ">=7.4",
+        "php": ">=7.4 || ^8.0",
         "ext-pdo": "*",
         "simplesamlphp/composer-module-installer": "~1.1",
         "simplesamlphp/simplesamlphp": "dev-master",
