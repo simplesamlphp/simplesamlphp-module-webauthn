@@ -11,6 +11,7 @@
 
 namespace SimpleSAML\Module\webauthn\Auth\Process;
 
+use SimpleSAML\Assert\Assert;
 use SimpleSAML\Auth;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error;
@@ -19,7 +20,6 @@ use SimpleSAML\Module;
 use SimpleSAML\Module\webauthn\Store;
 use SimpleSAML\Module\webauthn\WebAuthn\StaticProcessHelper;
 use SimpleSAML\Utils;
-use Webmozart\Assert\Assert;
 
 class WebAuthn extends Auth\ProcessingFilter
 {
