@@ -163,7 +163,7 @@ class WebAuthn extends Auth\ProcessingFilter
         Assert::keyExists($state['Source'], 'metadata-set');
 
         if (!array_key_exists($this->stateData->usernameAttrib, $state['Attributes'])) {
-            throw new Exception('webauthn: cannot determine if user needs second factor, missing attribute "' .
+            throw new \Exception('webauthn: cannot determine if user needs second factor, missing attribute "' .
                 $this->stateData->usernameAttrib . '".');
         }
 
