@@ -96,7 +96,7 @@ class ManageToken
 
         $this->logger::info('FIDO2 - Accessing WebAuthn token management');
 
-        $stateId = $request->request->get('StateId');
+        $stateId = $request->query->get('StateId');
         if ($stateId === null) {
             throw new Error\BadRequest('Missing required StateId query parameter.');
         }
