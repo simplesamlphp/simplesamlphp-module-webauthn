@@ -200,11 +200,11 @@ class RegProcess
                 echo $regObject->getDebugBuffer();
                 echo $regObject->getValidateBuffer();
                 echo "<form id='regform' method='POST' action='" .
-                    Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($id)) . "'>";
+                    Module::getModuleURL('webauthn/webauthn?StateId=' . urlencode($id)) . "'>";
                 echo "<button type='submit'>Return to previous page.</button>";
             });
         } elseif (array_key_exists('Registration', $state)) {
-            $response = new RedirectResponse(Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($id)));
+            $response = new RedirectResponse(Module::getModuleURL('webauthn/webauthn?StateId=' . urlencode($id)));
         } else {
             $response = new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
         }
