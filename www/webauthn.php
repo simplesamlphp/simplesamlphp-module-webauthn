@@ -93,4 +93,4 @@ if (
 
 // dynamically generate the JS code needed for token registration
 
-$t->send();
+$t->show();
