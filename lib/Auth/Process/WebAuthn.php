@@ -154,15 +154,8 @@ class WebAuthn extends Auth\ProcessingFilter
      * @param array &$state The state of the response.
      *
      */
-    public function process(array &$state): void
+    public function process(&$state)
     {
-        Assert::keyExists($state, 'UserID');
-        Assert::keyExists($state, 'Destination');
-        Assert::keyExists($state['Destination'], 'entityid');
-        Assert::keyExists($state['Destination'], 'metadata-set');
-        Assert::keyExists($state['Source'], 'entityid');
-        Assert::keyExists($state['Source'], 'metadata-set');
-
         if (!array_key_exists($this->stateData->usernameAttrib, $state['Attributes'])) {
             Logger::warning('webauthn: cannot determine if user needs second factor, missing attribute "' .
                 $this->stateData->usernameAttrib . '".');
