@@ -70,7 +70,7 @@ class WebAuthn extends Auth\ProcessingFilter
      *
      * @throws \SimpleSAML\Error\Exception if the configuration is not valid.
      */
-    public function __construct(array $config, $reserved)
+    public function __construct($config, $reserved)
     {
         parent::__construct($config, $reserved);
 
@@ -156,7 +156,7 @@ class WebAuthn extends Auth\ProcessingFilter
      *
      * @return void
      */
-    public function process(array &$state): void
+    public function process(&$state): void
     {
         Assert::keyExists($state, 'UserID');
         Assert::keyExists($state, 'Destination');
