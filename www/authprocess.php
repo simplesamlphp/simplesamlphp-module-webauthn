@@ -21,8 +21,8 @@ if (!array_key_exists('StateId', $_REQUEST)) {
     );
 }
 
-$config = Configuration::getInstance();
-$debugEnabled = $config->getValue('logging.level', Logger::NOTICE) === Logger::DEBUG;
+$moduleConfig = Configuration::getOptionalConfig('module_webauthn.php');
+$debugEnabled = $moduleConfig->getBoolean('debug', false);
 
 $id = $_REQUEST['StateId'];
 /** @var array $state */

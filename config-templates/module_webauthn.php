@@ -1,6 +1,9 @@
 <?php
 
 $config = [
+    /* Enable/disable Debug made */
+    'debug' => false,
+
     /* required configuration parameters */
     'store' => [
         'webauthn:Database',
