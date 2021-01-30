@@ -97,8 +97,10 @@ class WebAuthn
         /** @var array $state */
         $state = $this->authState::loadState($stateId, 'webauthn:request');
 
+        $templateFile = $state['UseInflowRegistration'] ? 'webauthn:webauthn.tpl.php' : 'webauthn:authentication.tpl.php';
+
         // Make, populate and layout consent form
-        $t = new Template($this->config, 'webauthn:authentication.tpl.php');
+        $t = new Template($this->config, $templateFile);
         $t->data['UserID'] = $state['FIDO2Username'];
         $t->data['FIDO2Tokens'] = $state['FIDO2Tokens'];
 
@@ -143,11 +145,11 @@ class WebAuthn
 
         $t->data['FIDO2AuthSuccessful'] = $state['FIDO2AuthSuccessful'];
         if (
-            count($state['FIDO2Tokens']) == 0 ||
+            count($state['FIDO2Tokens']) === 0 ||
             ($state['FIDO2WantsRegister'] === true && $state['FIDO2AuthSuccessful'] !== false)
         ) {
-            $t->data['regURL'] = Module::getModuleURL('webauthn.php/regprocess?StateId=' . urlencode($stateId));
-            $t->data['delURL'] = Module::getModuleURL('webauthn.php/managetoken?StateId=' . urlencode($stateId));
+            $t->data['regURL'] = Module::getModuleURL('webauthn/regprocess.php?StateId=' . urlencode($stateId));
+            $t->data['delURL'] = Module::getModuleURL('webauthn/managetoken.php?StateId=' . urlencode($stateId));
         }
 
         $t->data['authForm'] = "";

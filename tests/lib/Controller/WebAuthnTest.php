@@ -79,6 +79,7 @@ class WebAuthnTest extends TestCase
             public static function loadState($id, $stage, $allowMissing = false)
             {
                 return [
+                    'UseInflowRegistration' => true,
                     'FIDO2Displayname' => 'Donald Duck',
                     'FIDO2Username' => 'dduck',
                     'FIDO2Scope' => 'Ducktown',
