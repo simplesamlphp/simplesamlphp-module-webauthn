@@ -30,7 +30,7 @@ $id = $_REQUEST['StateId'];
 /** @var array $state */
 $state = Auth\State::loadState($id, 'webauthn:request');
 
-$templateFile = $state['UseInflowRegistration'] ? 'webauthn:webauthn.php' : 'webauthn:authentication.twig';
+$templateFile = $state['UseInflowRegistration'] ? 'webauthn:webauthn.tpl.php' : 'webauthn:authentication.tpl.php';
 
 // Make, populate and layout consent form
 $t = new Template($globalConfig, $templateFile);
