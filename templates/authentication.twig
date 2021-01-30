@@ -19,6 +19,8 @@
             <input type='hidden' id='operation' name='operation' value='AUTH'/>
             <button type='button' id='authformSubmit'>{{ '{webauthn:webauthn:authTokenButton}'|trans }}</button>
         </form>
+    {% else %}
+        <p>Please first register your token on the <a href="{{ moduleURL('webauthn/registration.php') }}">registration page</a> before continuing.
     {% endif %}
     <script src="{{ asset('js/webauthn.js', 'webauthn') }}"></script>
     <script src="{{ asset('js/authentication.js', 'webauthn') }}"></script>

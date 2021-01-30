@@ -18,6 +18,8 @@
             <input type='hidden' id='operation' name='operation' value='AUTH'/>
             <button type='button' id='authformSubmit'><?php echo htmlspecialchars($this->t('{webauthn:webauthn:authTokenButton}')); ?></button>
         </form>
+    <?php else: ?>
+        <p>Please first register your token on the <a href="<?php echo htmlspecialchars(SimpleSAML\Module::getModuleURL('webauthn/registration.php')); ?>">registration page</a> before continuing.
     <?php endif; ?>
     <script src="<?php echo htmlspecialchars(SimpleSAML\Module::getModuleUrl('webauthn/')); ?>assets/js/webauthn.js"></script>
     <script src="<?php echo htmlspecialchars(SimpleSAML\Module::getModuleUrl('webauthn/')); ?>assets/js/authentication.js"></script>
