@@ -183,7 +183,9 @@ class AuthProcess
             });
         } else {
             if ($state['FIDO2WantsRegister']) {
-                $response = new RedirectResponse(Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($stateId)));
+                $response = new RedirectResponse(
+                    Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($stateId))
+                );
             } else {
                 $response = new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
             }

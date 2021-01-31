@@ -26,7 +26,9 @@ foreach ($token->getClaim('entries') as $oneEntryObject) {
     if (isset($mdArray['aaguid']) && isset($mdArray['attestationRootCertificates'][0])) {
         $compressedAaguid = strtolower(str_replace('-', '', $mdArray['aaguid']));
         // we need C and O values for the attestation certificates. Extract those from the first root
-        $x509 = openssl_x509_parse("-----BEGIN CERTIFICATE-----\n" . $mdArray['attestationRootCertificates'][0] . "\n-----END CERTIFICATE-----");
+        $x509 = openssl_x509_parse(
+            "-----BEGIN CERTIFICATE-----\n" . $mdArray['attestationRootCertificates'][0] . "\n-----END CERTIFICATE-----"
+        );
         // print_r($x509);
         if (isset($x509['subject']['C']) && isset($x509['subject']['O'])) {
             $res[$compressedAaguid] = [
@@ -41,8 +43,8 @@ foreach ($token->getClaim('entries') as $oneEntryObject) {
 }
 // no Yubico nor Microsoft in the list? (2020-01-31)
 // add those manually but this is REALLY bad news if the MDS does not have complete information
-//     * Yubico values from: https://support.yubico.com/hc/en-us/articles/360016648959-YubiKey-Hardware-FIDO2-AAGUIDs
-//     * Microsoft values from: https://docs.microsoft.com/en-us/microsoft-edge/dev-guide/windows-integration/web-authentication
+//   * Yubico values from: https://support.yubico.com/hc/en-us/articles/360016648959-YubiKey-Hardware-FIDO2-AAGUIDs
+//   * Microsoft values from: https://docs.microsoft.com/en-us/microsoft-edge/dev-guide/windows-integration/web-authentication
 
 $res["fa2b99dc9e3942578f924a30d23c4118"] = [
     "C"        => "SE",

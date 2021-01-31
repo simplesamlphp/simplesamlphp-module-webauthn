@@ -6,12 +6,19 @@
         By default it is less stringent about long lines than other coding standards
     </description>
 
+    <file>bin</file>
+    <file>config-templates</file>
+    <file>lib</file>
+    <file>www</file>
+    <file>tests</file>
+
     <!-- Use this to exclude paths. You can have multiple patterns -->
     <!--<exclude-pattern>*/tests/*</exclude-pattern>-->
     <!--<exclude-pattern>*/other/*</exclude-pattern>-->
 
     <!-- Exclude old PHP templates (and related); they are removed in SSP 2.0 -->
     <exclude-pattern>templates/*.tpl.php</exclude-pattern>
+    <exclude-pattern>www/*.js</exclude-pattern>
 
     <!-- This is the rule we inherit from. If you want to exlude some specific rules, see the docs on how to do that -->
     <rule ref="PSR12"/>
