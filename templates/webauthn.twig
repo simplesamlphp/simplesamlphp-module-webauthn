@@ -23,7 +23,7 @@
             </ul>
         </div>
     {% endif %}
-    {% if regURL|length > 0 %}
+    {% if regURL is defined and regURL|length > 0 %}
         <form id='regform' method='POST' action='{{ regURL|raw }}'>
             <input type='hidden' id='resp' name='response_id' value='0'/>
             <input type='hidden' id='data' name='attestation_client_data_json' value='nix'/>
@@ -57,7 +57,7 @@
             {% endif %}
         {% endif %}
     {% endif %}
-    {% if authURL|length > 0 %}
+    {% if authURL is defined and authURL|length > 0 %}
         <form id='authform' method='POST' action='{{ authURL|raw }}'>
             <input type='hidden' id='resp' name='response_id' value='0'/>
             <input type='hidden' id='data_raw_b64' name='client_data_raw' value='garnix'/>
