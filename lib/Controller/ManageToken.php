@@ -125,7 +125,7 @@ class ManageToken
                         }
                     }
 
-                    $response = new RunnableResponse([StaticProcessHelper::class, 'saveStateAndRedirect'], [$state]);
+                    $response = new RunnableResponse([StaticProcessHelper::class, 'saveStateAndRedirect'], [&$state]);
                 } else {
                     $response = new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
                 }

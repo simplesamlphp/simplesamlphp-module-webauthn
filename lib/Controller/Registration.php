@@ -151,6 +151,6 @@ class Registration
         $state['FIDO2AuthSuccessful'] = $state['FIDO2Tokens'][0][0];
         $state['FIDO2WantsRegister'] = true;
 
-        return new RunnableResponse([StaticProcessHelper::class, 'saveStateAndRedirect'], [$state]);
+        return new RunnableResponse([StaticProcessHelper::class, 'saveStateAndRedirect'], [&$state]);
     }
 }
