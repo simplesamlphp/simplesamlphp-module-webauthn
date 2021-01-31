@@ -39,9 +39,9 @@ foreach ($token->getClaim('entries') as $oneEntryObject) {
         }
     }
 }
-// no Yubico nor Microsoft in the list? (2019-09-12)
+// no Yubico nor Microsoft in the list? (2020-01-31)
 // add those manually but this is REALLY bad news if the MDS does not have complete information
-//     * Yubico values from: https://support.yubico.com/support/solutions/articles/15000014219-yubikey-5-series-technical-manual#AAGUID_Valuesbu3ryn
+//     * Yubico values from: https://support.yubico.com/hc/en-us/articles/360016648959-YubiKey-Hardware-FIDO2-AAGUIDs
 //     * Microsoft values from: https://docs.microsoft.com/en-us/microsoft-edge/dev-guide/windows-integration/web-authentication
 
 $res["fa2b99dc9e3942578f924a30d23c4118"] = [
@@ -65,6 +65,34 @@ $res["c5ef55ffad9a4b9fb580adebafe026d0"] = [
     "RootPEMs" => [YUBICO_CA],
     "multi"    => null
 ];
+$res["f8a011f38c0a4d15800617111f9edc7d"] = [
+    "C"        => "SE",
+    "O"        => "Yubico AB",
+    "model"    => "YubiKey Security Key",
+    "RootPEMs" => [YUBICO_CA],
+    "multi"    => null
+];
+$res["b92c3f9ac0144056887f140a2501163b"] = [
+    "C"        => "SE",
+    "O"        => "Yubico AB",
+    "model"    => "YubiKey Security Key",
+    "RootPEMs" => [YUBICO_CA],
+    "multi"    => null
+];
+$res["6d44ba9bf6ec2e49b9300c8fe920cb73"] = [
+    "C"        => "SE",
+    "O"        => "Yubico AB",
+    "model"    => "YubiKey Security Key NFC",
+    "RootPEMs" => [YUBICO_CA],
+    "multi"    => null
+];
+$res["149a20218ef6413396b881f8d5b7f1f5"] = [
+    "C"        => "SE",
+    "O"        => "Yubico AB",
+    "model"    => "YubiKey Security Key NFC",
+    "RootPEMs" => [YUBICO_CA],
+    "multi"    => null
+];
 $res["6028b017b1d44c02b4b3afcdafc96bb2"] = [
     "C"     => "US",
     "O"     => "Microsoft Corporation",
@@ -75,12 +103,6 @@ $res["6e96969ea5cf4aad9b56305fe6c82795"] = [
     "C"     => "US",
     "O"     => "Microsoft Corporation",
     "model" => "Windows Hello VBS software authenticator",
-    "multi" => null
-];
-$res["08987058cadc4b81b6e130de50dcbe96"] = [
-    "C"     => "US",
-    "O"     => "Microsoft Corporation",
-    "model" => "Windows Hello hardware authenticator",
     "multi" => null
 ];
 $res["9ddd1817af5a4672a2b93e3dd95000a9"] = [
