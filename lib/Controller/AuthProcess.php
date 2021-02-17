@@ -151,14 +151,16 @@ class AuthProcess
         /**
          * §7.2 STEP 18 : detect physical object cloning on the token
          */
-        $counter = $authObject->getCounter();
-        if (($previousCounter != 0 || $counter != 0) && $counter > $previousCounter) {
+	$counter = $authObject->getCounter();
+	if ($previousCounter == 0 && $counter == 0) {
+                // no cloning check, it is a brand new token
+	} elseif ($counter > $previousCounter) {
             // Signature counter was incremented compared to last time, good
             $store = $state['webauthn:store'];
             $store->updateSignCount($oneToken[0], $counter);
         } else {
             throw new Exception(
-                "Signature counter less or equal to a previous authentication! Token cloning likely (old: $previousCounter, new: $counter."
+                "Signature counter less or equal to a previous authentication! Token cloning likely (old: $previousCounter, new: $counter)."
             );
         }
 
