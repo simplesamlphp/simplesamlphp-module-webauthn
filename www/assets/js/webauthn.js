@@ -78,6 +78,9 @@ var publicKeyCredentialCreationOptions = {
             displayName: frontendData['state']['FIDO2Displayname'],
         },
         pubKeyCredParams: [{alg: -7, type: 'public-key'}],
+        authenticatorSelection: {
+            userVerification: "discouraged"
+        },
         timeout: 60000,
         attestation: frontendData['attestation'],
     }
