@@ -12,7 +12,6 @@ use SimpleSAML\Logger;
 use SimpleSAML\Module;
 use SimpleSAML\Module\webauthn\WebAuthn\StaticProcessHelper;
 use SimpleSAML\Session;
-use SimpleSAML\Utils;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

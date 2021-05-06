@@ -132,7 +132,8 @@ class Registration
         }
 
         $stateData->scope = $moduleConfig->getString('scope', null);
-        $baseurl = Utils\HTTP::getSelfHost();
+        $httpUtils = new Utils\HTTP();
+        $baseurl = $httpUtils->getSelfHost();
         $hostname = parse_url($baseurl, PHP_URL_HOST);
         if ($hostname !== null) {
             $stateData->derivedScope = $hostname;

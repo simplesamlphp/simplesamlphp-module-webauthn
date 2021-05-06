@@ -190,8 +190,9 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
 	// § 8.8 Bullet 2
         $nonceToHash = $attestationArray['authData'] . $this->clientDataHash;
 	// § 8.8 Bullet 3
-	$nonce = hash("sha256", $nonceToHash, TRUE); // does raw_output have to be FALSE or TRUE?
-        $certProps = openssl_x509_parse(Utils\Crypto::der2pem($stmtDecoded['x5c'][0]));	
+	$nonce = hash("sha256", $nonceToHash, true); // does raw_output have to be FALSE or TRUE?
+        $cryptoUtils = new Utils\Crypto();
+        $certProps = openssl_x509_parse($cryptoUtils->der2pem($stmtDecoded['x5c'][0]));
 	// § 8.8 Bullet 4
         if (
            !isset($certProps['extensions']['1.2.840.113635.100.8.2'])
@@ -207,29 +208,29 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
 	// chain validation first
 	foreach ( $stmtDecoded['x5c'] as $runIndex => $runCert ) {
 		if (isset($stmtDecoded['x5c'][$runIndex + 1])) { // there is a next cert, so follow the chain
-			$certResource = openssl_x509_read(Utils\Crypto::der2pem($runCert));
-			$signerPubKey = openssl_pkey_get_public(Utils\Crypto::der2pem($stmtDecoded['x5c'][$runIndex + 1]));
+			$certResource = openssl_x509_read($cryptoUtils->der2pem($runCert));
+			$signerPubKey = openssl_pkey_get_public($cryptoUtils->der2pem($stmtDecoded['x5c'][$runIndex + 1]));
 			if (openssl_x509_verify($certResource, $signerPubKey) != 1) {
 				$this->fail("Error during chain validation of the attestation certificate (while validating cert #$runIndex, which is "
-                                    . Utils\Crypto::der2pem($runCert)
+                                    . $cryptoUtils->der2pem($runCert)
                                     . "; next cert was "
-                                    . Utils\Crypto::der2pem($stmtDecoded['x5c'][$runIndex + 1]));
+                                    . $cryptoUtils->der2pem($stmtDecoded['x5c'][$runIndex + 1]));
 			}
 		} else { // last cert, compare to the root
-			$certResource = openssl_x509_read(Utils\Crypto::der2pem($runCert));
+			$certResource = openssl_x509_read($cryptoUtils->der2pem($runCert));
 			$signerPubKey = openssl_pkey_get_public($APPLE_WEBAUTHN_ROOT_CA);
 			if (openssl_x509_verify($certResource, $signerPubKey) != 1) {
-                                $this->fail("Error during root CA validation of the attestation chain certificate, which is ".Utils\Crypto::der2pem($runCert));
+                                $this->fail("Error during root CA validation of the attestation chain certificate, which is " . $cryptoUtils->der2pem($runCert));
                         }
 		}
 	}
 
-        $keyResource = openssl_pkey_get_public(Utils\Crypto::der2pem($stmtDecoded['x5c'][0]));
+        $keyResource = openssl_pkey_get_public($cryptoUtils->der2pem($stmtDecoded['x5c'][0]));
         if ($keyResource === FALSE) {
 		$this->fail("Did not get a parseable X.509 structure out of the Apple attestation statement - x5c nr. 0 statement was: XXX "
                     . $stmtDecoded['x5c'][0]
                     . " XXX; PEM equivalent is "
-                    . Utils\Crypto::der2pem($stmtDecoded['x5c'][0])
+                    . $cryptoUtils->der2pem($stmtDecoded['x5c'][0])
                     . ". OpenSSL error: "
                     . openssl_error_string()
                     );
@@ -253,11 +254,11 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
 	$keyDetails = openssl_pkey_get_details($keyResource);
 	if ( $credentialDetails['bits'] != $keyDetails['bits'] ||
              $credentialDetails['key']  != $keyDetails['key']  ||
-             $credentialDetails['type'] != $keyDetails['type'] ) { 
+             $credentialDetails['type'] != $keyDetails['type'] ) {
 		$this->fail("The credential public key does not match the certificate public key in attestationData. ("
-              . $credentialDetails['key'] 
+              . $credentialDetails['key']
               . " - "
-              . $keyDetails['key'] 
+              . $keyDetails['key']
               . ")");
 	}
 	$this->pass("Apple attestation format verification passed.");
@@ -290,12 +291,13 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
      */
     private function validateAttestationFormatPackedX5C(array $attestationArray): void
     {
+        $cryptoUtils = new Utils\Crypto();
         $stmtDecoded = $attestationArray['attStmt'];
         /**
          * §8.2 Step 2: check x5c attestation
          */
         $sigdata = $attestationArray['authData'] . $this->clientDataHash;
-        $keyResource = openssl_pkey_get_public(Utils\Crypto::der2pem($stmtDecoded['x5c'][0]));
+        $keyResource = openssl_pkey_get_public($cryptoUtils->der2pem($stmtDecoded['x5c'][0]));
         if ($keyResource === false) {
             $this->fail("Unable to construct public key resource from PEM.");
         }
@@ -310,7 +312,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         /**
          * §8.2 Step 2 Bullet 2: check certificate properties listed in §8.2.1
          */
-        $certProps = openssl_x509_parse(Utils\Crypto::der2pem($stmtDecoded['x5c'][0]));
+        $certProps = openssl_x509_parse($cryptoUtils->der2pem($stmtDecoded['x5c'][0]));
         $this->debugBuffer .= "Attestation Certificate:" . print_r($certProps, true) . "<br/>";
         if (
             $certProps['version'] !== 2 || /** §8.2.1 Bullet 1 */
@@ -424,7 +426,8 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         if (count($stmtDecoded['x5c']) !== 1) {
             $this->fail("FIDO U2F attestation requires 'x5c' to have only exactly one key.");
         }
-        $attCert = Utils\Crypto::der2pem($stmtDecoded['x5c'][0]);
+        $cryptoUtils = new Utils\Crypto();
+        $attCert = $cryptoUtils->der2pem($stmtDecoded['x5c'][0]);
         $key = openssl_pkey_get_public($attCert);
         $keyProps = openssl_pkey_get_details($key);
         if (!isset($keyProps['ec']['curve_name']) || $keyProps['ec']['curve_name'] !== "prime256v1") {

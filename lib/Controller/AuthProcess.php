@@ -13,7 +13,6 @@ use SimpleSAML\Module;
 use SimpleSAML\Module\webauthn\WebAuthn\WebAuthnAbstractEvent;
 use SimpleSAML\Module\webauthn\WebAuthn\WebAuthnAuthenticationEvent;
 use SimpleSAML\Session;
-use SimpleSAML\Utils;
 use SimpleSAML\XHTML\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;

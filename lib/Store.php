@@ -133,7 +133,8 @@ abstract class Store
     public static function parseStoreConfig($config): Store
     {
         if (is_string($config)) {
-            $config = Utils\Arrays::arrayize($config);
+            $arrayUtils = new Utils\Arrays();
+            $config = $arrayUtils->arrayize($config);
         }
 
         /** @psalm-var mixed $config */

@@ -3,6 +3,7 @@
 namespace SimpleSAML\Module\webauthn\WebAuthn\Store;
 
 use SimpleSAML\Configuration;
+use SimpleSAML\Database as WebAuthnDatabase;
 use SimpleSAML\Logger;
 use SimpleSAML\Module\webauthn\Store;
 
@@ -51,7 +52,7 @@ class Database extends Store
     {
         parent::__construct($config);
         $this->config = $config;
-        $this->db = \SimpleSAML\Database::getInstance(Configuration::loadFromArray($config));
+        $this->db = WebAuthnDatabase::getInstance(Configuration::loadFromArray($config));
     }
 
 
@@ -73,7 +74,7 @@ class Database extends Store
      */
     public function __wakeup(): void
     {
-        $this->db = \SimpleSAML\Database::getInstance(Configuration::loadFromArray($this->config));
+        $this->db = WebAuthnDatabase::getInstance(Configuration::loadFromArray($this->config));
     }
 
 
