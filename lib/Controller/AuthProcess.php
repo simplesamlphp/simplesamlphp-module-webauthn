@@ -98,7 +98,7 @@ class AuthProcess
     {
         $this->logger::info('FIDO2 - Accessing WebAuthn enrollment validation');
 
-        $stateId = $request->query->get('StateId');
+        $stateId = $request->get('StateId');
         if ($stateId === null) {
             throw new Error\BadRequest('Missing required StateId query parameter.');
         }
@@ -108,7 +108,7 @@ class AuthProcess
         /** @var array $state */
         $state = $this->authState::loadState($stateId, 'webauthn:request');
 
-        $incomingID = bin2hex(WebAuthnAbstractEvent::base64urlDecode($request->request->get('response_id')));
+        $incomingID = bin2hex(WebAuthnAbstractEvent::base64urlDecode($request->get('response_id')));
 
         /**
          * §7.2 STEP 2 - 4 : check that the credential is one of those the particular user owns
@@ -134,15 +134,15 @@ class AuthProcess
 
         /** @psalm-var array $oneToken */
         $authObject = new WebAuthnAuthenticationEvent(
-            $request->request->get('type'),
+            $request->get('type'),
             ($state['FIDO2Scope'] === null ? $state['FIDO2DerivedScope'] : $state['FIDO2Scope']),
             $state['FIDO2SignupChallenge'],
             $state['IdPMetadata']['entityid'],
-            base64_decode($request->request->get('authenticator_data')),
-            base64_decode($request->request->get('client_data_raw')),
+            base64_decode($request->get('authenticator_data')),
+            base64_decode($request->get('client_data_raw')),
             $oneToken[0],
             $oneToken[1],
-            base64_decode($request->request->get('signature')),
+            base64_decode($request->get('signature')),
             $debugEnabled
         );
 
@@ -164,7 +164,7 @@ class AuthProcess
         $state['FIDO2AuthSuccessful'] = $oneToken[0];
 
         // See if he wants to hang around for token management operations
-        if ($request->request->get('credentialChange') === 'on') {
+        if ($request->get('credentialChange') === 'on') {
             $state['FIDO2WantsRegister'] = true;
         } else {
             $state['FIDO2WantsRegister'] = false;
