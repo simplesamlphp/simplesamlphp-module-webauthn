@@ -17,7 +17,7 @@ class AAGUID
      *
      * @var array
      */
-    protected $dictionary = [];
+    protected array $dictionary = [];
 
     /**
      * The name of the configuration file where we should expect the AAGUID dictionary.
@@ -29,7 +29,7 @@ class AAGUID
      *
      * @var \SimpleSAML\Module\webauthn\WebAuthn\AAGUID|null
      */
-    protected static $instance = null;
+    protected static ?AAGUID $instance = null;
 
 
     /**

@@ -30,10 +30,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class RegProcess
 {
     /** @var \SimpleSAML\Configuration */
-    protected $config;
+    protected Configuration $config;
 
     /** @var \SimpleSAML\Session */
-    protected $session;
+    protected Session $session;
 
     /**
      * @var \SimpleSAML\Auth\State|string

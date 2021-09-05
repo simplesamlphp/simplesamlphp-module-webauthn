@@ -18,6 +18,7 @@ use SimpleSAML\Error;
 use SimpleSAML\Logger;
 use SimpleSAML\Module;
 use SimpleSAML\Module\webauthn\Store;
+use SimpleSAML\Module\webauthn\WebAuthn\StateData;
 use SimpleSAML\Module\webauthn\WebAuthn\StaticProcessHelper;
 use SimpleSAML\Utils;
 
@@ -26,38 +27,38 @@ class WebAuthn extends Auth\ProcessingFilter
     /**
      * @var boolean should new users be considered as enabled by default?
      */
-    private $defaultEnabled;
+    private bool $defaultEnabled;
 
     /**
      * @var boolean switch that determines how 'toggle' will be used, if true then value of 'toggle'
      *              will mean whether to trigger (true) or not (false) the webauthn authentication,
      *              if false then $toggle means whether to switch the value of $defaultEnabled and then use that
      */
-    private $force;
+    private bool $force;
 
     /**
      * @var string an attribute which is associated with 'force' because it determines its meaning,
      *              it either simply means whether to trigger webauthn authentication or switch the default settings,
      *              if null (was not sent as attribute) then the information from database is used
      */
-    private $toggleAttrib;
+    private string $toggleAttrib;
 
     /**
      * @var bool a bool that determines whether to use local database or not
      */
-    private $useDatabase;
+    private bool $useDatabase;
 
     /**
      * @var string|null AuthnContextClassRef
      */
-    private $authnContextClassRef = null;
+    private ?string $authnContextClassRef = null;
 
     /**
      * An object with all the parameters that will be needed in the process
      *
-     * @var Module\webauthn\WebAuthn\StateData
+     * @var \SimpleSAML\Module\webauthn\WebAuthn\StateData
      */
-    private $stateData;
+    private StateData $stateData;
 
     /**
      * Initialize filter.

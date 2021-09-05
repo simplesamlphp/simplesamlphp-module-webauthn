@@ -29,20 +29,20 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * the AAGUID of the newly registered authenticator
      * @var string
      */
-    protected $AAGUID;
+    protected string $AAGUID;
 
     /**
      * how sure are we about the AAGUID?
      * @var int
      */
-    protected $AAGUIDAssurance;
+    protected int $AAGUIDAssurance;
 
     /**
      * An array of known hardware tokens
      *
-     * @var AAGUID
+     * @var \SimpleSAML\Module\webauthn\WebAuthn\AAGUID
      */
-    protected $AAGUIDDictionary;
+    protected AAGUID $AAGUIDDictionary;
 
     /**
      * Initialize the event object.

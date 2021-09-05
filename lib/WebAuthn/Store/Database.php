@@ -29,14 +29,14 @@ class Database extends Store
      *
      * This variable can't be serialized.
      */
-    private $db;
+    private WebAuthnDatabase $db;
 
     /**
      * The configuration for our database store.
      *
      * @var array
      */
-    private $config;
+    private array $config;
 
 
     /**

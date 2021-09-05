@@ -23,56 +23,56 @@ abstract class WebAuthnAbstractEvent
      *
      * @var string
      */
-    private $scope;
+    private string $scope;
 
     /**
      * The SHA256 hash of the clientDataJSON
      *
      * @var string
      */
-    protected $clientDataHash;
+    protected string $clientDataHash;
 
     /**
      * The challenge that was used to trigger this event
      *
      * @var string
      */
-    private $challenge;
+    private string $challenge;
 
     /**
      * Our IdP EntityId
      *
      * @var string
      */
-    private $idpEntityId;
+    private string $idpEntityId;
 
     /**
      * the authenticator's signature counter
      *
      * @var int
      */
-    protected $counter;
+    protected int $counter;
 
     /**
      * extensive debug information collection?
      *
      * @var bool
      */
-    protected $debugMode = false;
+    protected bool $debugMode = false;
 
     /**
      * A string buffer to hold debug information in case we need it.
      *
      * @var string
      */
-    protected $debugBuffer = "";
+    protected string $debugBuffer = "";
 
     /**
      * A string buffer to hold raw validation data in case we want to look at it.
      *
      * @var string
      */
-    protected $validateBuffer = "";
+    protected string $validateBuffer = "";
 
     /**
      * the type of event requested. This is to be set in child class constructors
@@ -80,12 +80,12 @@ abstract class WebAuthnAbstractEvent
      *
      * @var string
      */
-    protected $eventType;
+    protected string $eventType;
 
     /**
      * The rpIdHash, available once validated during constructor of base class
      */
-    protected $rpIdHash;
+    protected string $rpIdHash;
 
     /**
      * the credential ID for this event (either the one that gets registered, or
@@ -95,7 +95,7 @@ abstract class WebAuthnAbstractEvent
      *
      * @var string
      */
-    protected $credentialId;
+    protected string $credentialId;
 
     /**
      * the credential binary data for this event (either the one that gets
@@ -105,7 +105,7 @@ abstract class WebAuthnAbstractEvent
      *
      * @var string
      */
-    protected $credential;
+    protected string $credential;
 
 
     /**
