@@ -319,7 +319,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
             $certProps['subject']['OU'] !== "Authenticator Attestation" || /** §8.2.1 Bullet 2 [Subject-OU] */
             !isset($certProps['subject']['CN']) || /** §8.2.1 Bullet 2 [Subject-CN] */
             !isset($certProps['extensions']['basicConstraints']) ||
-            strstr("CA:FALSE", $certProps['extensions']['basicConstraints']) === false /** §8.2.1 Bullet 4 */
+            strstr($certProps['extensions']['basicConstraints'], "CA:FALSE") === false /** §8.2.1 Bullet 4 */
         ) {
             $this->fail("Attestation certificate properties are no good.");
         }
