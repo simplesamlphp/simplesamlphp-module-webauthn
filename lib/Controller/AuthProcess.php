@@ -18,7 +18,6 @@ use SimpleSAML\XHTML\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Controller class for the webauthn module.
@@ -92,8 +91,7 @@ class AuthProcess
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @return (\Symfony\Component\HttpFoundation\RedirectResponse|
-     *         \SimpleSAML\HTTP\RunnableResponse|
-     *         \Symfony\Component\HttpFoundation\StreamedResponse)  A Symfony Response-object.
+     *         \SimpleSAML\HTTP\RunnableResponse) A Symfony Response-object.
      */
     public function main(Request $request): Response
     {
@@ -177,12 +175,14 @@ class AuthProcess
         $this->authState::saveState($state, 'webauthn:request');
 
         if ($debugEnabled) {
-            $response = new StreamedResponse();
-            $response->setCallback(function ($authObject, $state) {
-                echo $authObject->getDebugBuffer();
-                echo $authObject->getValidateBuffer();
-                echo "Debug mode, not continuing to " . ($state['FIDO2WantsRegister'] ? "credential registration page." : "destination.");
-            });
+            $response = new RunnableResponse(
+                function ($authObject, $state) {
+                    echo $authObject->getDebugBuffer();
+                    echo $authObject->getValidateBuffer();
+                    echo "Debug mode, not continuing to " . ($state['FIDO2WantsRegister'] ? "credential registration page." : "destination.");
+                },
+                [$authObject, $state]
+            );
         } else {
             if ($state['FIDO2WantsRegister']) {
                 $response = new RedirectResponse(
