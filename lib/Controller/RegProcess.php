@@ -92,7 +92,7 @@ class RegProcess
 
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\SimpleSAML\HTTP\RunnableResponse|\Symfony\Component\HttpFoundation\StreamedResponse
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\SimpleSAML\HTTP\RunnableResponse
      *   A Symfony Response-object.
      */
     public function main(Request $request): Response
