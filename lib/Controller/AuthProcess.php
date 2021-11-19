@@ -175,7 +175,7 @@ class AuthProcess
         $this->authState::saveState($state, 'webauthn:request');
 
         if ($debugEnabled) {
-            $response = new RunnableResponse(;
+            $response = new RunnableResponse(
                 function ($authObject, $state) {
                     echo $authObject->getDebugBuffer();
                     echo $authObject->getValidateBuffer();
