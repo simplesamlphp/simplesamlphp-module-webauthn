@@ -18,7 +18,8 @@ use SimpleSAML\XHTML\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+
+use function urlencode;
 
 /**
  * Controller class for the webauthn module.
@@ -91,7 +92,7 @@ class RegProcess
 
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\SimpleSAML\HTTP\RunnableResponse|\Symfony\Component\HttpFoundation\StreamedResponse
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\SimpleSAML\HTTP\RunnableResponse
      *   A Symfony Response-object.
      */
     public function main(Request $request): Response
@@ -194,14 +195,16 @@ class RegProcess
 
         $id = $this->authState::saveState($state, 'webauthn:request');
         if ($debugEnabled === true) {
-            $response = new StreamedResponse();
-            $response->setCallback(function ($regObject, $id) {
-                echo $regObject->getDebugBuffer();
-                echo $regObject->getValidateBuffer();
-                echo "<form id='regform' method='POST' action='" .
-                    Module::getModuleURL('webauthn/webauthn?StateId=' . urlencode($id)) . "'>";
-                echo "<button type='submit'>Return to previous page.</button>";
-            });
+            $response = new RunnableResponse(
+                function ($regObject, $id) {
+                    echo $regObject->getDebugBuffer();
+                    echo $regObject->getValidateBuffer();
+                    echo "<form id='regform' method='POST' action='" .
+                        Module::getModuleURL('webauthn/webauthn?StateId=' . urlencode($id)) . "'>";
+                    echo "<button type='submit'>Return to previous page.</button>";
+                },
+                [$regObject, $id]
+            );
         } elseif (array_key_exists('Registration', $state)) {
             $response = new RedirectResponse(Module::getModuleURL('webauthn/webauthn?StateId=' . urlencode($id)));
         } else {
