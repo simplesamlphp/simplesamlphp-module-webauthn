@@ -19,12 +19,12 @@
         "php": ">=7.4 || ^8.0",
         "ext-pdo": "*",
         "simplesamlphp/composer-module-installer": "~1.1",
-        "simplesamlphp/simplesamlphp": "dev-master",
+        "simplesamlphp/simplesamlphp": "^2.0.0-beta.2",
         "spomky-labs/cbor-php": "^1.0",
         "web-auth/cose-lib": "^3.3"
     },
     "require-dev": {
         "lcobucci/jwt": "^4.0",
-        "simplesamlphp/simplesamlphp-test-framework": "^1.1.0"
+        "simplesamlphp/simplesamlphp-test-framework": "^1.1.4"
     }
 }
