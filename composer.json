@@ -26,5 +26,11 @@
     "require-dev": {
         "lcobucci/jwt": "^4.0",
         "simplesamlphp/simplesamlphp-test-framework": "^1.1.4"
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "simplesamlphp/composer-module-installer": true
+        }
     }
 }
