@@ -89,7 +89,7 @@ class WebAuthn
     {
         $this->logger::info('FIDO2 - Accessing WebAuthn interface');
 
-        $stateId = $request->get('StateId');
+        $stateId = $request->request->get('StateId');
         if ($stateId === null) {
             throw new Error\BadRequest('Missing required StateId query parameter.');
         }

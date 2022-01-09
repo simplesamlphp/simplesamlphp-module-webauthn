@@ -95,7 +95,7 @@ class ManageToken
 
         $this->logger::info('FIDO2 - Accessing WebAuthn token management');
 
-        $stateId = $request->get('StateId');
+        $stateId = $request->request->get('StateId');
         if ($stateId === null) {
             throw new Error\BadRequest('Missing required StateId query parameter.');
         }
@@ -107,12 +107,12 @@ class ManageToken
             throw new Exception("Attempt to access the token management page unauthenticated.");
         }
 
-        switch ($request->get('submit')) {
+        switch ($request->request->get('submit')) {
             case "NEVERMIND":
                 $response = new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
                 break;
             case "DELETE":
-                $credId = $request->get('credId');
+                $credId = $request->request->get('credId');
                 if ($state['FIDO2AuthSuccessful'] == $credId) {
                     throw new Exception("Attempt to delete the currently used credential despite UI preventing this.");
                 }

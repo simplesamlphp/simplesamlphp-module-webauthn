@@ -99,7 +99,7 @@ class RegProcess
     {
         $this->logger::info('FIDO2 - Accessing WebAuthn enrollment validation');
 
-        $stateId = $request->get('StateId');
+        $stateId = $request->request->get('StateId');
         if ($stateId === null) {
             throw new Error\BadRequest('Missing required StateId query parameter.');
         }
@@ -120,13 +120,13 @@ class RegProcess
         }
 
         $regObject = new WebAuthnRegistrationEvent(
-            $request->get('type'),
+            $request->request->get('type'),
             $fido2Scope,
             $state['FIDO2SignupChallenge'],
             $state['IdPMetadata']['entityid'],
-            base64_decode($request->get('attestation_object')),
-            $request->get('response_id'),
-            $request->get('attestation_client_data_json'),
+            base64_decode($request->request->get('attestation_object')),
+            $request->request->get('response_id'),
+            $request->request->get('attestation_client_data_json'),
             $debugEnabled
         );
 
@@ -142,7 +142,7 @@ class RegProcess
         }
 
         // THAT'S IT. This is a valid credential and can be enrolled to the user.
-        $friendlyName = $request->get('tokenname');
+        $friendlyName = $request->request->get('tokenname');
 
         // if we have requested the token model, add it to the name
         if ($state['requestTokenModel']) {
