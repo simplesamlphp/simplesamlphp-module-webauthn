@@ -21,6 +21,15 @@ You can install this module with composer:
 % composer require simplesamlphp/simplesamlphp-module-webauthn
 ```
 
+Next, you need to do is to enable the module: in
+ `config.php`, search for the `module.enable` key and set `webauthn` to true:
+
+ ```php
+     'module.enable' => [
+          'webauthn' => true,
+          …
+     ],
+ ```
 
 How to setup the webauthn module
 -----------------------------------------
