@@ -101,7 +101,7 @@ class AuthProcess
             throw new Error\BadRequest('Missing required StateId query parameter.');
         }
 
-        $debugEnabled = $this->config->getValue('logging.level', Logger::NOTICE) === Logger::DEBUG;
+        $debugEnabled = $this->config->getOptionalValue('logging.level', Logger::NOTICE) === Logger::DEBUG;
 
         /** @var array $state */
         $state = $this->authState::loadState($stateId, 'webauthn:request');

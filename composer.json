@@ -19,7 +19,7 @@
         "php": ">=7.4 || ^8.0",
         "ext-pdo": "*",
         "simplesamlphp/composer-module-installer": "~1.1",
-        "simplesamlphp/simplesamlphp": "^2.0.0-beta.2",
+        "simplesamlphp/simplesamlphp": "^2.0.0-beta.9",
         "spomky-labs/cbor-php": "^1.0",
         "web-auth/cose-lib": "^3.3"
     },
