@@ -20,10 +20,11 @@ jobs:
       - name: Setup PHP, with composer and extensions
         uses: shivammathur/setup-php@v2 #https://github.com/shivammathur/setup-php
         with:
+          coverage: pcov
+          extensions: intl, mbstring, pdo, xml
+          ini-values: error_reporting=E_ALL
           php-version: ${{ matrix.php-versions }}
           tools: composer:v2
-          extensions: intl, mbstring, pdo, xml
-          coverage: pcov
 
       - name: Setup problem matchers for PHP
         run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
