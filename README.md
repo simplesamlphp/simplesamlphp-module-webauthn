@@ -1,57 +1,55 @@
+# WebAuthn as Second Factor module
+
 ![Build Status](https://github.com/simplesamlphp/simplesamlphp-module-webauthn/workflows/CI/badge.svg?branch=master)
 [![Coverage Status](https://codecov.io/gh/simplesamlphp/simplesamlphp-module-webauthn/branch/master/graph/badge.svg)](https://codecov.io/gh/simplesamlphp/simplesamlphp-module-webauthn)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/simplesamlphp/simplesamlphp-module-webauthn/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/simplesamlphp/simplesamlphp-module-webauthn/?branch=master)
 [![Type Coverage](https://shepherd.dev/github/simplesamlphp/simplesamlphp-module-webauthn/coverage.svg)](https://shepherd.dev/github/simplesamlphp/simplesamlphp-module-webauthn)
 [![Psalm Level](https://shepherd.dev/github/simplesamlphp/simplesamlphp-module-webauthn/level.svg)](https://shepherd.dev/github/simplesamlphp/simplesamlphp-module-webauthn)
 
-WebAuthn as Second Factor module
-==============
-
 <!-- {{TOC}} -->
 
-
-The module is implemented as an Authentication Processing Filter. That 
-means it can be configured in the global config.php file or the SP remote or 
+The module is implemented as an Authentication Processing Filter. That
+means it can be configured in the global config.php file or the SP remote or
 IdP hosted metadata.
 
-Installation
-------------
+## Installation
 
 You can install this module with composer:
 
 ```bash
-% composer require simplesamlphp/simplesamlphp-module-webauthn
+vendor/bin/composer require simplesamlphp/simplesamlphp-module-webauthn
 ```
 
 Next, you need to do is to enable the module: in
  `config.php`, search for the `module.enable` key and set `webauthn` to true:
 
- ```php
-     'module.enable' => [
-          'webauthn' => true,
-          …
-     ],
- ```
+```php
+'module.enable' => [
+    'webauthn' => true,
+    …
+],
+```
 
-How to setup the webauthn module
------------------------------------------
+## How to setup the webauthn module
+
 You need to enable the module's authprocfilter at a priority level
 so that it takes place AFTER the first-factor authentication. E.g. at 100 and
 if standalone registration and name2oid are used together, then the WebAuthn
- auth proc filter has to run after name2oid.
+auth proc filter has to run after name2oid.
 
 ```php
 100 => [
         'class' => 'webauthn:WebAuthn',
-    ],
+],
 ```
-Then you need to copy config-templates/module_webauthn.php to your config directory
- and adjust settings accordingly. See the file for parameters description.
 
-Using storage
--------------
+Then you need to copy config-templates/module_webauthn.php to your config
+directory and adjust settings accordingly. See the file for parameters
+description.
 
-You first need to setup the database. 
+## Using storage
+
+You first need to setup the database.
 
 Here is the initialization SQL script:
 
@@ -66,7 +64,8 @@ CREATE TABLE credentials (
     UNIQUE (user_id,credentialId)
 );
 
-GRANT SELECT,INSERT,UPDATE,DELETE ON ...credentials TO '...dbuser'@'1.2.3.4' IDENTIFIED BY '...dbpass';
+GRANT SELECT,INSERT,UPDATE,DELETE ON ...credentials TO '...dbuser'@'1.2.3.4'
+IDENTIFIED BY '...dbpass';
 
 CREATE TABLE userstatus (
     user_id VARCHAR(80) NOT NULL,
@@ -92,73 +91,104 @@ The `webauthn:Database` backend storage has the following options:
 :   Password for the database user used for the connection.
 
 `timeout`
-:   The number of seconds to wait for a connection to the database server. This option is optional. If unset, it uses the default from the database-driver.
+:   The number of seconds to wait for a connection to the database server.
+    This option is optional. If unset, it uses the default from the
+    database-driver.
 
 Example config using PostgreSQL database:
 
 ```php
-    100 => array(
-        'class'	=> 'webauthn:WebAuthn', 
-        'store'	=> array(
-            'webauthn:Database', 
-            'database.dsn' => 'pgsql:host=sql.example.org;dbname=fido2',
-            'database.username' => 'simplesaml',
-            'database.password' => 'sdfsdf',
-        ),
-    ),
+100 => [
+    'class' => 'webauthn:WebAuthn', 
+    'store' => [
+        'webauthn:Database', 
+        'database.dsn' => 'pgsql:host=sql.example.org;dbname=fido2',
+        'database.username' => 'simplesaml',
+        'database.password' => 'sdfsdf',
+    ],
+],
 ```
 
 Example config using MySQL database:
 
 ```php
-    100 => array(
-        'class'	=> 'webauthn:WebAuthn', 
-        'store'	=> array(
-            'webauthn:Database', 
-            'database.dsn' => 'mysql:host=db.example.org;dbname=fido2',
-            'database.username' => 'simplesaml',
-            'database.password' => 'sdfsdf',
-        ),
-    ),
+100 => [
+    'class' => 'webauthn:WebAuthn', 
+    'store' => [
+        'webauthn:Database', 
+        'database.dsn' => 'mysql:host=db.example.org;dbname=fido2',
+        'database.username' => 'simplesaml',
+        'database.password' => 'sdfsdf',
+    ],
+],
 ```
 
-Options
--------
+### Options
+
 `scope`
-:    FIDO2 is phishing-resistent by binding generated credentials to a scope. Browsers will only invoke the registration/authentication if the scope matches the principal domain name the user is currently visiting. If not specified, the scope will be the hostname of the IdP as per its metadata. It is permissible to widen the scope up to the prinicpal domain though (e.g. authentication service is "saml.example.com" => scope can be extended to "example.com"; but not "examp1e.com". A registered FIDO2 token can then also be used on other servers in the same domain. If configuring this item, be sure that the authentication server name and the desired scope are a suffix match.
+:    FIDO2 is phishing-resistent by binding generated credentials to a scope.
+     Browsers will only invoke the registration/authentication if the scope
+     matches the principal domain name the user is currently visiting. If not
+     specified, the scope will be the hostname of the IdP as per its metadata.
+     It is permissible to widen the scope up to the prinicpal domain though
+     (e.g. authentication service is "saml.example.com" => scope can be
+     extended to "example.com"; but not "examp1e.com"). A registered FIDO2
+     token can then also be used on other servers in the same domain. If
+     configuring this item, be sure that the authentication server name and
+     the desired scope are a suffix match.
 
 `request_tokenmodel`
-:    The following will interactively ask the user if he is willing to share manufacturer and model information during credential registration. The user can decline, in which case registration will still succeed but vendor and model will be logged as "unknown model [unknown vendor]". When not requesting this, there is one less user interaction during the registration process; and no model information will be saved. Defaults to "false".
-    
+:    The following will interactively ask the user if he is willing to share
+     manufacturer and model information during credential registration. The
+     user can decline, in which case registration will still succeed but
+     vendor and model will be logged as "unknown model [unknown vendor]".
+     When not requesting this, there is one less user interaction during
+     the registration process; and no model information will be saved.
+     Defaults to "false".
+
 `default_enable`
-:    Should WebAuthn be enabled by default for all users? If not, users need to be white-listed in the database - other users simply pass through the filter without being subjected to 2FA. Defaults to "disabled by default" === false    
+:    Should WebAuthn be enabled by default for all users? If not, users need
+     to be white-listed in the database - other users simply pass through the
+     filter without being subjected to 2FA.
+     Defaults to "disabled by default" === false
 
 `force`
-:    This parameter is used only if "use_database" is false. If the value of "force" is true then we trigger WebAuthn only if "attrib_toggle" from the user is not empty. If the value of "force" is false then we switch the value of "default_enable" only if "attrib_toggle" from the user is not empty. Default value is true.
+:    This parameter is used only if "use_database" is false. If the value of
+     "force" is true then we trigger WebAuthn only if "attrib_toggle" from the
+     user is not empty. If the value of "force" is false then we switch the
+     value of "default_enable" only if "attrib_toggle" from the user is not
+     empty. Default value is true.
 
 `attrib_toggle`
-:    This parameter stores the name of the attribute that is sent with user and which determines whether to trigger WebAuthn. Default value is 'toggle'.
+:    This parameter stores the name of the attribute that is sent with user and
+     which determines whether to trigger WebAuthn. Default value is 'toggle'.
 
 `use_database`
-:    This parameter determines if the database will be used to check whether to trigger second factor authentication or use the "attrib_toggle" instead. Default value of this attribute is true.
+:    This parameter determines if the database will be used to check whether to
+     trigger second factor authentication or use the "attrib_toggle" instead.
+     Default value of this attribute is true.
 
 `use_inflow_registration`
-:    Optional parameter which determines whether you will be able to register and manage tokens while authenticating or you want to use the standalone registration page for these purposes. If set to false => standalone registration page, if true => inflow registration. If this parameter is not explicitly set, the value is considered to be true.
+:    Optional parameter which determines whether you will be able to register
+     and manage tokens while authenticating or you want to use the standalone
+     registration page for these purposes. If set to false => standalone
+     registration page, if true => inflow registration. If this parameter is
+     not explicitly set, the value is considered to be true.
 
-User Experience / Workflow
---------------------------
+## User Experience / Workflow
+
 Users for which WebAuthn is enabled cannot continue without a FIDO2 token. The
 UI is different depending on the number of tokens the user has registered:
 
-- User has 0 tokens: UI requires the user to register a token. The user can 
-  choose a convenient name for the token to recognise it later. If 
+- User has 0 tokens: UI requires the user to register a token. The user can
+  choose a convenient name for the token to recognise it later. If
   request_tokenmodel is set, the name will be appended with the token model and
-  vendor. 
-  After successful registration, the authprocfilter is done (user continues to 
+  vendor.
+  After successful registration, the authprocfilter is done (user continues to
   SP)
-- User has 1 token: UI requires the user to authenticate. After the 
+- User has 1 token: UI requires the user to authenticate. After the
   authentication, user can optionally enroll another token.
-- User has 2+ tokens: UI requires the user to authenticate. After the 
+- User has 2+ tokens: UI requires the user to authenticate. After the
   authentication, user can optionally enroll another token or delete an obsolete
   one.
 
@@ -167,19 +197,20 @@ to contact his administrator and have his account temporarily disabled for two-
 factor authentication.
 
 As long as a user account has 0 tokens there is no benefit yet; it's effectively
-still single factor authentication because anyone with the user's password can 
+still single factor authentication because anyone with the user's password can
 register any token. That is in the nature of things. It could be avoided with
 an out-of-band registration process (in the same scope).
 
-If the standalone registration page is used, the user can't optionally enroll and manage tokens while logging in.
-The standalone registration page can be found under webauthn/registration.php, it requires authentication
-and after that you are redirected to a page where you can manage tokens.
+If the standalone registration page is used, the user can't optionally enroll
+and manage tokens while logging in. The standalone registration page can be
+found under webauthn/registration.php, it requires authentication and after
+that you are redirected to a page where you can manage tokens.
 
-Device model detection
-----------------------
+## Device model detection
+
 The option `request_tokenmodel` can be used to get a token's so-called AAGUID
-which uniquely identifies the model and manufacturer (it is not a serial 
-number). 
+which uniquely identifies the model and manufacturer (it is not a serial
+number).
 
 Mapping the AAGUID to a cleartext model and manufacturer name is done by having
 (or not) meta-information about the AAGUID. The FIDO Alliance operates a
@@ -189,7 +220,7 @@ and indeed, some manufacturers are missing.
 
 The module contains a full list of AAGUIDs and relevant metadata as pulled from
 the FIDO MDS. It also has a limited amount of manually curated information of
-some AAGUIDs which are not in the FIDO MDS, namely for Yubico products and 
+some AAGUIDs which are not in the FIDO MDS, namely for Yubico products and
 Microsoft. This list is in the `config/webauthn-aaguid.json` file, and this file
 needs to be moved to your SimpleSAMLphp configuration directory.
 
@@ -212,8 +243,8 @@ I contacted FIDO Alliance to ask about the lack of complete information in their
 MDS. Purportedly, listing in the MDS has chances of becoming mandatory in a
 future FIDO Certification. Until then, there is no good solution to the problem.
 
-Disabling WebAuthn
-------------------
+## Disabling WebAuthn
+
 You can disable the module entirely by not listing it as an authprocfilter.
 
 You can disable the module by default by setting default_enable = false. You can
@@ -222,25 +253,25 @@ them with status "FIDO2Enabled" to the `userstatus` table or if you don't want t
 use the `userstatus` table, you can send an attribute whose name is stored in `attrib_toggle`
 for this.
 
-If the module is enabled by default, you can selectively disable WebAuthn 
+If the module is enabled by default, you can selectively disable WebAuthn
 second-factor authentication by adding the username with status FIDO2Disabled to
 the `userstatus` table or if you don't want to use the `userstatus` table, you can
 send an attribute whose name is stored in `attrib_toggle` for this.
 
-Limitations / Design Decisions
-------------------------------
-This implementation does not validate token bindings, if sent by the 
-authenticator (§7.1 Step 7 / §7.2 Step 11 skip token binding information 
-validation if present). That is because Yubikeys do not support token binding 
+## Limitations / Design Decisions
+
+This implementation does not validate token bindings, if sent by the
+authenticator (§7.1 Step 7 / §7.2 Step 11 skip token binding information
+validation if present). That is because Yubikeys do not support token binding
 and the corresponding functionality thus has no test case.
 
 This implementation does not distinguish between User Presence (user has proven
 to be near the authenticator) and User Verification (user has proven to be near
 the authenticator AND to have unlocked the authenticator with a personal asset
-such as PIN or fingerprint). Both variants are considered sufficient to 
+such as PIN or fingerprint). Both variants are considered sufficient to
 authenticate successfully (§7.1 steps 11 and 12 are joined into one condition)
 
-The implementation requests ECDSA keys (algorithm -7) because all Yubikeys 
+The implementation requests ECDSA keys (algorithm -7) because all Yubikeys
 support that. It is trivial to add RSA support if there are keys which don't.
 
 The implementation does not request any client extensions. The specification
@@ -248,15 +279,17 @@ gives implementations a policy choice on what to do if a client sends extensions
 anyway: this implementation chose to then fail the registration/authentication.
 
 The implementation supports the attestation formats "none", "packed / x5c" and
-"packed / self", and "fido-u2f". Other attestation formats lead to a 
+"packed / self", and "fido-u2f". Other attestation formats lead to a
 registration failure.
 
-For the attation type "packed / x5c", 
-* the optional OCSP checks are not performed (this is explicitly permitted in 
+For the attation type "packed / x5c",
+
+- the optional OCSP checks are not performed (this is explicitly permitted in
   the spec due to other means of revocation checking in the FIDO MDS).
 
 For bith "packed / x5c" and "fido-u2f":
-* due to the lack of any externally provided knowledge about CAs(???) all
+
+- due to the lack of any externally provided knowledge about CAs(???) all
   attestations are classified as "Basic" (i.e. no "AttCA" level)
 
 Given the sorry state of completeness of the FIDO MDS, only very few attestation
