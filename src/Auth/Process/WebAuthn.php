@@ -91,8 +91,8 @@ class WebAuthn extends Auth\ProcessingFilter
             $this->stateData->scope = $moduleConfig['scope'];
         }
 
-	// Set the derived scope so we can compare it to the sent host at a later point
-	$httpUtils = new Utils\HTTP();
+        // Set the derived scope so we can compare it to the sent host at a later point
+        $httpUtils = new Utils\HTTP();
         $baseurl = $httpUtils->getSelfHost();
         $hostname = parse_url($baseurl, PHP_URL_HOST);
         if ($hostname !== null) {
@@ -169,7 +169,8 @@ class WebAuthn extends Auth\ProcessingFilter
                 $this->stateData->usernameAttrib . '".');
         }
 
-        $state['saml:AuthnContextClassRef'] = $this->authnContextClassRef ?? 'urn:rsa:names:tc:SAML:2.0:ac:classes:FIDO';
+        $state['saml:AuthnContextClassRef'] = $this->authnContextClassRef
+            ?? 'urn:rsa:names:tc:SAML:2.0:ac:classes:FIDO';
         Logger::debug('webauthn: userid: ' . $state['Attributes'][$this->stateData->usernameAttrib][0]);
 
         $localToggle = !empty($state['Attributes'][$this->toggleAttrib])

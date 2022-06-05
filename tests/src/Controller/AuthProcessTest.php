@@ -95,7 +95,8 @@ class AuthProcessTest extends TestCase
 
         $this->expectException(Exception::class);
         $this->expectExceptionMessage(
-            "User attempted to authenticate with an unknown credential ID. This should already have been prevented by the browser!"
+            "User attempted to authenticate with an unknown credential ID." .
+            " This should already have been prevented by the browser!"
         );
         $c->main($request);
     }
