@@ -21,7 +21,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      */
     public const PK_ALGORITHM_ECDSA = "-7";
     public const PK_ALGORITHM_RSA = "-257";
-    public const PK_ALGORITHM = [ PK_ALGORITHM_ECDSA, PK_ALGORITHM_RSA ];
+    public const PK_ALGORITHM = [ self::PK_ALGORITHM_ECDSA, self::PK_ALGORITHM_RSA ];
     public const AAGUID_ASSURANCE_LEVEL_NONE = 0;
     public const AAGUID_ASSURANCE_LEVEL_SELF = 1;
     public const AAGUID_ASSURANCE_LEVEL_BASIC = 2;
