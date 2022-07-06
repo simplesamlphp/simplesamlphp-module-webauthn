@@ -410,14 +410,14 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
             $this->fail("Unexpected algorithm type in packed basic attestation: " . $stmtDecoded['alg'] . ".");
         }
         switch ($stmtDecoded['alg']) {
-            case PK_ALGORITHM_ECDSA:
+            case self::PK_ALGORITHM_ECDSA:
                 $keyObject = new Ec2Key($this->cborDecode(hex2bin($this->credential)));
                 $keyResource = openssl_pkey_get_public($keyObject->asPEM());
                 if ($keyResource === false) {
                       $this->fail("Unable to construct ECDSA public key resource from PEM.");
                 };
                 break;
-            case PK_ALGORITHM_RSA:
+            case self::PK_ALGORITHM_RSA:
                 $keyObject = new RsaKey($this->cborDecode(hex2bin($this->credential)));
                 $keyResource = openssl_pkey_get_public($keyObject->asPEM());
                 if ($keyResource === false) {
