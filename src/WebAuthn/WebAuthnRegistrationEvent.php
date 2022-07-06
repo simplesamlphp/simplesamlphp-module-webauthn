@@ -418,7 +418,11 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
                 };
                 break;
             case PK_ALGORITHM_RSA:
-                $this->fail("TODO: verify that public key data actually extracts to an RSA public key.");
+                $keyObject = new RsaKey($this->cborDecode(hex2bin($this->credential)));
+                $keyResource = openssl_pkey_get_public($keyObject->asPEM());
+                if ($keyResource === false) {
+                    $this->fail("Unable to construct RSA public key resource from PEM.");
+                }
                 break;
             default:
                 $this->fail("Unable to construct public key resource from PEM.");
