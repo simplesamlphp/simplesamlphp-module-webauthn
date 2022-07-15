@@ -12,9 +12,9 @@
 * TouchID (tested on Macbook Pro 2019, macOS 10.15.3, Google Chrome)
   AAGUID 'adce000235bcc60a648b0b25f1f05503' not in database yet
 * FaceID (tested on an iPhone with iOS 14)
-* Windows Hello
 
 ## Attestation mode None
 
 * Android 7 (Samsung Galaxy S6, Fingerprint Sensor) - when requesting
   indirect/direct, none is delivered instead
+* Windows Hello - when requesting indirect/direct, throws Exception because of unimlemented TPM attestation mode
