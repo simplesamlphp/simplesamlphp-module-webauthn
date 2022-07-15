@@ -62,11 +62,15 @@ class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent
         $keyObject = NULL;
         try {
             $keyObject = new Ec2Key($keyArray);
-        } catch \Exception $e;
+        } catch (\Exception $e) {
+            // never mind
+        };
         if (!is_object($keyObject)) {
             try {
                 $keyObject = new RsaKey($keyArray);
-            } catch \Exception $e;
+            } catch (\Exception $e) {
+                // never mind
+            };
         }
         if (!is_object($keyObject)) {
             throw new Exception("Unable to make something out of the incoming 'public key'!");
