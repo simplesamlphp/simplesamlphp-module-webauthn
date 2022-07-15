@@ -3,6 +3,7 @@
 namespace SimpleSAML\Module\webauthn\WebAuthn;
 
 use Cose\Key\Ec2Key;
+use Cose\Key\RsaKey;
 use SimpleSAML\Logger;
 use SimpleSAML\Utils;
 
