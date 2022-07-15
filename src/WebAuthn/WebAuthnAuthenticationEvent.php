@@ -73,7 +73,7 @@ class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent
             };
         }
         if (!is_object($keyObject)) {
-            throw new Exception("Unable to make something out of the incoming 'public key'!");
+            throw new \Exception("Unable to make something out of the incoming 'public key'!");
         }
         $keyResource = openssl_pkey_get_public($keyObject->asPEM());
         if ($keyResource === false) {
