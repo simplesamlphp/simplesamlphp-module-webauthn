@@ -410,6 +410,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         if (!in_array($stmtDecoded['alg'], self::PK_ALGORITHM)) {
             $this->fail("Unexpected algorithm type in packed basic attestation: " . $stmtDecoded['alg'] . ".");
         }
+        $keyObject = NULL;
         switch ($stmtDecoded['alg']) {
             case self::PK_ALGORITHM_ECDSA:
                 $keyObject = new Ec2Key($this->cborDecode(hex2bin($this->credential)));
