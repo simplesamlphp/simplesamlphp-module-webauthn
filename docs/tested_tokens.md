@@ -17,4 +17,4 @@
 
 * Android 7 (Samsung Galaxy S6, Fingerprint Sensor) - when requesting
   indirect/direct, none is delivered instead
-* Windows Hello - when requesting indirect/direct, throws Exception because of unimlemented TPM attestation mode
+* Windows Hello - when requesting indirect/direct, throws Exception because of unimplemented TPM attestation mode
