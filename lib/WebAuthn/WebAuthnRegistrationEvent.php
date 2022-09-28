@@ -3,6 +3,7 @@
 namespace SimpleSAML\Module\webauthn\WebAuthn;
 
 use Cose\Key\Ec2Key;
+use Cose\Key\RsaKey;
 use SimpleSAML\Logger;
 use SimpleSAML\Utils\Config as SSPConfig;
 
@@ -18,9 +19,11 @@ use SimpleSAML\Utils\Config as SSPConfig;
 class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
 {
     /**
-     * Public key algorithm supported. This is -7 - ECDSA with curve P-256
+     * Public key algorithm supported. This is -7 - ECDSA with curve P-256, or -275 (RS256)
      */
-    public const PK_ALGORITHM = "-7";
+    public const PK_ALGORITHM_ECDSA = "-7";
+    public const PK_ALGORITHM_RSA = "-257";
+    public const PK_ALGORITHM = [ self::PK_ALGORITHM_ECDSA, self::PK_ALGORITHM_RSA ];
     public const AAGUID_ASSURANCE_LEVEL_NONE = 0;
     public const AAGUID_ASSURANCE_LEVEL_SELF = 1;
     public const AAGUID_ASSURANCE_LEVEL_BASIC = 2;
@@ -379,13 +382,27 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         /**
          * §8.2 Step 4 Bullet 1: check algorithm
          */
-        if ($stmtDecoded['alg'] !== self::PK_ALGORITHM) {
+        if (!in_array($stmtDecoded['alg'], self::PK_ALGORITHM)) {
             $this->fail("Unexpected algorithm type in packed basic attestation: " . $stmtDecoded['alg'] . ".");
         }
-        $keyObject = new Ec2Key($this->cborDecode(hex2bin($this->credential)));
-        $keyResource = openssl_pkey_get_public($keyObject->asPEM());
-        if ($keyResource === false) {
-            $this->fail("Unable to construct public key resource from PEM.");
+        $keyObject = NULL;
+        switch ($stmtDecoded['alg']) {
+            case self::PK_ALGORITHM_ECDSA:
+                $keyObject = new Ec2Key($this->cborDecode(hex2bin($this->credential)));
+                $keyResource = openssl_pkey_get_public($keyObject->asPEM());
+                if ($keyResource === false) {
+                      $this->fail("Unable to construct ECDSA public key resource from PEM.");
+                };
+                break;
+            case self::PK_ALGORITHM_RSA:
+                $keyObject = new RsaKey($this->cborDecode(hex2bin($this->credential)));
+                $keyResource = openssl_pkey_get_public($keyObject->asPEM());
+                if ($keyResource === false) {
+                    $this->fail("Unable to construct RSA public key resource from PEM.");
+                }
+                break;
+            default:
+                $this->fail("Unable to construct public key resource from PEM.");
         }
         $sigdata = $attestationArray['authData'] . $this->clientDataHash;
         /**
@@ -523,8 +540,8 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         /**
          * STEP 13 of the validation procedure in § 7.1 of the spec: is the algorithm the expected one?
          */
-        if ($arrayPK['3'] === self::PK_ALGORITHM) { // we requested -7, so want to see it here
-            $this->pass("Public Key Algorithm is the expected one (-7, ECDSA).");
+        if (in_array($arrayPK['3'], self::PK_ALGORITHM)) { // we requested -7 or -257, so want to see it here
+            $this->pass("Public Key Algorithm is the expected one (-7 or -257).");
         } else {
             $this->fail("Public Key Algorithm mismatch!");
         }

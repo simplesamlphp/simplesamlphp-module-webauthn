@@ -77,7 +77,7 @@ var publicKeyCredentialCreationOptions = {
             name: frontendData['state']['FIDO2Username'],
             displayName: frontendData['state']['FIDO2Displayname'],
         },
-        pubKeyCredParams: [{alg: -7, type: 'public-key'}],
+        pubKeyCredParams: [{alg: -7, type: 'public-key'},{alg: -257, type: 'public-key'}],
         authenticatorSelection: {
             userVerification: "discouraged"
         },

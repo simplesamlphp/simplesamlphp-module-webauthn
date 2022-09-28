@@ -3,6 +3,7 @@
 namespace SimpleSAML\Module\webauthn\WebAuthn;
 
 use Cose\Key\Ec2Key;
+use Cose\Key\RsaKey;
 
 /**
  * FIDO2/WebAuthn Authentication Processing filter
@@ -59,7 +60,22 @@ class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent
     private function validateSignature(string $sigData, string $signature): void
     {
         $keyArray = $this->cborDecode(hex2bin($this->credential));
-        $keyObject = new Ec2Key($keyArray);
+        $keyObject = NULL;
+        try {
+            $keyObject = new Ec2Key($keyArray);
+        } catch (\Exception $e) {
+            // never mind
+        };
+        if (!is_object($keyObject)) {
+            try {
+                $keyObject = new RsaKey($keyArray);
+            } catch (\Exception $e) {
+                // never mind
+            };
+        }
+        if (!is_object($keyObject)) {
+            throw new \Exception("Unable to make something out of the incoming 'public key'!");
+        }
         $keyResource = openssl_pkey_get_public($keyObject->asPEM());
         if ($keyResource === false) {
             $this->fail("Unable to construct public key resource from PEM.");
