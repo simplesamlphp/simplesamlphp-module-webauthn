@@ -11,7 +11,7 @@ class StaticProcessHelper
     public static function saveStateAndRedirect(&$state)
     {
         $id = Auth\State::saveState($state, 'webauthn:request');
-        $url = Module::getModuleURL('webauthn/webauthn.php');
+        $url = Module::getModuleURL('webauthn/webauthn');
 	$httpUtils = new Utils\HTTP();
         $httpUtils->redirectTrustedURL($url, ['StateId' => $id]);
     }

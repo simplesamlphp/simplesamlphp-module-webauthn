@@ -186,7 +186,7 @@ class AuthProcess
         } else {
             if ($state['FIDO2WantsRegister']) {
                 $response = new RedirectResponse(
-                    Module::getModuleURL('webauthn/webauthn.php?StateId=' . urlencode($stateId))
+                    Module::getModuleURL('webauthn/webauthn?StateId=' . urlencode($stateId))
                 );
             } else {
                 $response = new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
