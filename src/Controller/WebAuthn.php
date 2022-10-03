@@ -97,7 +97,7 @@ class WebAuthn
         /** @var array $state */
         $state = $this->authState::loadState($stateId, 'webauthn:request');
 
-        $templateFile = $state['UseInflowRegistration'] ? 'webauthn:webauthn.tpl.php' : 'webauthn:authentication.tpl.php';
+        $templateFile = $state['UseInflowRegistration'] ? 'webauthn:webauthn.twig' : 'webauthn:authentication.twig';
 
         // Make, populate and layout consent form
         $t = new Template($this->config, $templateFile);
