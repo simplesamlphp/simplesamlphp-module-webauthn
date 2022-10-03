@@ -160,7 +160,7 @@ class WebAuthn extends Auth\ProcessingFilter
      *
      * @return void
      */
-    public function process(&$state)
+    public function process(&$state) : void
     {
         /**
          * Remove annotation + assert as soon as this method can be typehinted (SSP 2.0)
