@@ -8,10 +8,12 @@ $token = file_get_contents($argv[1]);
 $blobContent = json_decode(base64_decode(str_replace('_', '/', str_replace('-','+',explode('.', $token)[1]))),true);
 $outFormat = [];
 foreach ($blobContent['entries'] as $oneEntry) {
-	foreach ($oneEntry['attestationCertificateKeyIdentifiers'] as $oneKey) {
-		$outFormat[$oneKey] = [ 
-                      "model" => $oneEntry["metadataStatement"]["description"], 
-                      "RootPEMs" => $oneEntry["metadataStatement"]["attestationRootCertificates"] ];
+	if (isset($oneEntry['attestationCertificateKeyIdentifiers'])) {
+		foreach ($oneEntry['attestationCertificateKeyIdentifiers'] as $oneKey) {
+			$outFormat[$oneKey] = [ 
+                	      "model" => $oneEntry["metadataStatement"]["description"], 
+	                      "RootPEMs" => $oneEntry["metadataStatement"]["attestationRootCertificates"] ];
+		}
 	}
 }
 echo json_encode($outFormat, JSON_PRETTY_PRINT);
