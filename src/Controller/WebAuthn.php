@@ -149,8 +149,8 @@ class WebAuthn
             count($state['FIDO2Tokens']) === 0 ||
             ($state['FIDO2WantsRegister'] === true && $state['FIDO2AuthSuccessful'] !== false)
         ) {
-            $t->data['regURL'] = Module::getModuleURL('webauthn/regprocess.php?StateId=' . urlencode($stateId));
-            $t->data['delURL'] = Module::getModuleURL('webauthn/managetoken.php?StateId=' . urlencode($stateId));
+            $t->data['regURL'] = Module::getModuleURL('webauthn/regprocess?StateId=' . urlencode($stateId));
+            $t->data['delURL'] = Module::getModuleURL('webauthn/managetoken?StateId=' . urlencode($stateId));
         }
 
         $t->data['authForm'] = "";
@@ -158,7 +158,7 @@ class WebAuthn
             count($state['FIDO2Tokens']) > 0 &&
             ($state['FIDO2WantsRegister'] !== true || $state['FIDO2AuthSuccessful'] === false)
         ) {
-            $t->data['authURL'] = Module::getModuleURL('webauthn/authprocess.php?StateId=' . urlencode($stateId));
+            $t->data['authURL'] = Module::getModuleURL('webauthn/authprocess?StateId=' . urlencode($stateId));
         }
 
         // dynamically generate the JS code needed for token registration
