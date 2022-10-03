@@ -12,7 +12,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "SimpleSAML\\Module\\webauthn\\": "src/"
+            "SimpleSAML\\Module\\webauthn\\": "lib/"
         }
     },
     "require": {
