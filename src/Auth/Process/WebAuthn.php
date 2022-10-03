@@ -96,7 +96,8 @@ class WebAuthn extends Auth\ProcessingFilter
         }
 
         // Set the derived scope so we can compare it to the sent host at a later point
-        $baseurl = Utils\HTTP::getSelfHost();
+	$httpUtils = new Utils\HTTP();
+        $baseurl = $httpUtils->getSelfHost();
         $hostname = parse_url($baseurl, PHP_URL_HOST);
         if ($hostname !== null) {
             $this->stateData->derivedScope = $hostname;
