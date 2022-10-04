@@ -176,7 +176,7 @@ class AuthProcess
 
         if ($debugEnabled) {
             $response = new RunnableResponse(
-                function ($authObject, $state) {
+                function (WebAuthnAuthenticationEvent $authObject, array $state) {
                     echo $authObject->getDebugBuffer();
                     echo $authObject->getValidateBuffer();
                     echo "Debug mode, not continuing to " . ($state['FIDO2WantsRegister'] ? "credential registration page." : "destination.");

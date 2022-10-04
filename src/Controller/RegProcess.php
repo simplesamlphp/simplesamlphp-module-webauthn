@@ -196,7 +196,7 @@ class RegProcess
         $id = $this->authState::saveState($state, 'webauthn:request');
         if ($debugEnabled === true) {
             $response = new RunnableResponse(
-                function ($regObject, $id) {
+                function (WebAuthnRegistrationEvent $regObject, string $id) {
                     echo $regObject->getDebugBuffer();
                     echo $regObject->getValidateBuffer();
                     echo "<form id='regform' method='POST' action='" .

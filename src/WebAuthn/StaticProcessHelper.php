@@ -4,11 +4,12 @@ namespace SimpleSAML\Module\webauthn\WebAuthn;
 
 use SimpleSAML\Auth;
 use SimpleSAML\Module;
+use SimpleSAML\Module\webauthn\WebAuthn\StateData;
 use SimpleSAML\Utils;
 
 class StaticProcessHelper
 {
-    public static function saveStateAndRedirect(&$state)
+    public static function saveStateAndRedirect(array &$state): void
     {
         $id = Auth\State::saveState($state, 'webauthn:request');
         $url = Module::getModuleURL('webauthn/webauthn');
@@ -16,7 +17,7 @@ class StaticProcessHelper
         $httpUtils->redirectTrustedURL($url, ['StateId' => $id]);
     }
 
-    public static function prepareState($stateData, &$state)
+    public static function prepareState(StateData $stateData, array &$state): void
     {
         $state['requestTokenModel'] = $stateData->requestTokenModel;
         $state['webauthn:store'] = $stateData->store;
