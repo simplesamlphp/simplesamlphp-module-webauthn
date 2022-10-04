@@ -196,11 +196,11 @@ be new models listed. In order to do that, run the `bin/updateMetadata.php` scri
 like this:
 
 ```bash
-% php bin/updateMetadata.php <MDS_TOKEN>
+% php bin/updateMetadata.php <blob file>
 ```
 
-where `MDS_TOKEN` is the API token you get after registering
-[here](https://mds2.fidoalliance.org).
+where `<blob file>` is the metadata JWT blob you get from
+[here](https://mds3.fidoalliance.org).
 
 As a consequence, depending on the token model the user uses, even if the AAGUID
 is being sent as part of the registration process, it may be that the device is
@@ -238,8 +238,7 @@ the authenticator AND to have unlocked the authenticator with a personal asset
 such as PIN or fingerprint). Both variants are considered sufficient to 
 authenticate successfully (§7.1 steps 11 and 12 are joined into one condition)
 
-The implementation requests ECDSA keys (algorithm -7) because all Yubikeys 
-support that. It is trivial to add RSA support if there are keys which don't.
+The implementation requests ECDSA and RSA keys (algorithms -7, -257).
 
 The implementation does not request any client extensions. The specification
 gives implementations a policy choice on what to do if a client sends extensions
@@ -253,7 +252,7 @@ For the attation type "packed / x5c",
 * the optional OCSP checks are not performed (this is explicitly permitted in 
   the spec due to other means of revocation checking in the FIDO MDS).
 
-For bith "packed / x5c" and "fido-u2f":
+For both "packed / x5c" and "fido-u2f":
 * due to the lack of any externally provided knowledge about CAs(???) all
   attestations are classified as "Basic" (i.e. no "AttCA" level)
 
