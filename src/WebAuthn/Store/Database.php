@@ -55,9 +55,9 @@ class Database extends Store
         $this->config = $config;
         $this->db = \SimpleSAML\Database::getInstance(Configuration::loadFromArray($config));
         try {
-                $this->db->read("SELECT COUNT(*) FROM credentials");
+            $this->db->read("SELECT COUNT(*) FROM credentials");
         } catch (\Exception $e) {
-	$this->db->write("CREATE TABLE IF NOT EXISTS credentials (
+            $this->db->write("CREATE TABLE IF NOT EXISTS credentials (
             creation_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             user_id VARCHAR(80) NOT NULL,
             credentialId VARCHAR(500) NOT NULL,
@@ -69,9 +69,9 @@ class Database extends Store
             )");
 	}
         try {
-                $this->db->read("SELECT COUNT(*) FROM userstatus");
+            $this->db->read("SELECT COUNT(*) FROM userstatus");
         } catch (\Exception $e) {
-        $this->db->write("CREATE TABLE IF NOT EXISTS userstatus (
+            $this->db->write($db, "CREATE TABLE IF NOT EXISTS userstatus (
             user_id VARCHAR(80) NOT NULL,
             fido2Status ENUM('FIDO2Disabled','FIDO2Enabled') NOT NULL DEFAULT 'FIDO2Disabled',
             UNIQUE (user_id)

@@ -96,7 +96,6 @@ class WebAuthn
 
         /** @var array $state */
         $state = $this->authState::loadState($stateId, 'webauthn:request');
-        $state['FIDO2AuthSuccessful'] = FALSE; // initialise properly
 
         $templateFile = ( $state['UseInflowRegistration'] || $state['InRegistration'] ) ? 'webauthn:webauthn.twig' : 'webauthn:authentication.twig';
 
@@ -157,8 +156,7 @@ class WebAuthn
 
         $t->data['authForm'] = "";
         if (
-            count($state['FIDO2Tokens']) > 0 && $state['InRegistration'] === false &&
-            ($state['FIDO2WantsRegister'] !== true || $state['FIDO2AuthSuccessful'] === false)
+            count($state['FIDO2Tokens']) > 0 && ['FIDO2WantsRegister'] !== true && $state['FIDO2AuthSuccessful'] === false
         ) {
             $t->data['authURL'] = Module::getModuleURL('webauthn/authprocess?StateId=' . urlencode($stateId));
         }

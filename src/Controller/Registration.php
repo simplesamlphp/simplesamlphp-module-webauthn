@@ -149,7 +149,6 @@ class Registration
         $state['Source'] = $metadata;
         $state['IdPMetadata'] = $metadata;
         $state['Registration'] = true;
-        $state['FIDO2AuthSuccessful'] = $state['FIDO2Tokens'][0][0] ?? false;
         $state['FIDO2WantsRegister'] = true;
 
         return new RunnableResponse([StaticProcessHelper::class, 'saveStateAndRedirect'], [&$state]);
