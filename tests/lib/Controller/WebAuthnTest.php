@@ -53,7 +53,7 @@ class WebAuthnTest extends TestCase
         $this->session = Session::getSessionFromRequest();
 
         $this->logger = new class () extends Logger {
-            public static function info($str)
+            public static function info(string $str): void
             {
                 // do nothing
             }
@@ -76,7 +76,7 @@ class WebAuthnTest extends TestCase
         $c = new Controller\WebAuthn($this->config, $this->session);
         $c->setLogger($this->logger);
         $c->setAuthState(new class () extends State {
-            public static function loadState($id, $stage, $allowMissing = false)
+            public static function loadState(string $id, string $stage, bool $allowMissing = false): ?array
             {
                 return [
                     'UseInflowRegistration' => true,

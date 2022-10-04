@@ -72,7 +72,7 @@ class RegistrationTest extends TestCase
         $this->session = Session::getSessionFromRequest();
 
         $this->logger = new class () extends Logger {
-            public static function info($str)
+            public static function info(string $str): void
             {
                 // do nothing
             }
@@ -108,7 +108,7 @@ class RegistrationTest extends TestCase
         });
 
         $c->setAuthState(new class () extends Auth\State {
-            public static function loadState($id, $stage, $allowMissing = false)
+            public static function loadState(string $id, string $stage, bool $allowMissing = false): ?array
             {
                 return [
                 ];

@@ -53,7 +53,7 @@ class RegProcessTest extends TestCase
         $this->session = Session::getSessionFromRequest();
 
         $this->logger = new class () extends Logger {
-            public static function info($str)
+            public static function info(string $str): void
             {
                 // do nothing
             }
@@ -84,7 +84,7 @@ class RegProcessTest extends TestCase
         $c = new Controller\RegProcess($this->config, $this->session);
         $c->setLogger($this->logger);
         $c->setAuthState(new class () extends State {
-            public static function loadState($id, $stage, $allowMissing = false)
+            public static function loadState(string $id, string $stage, bool $allowMissing = false): ?array
             {
                 return [
                     'FIDO2Scope' => 'Ducktown',

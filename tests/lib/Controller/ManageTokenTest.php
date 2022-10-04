@@ -54,7 +54,7 @@ class ManageTokenTest extends TestCase
         $this->session = Session::getSessionFromRequest();
 
         $this->logger = new class () extends Logger {
-            public static function info($str)
+            public static function info(string $str): void
             {
                 // do nothing
             }
@@ -77,7 +77,7 @@ class ManageTokenTest extends TestCase
         $c = new Controller\ManageToken($this->config, $this->session);
         $c->setLogger($this->logger);
         $c->setAuthState(new class () extends State {
-            public static function loadState($id, $stage, $allowMissing = false)
+            public static function loadState(string $id, string $stage, bool $allowMissing = false): ?array
             {
                 return [
                     'FIDO2AuthSuccessful' => true,
@@ -106,7 +106,7 @@ class ManageTokenTest extends TestCase
         $c = new Controller\ManageToken($this->config, $this->session);
         $c->setLogger($this->logger);
         $c->setAuthState(new class () extends State {
-            public static function loadState($id, $stage, $allowMissing = false)
+            public static function loadState(string $id, string $stage, bool $allowMissing = false): ?array
             {
                 return [
                     'FIDO2AuthSuccessful' => true,
@@ -137,7 +137,7 @@ class ManageTokenTest extends TestCase
         $c = new Controller\ManageToken($this->config, $this->session);
         $c->setLogger($this->logger);
         $c->setAuthState(new class () extends State {
-            public static function loadState($id, $stage, $allowMissing = false)
+            public static function loadState(string $id, string $stage, bool $allowMissing = false): ?array
             {
                 return [
                     'FIDO2AuthSuccessful' => true,
@@ -168,7 +168,7 @@ class ManageTokenTest extends TestCase
         $c = new Controller\ManageToken($this->config, $this->session);
         $c->setLogger($this->logger);
         $c->setAuthState(new class () extends State {
-            public static function loadState($id, $stage, $allowMissing = false)
+            public static function loadState(string $id, string $stage, bool $allowMissing = false): ?array
             {
                 return [
                     'FIDO2AuthSuccessful' => false,
