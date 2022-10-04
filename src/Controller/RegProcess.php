@@ -106,7 +106,6 @@ class RegProcess
         $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php');
         $debugEnabled = $moduleConfig->getOptionalBoolean('debug', false);
 
-        /** @var array $state */
         $state = $this->authState::loadState($stateId, 'webauthn:request');
 
         // registering a credential is only allowed for new users or after being authenticated

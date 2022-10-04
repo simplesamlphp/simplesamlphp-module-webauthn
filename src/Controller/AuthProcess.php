@@ -105,7 +105,6 @@ class AuthProcess
         $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php');
         $debugEnabled = $moduleConfig->getOptionalBoolean('debug', false);
 
-        /** @var array $state */
         $state = $this->authState::loadState($stateId, 'webauthn:request');
 
         $incomingID = bin2hex(WebAuthnAbstractEvent::base64urlDecode($request->request->get('response_id')));
