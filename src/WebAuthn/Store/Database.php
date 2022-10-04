@@ -2,7 +2,9 @@
 
 namespace SimpleSAML\Module\webauthn\WebAuthn\Store;
 
+use PDO;
 use SimpleSAML\Configuration;
+use SimpleSAML\Datadata as SSP_Database;
 use SimpleSAML\Logger;
 use SimpleSAML\Module\webauthn\Store;
 
@@ -29,7 +31,7 @@ class Database extends Store
      *
      * This variable can't be serialized.
      */
-    private $db;
+    private SSP_Database $db;
 
 
     /**
@@ -37,7 +39,7 @@ class Database extends Store
      *
      * @var array
      */
-    private $config;
+    private array $config;
 
 
     /**
@@ -53,7 +55,7 @@ class Database extends Store
     {
         parent::__construct($config);
         $this->config = $config;
-        $this->db = \SimpleSAML\Database::getInstance(Configuration::loadFromArray($config));
+        $this->db = SSP_Database::getInstance(Configuration::loadFromArray($config));
         $this->db->write("SET sql_notes = 0"); // ignore the warning "already exists"
         $this->db->write("CREATE TABLE IF NOT EXISTS credentials (
             creation_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -91,7 +93,7 @@ class Database extends Store
      */
     public function __wakeup(): void
     {
-        $this->db = \SimpleSAML\Database::getInstance(Configuration::loadFromArray($this->config));
+        $this->db = SSP_Database::getInstance(Configuration::loadFromArray($this->config));
     }
 
 
@@ -265,7 +267,7 @@ class Database extends Store
             ['userId' => $userId]
         );
 
-        while ($row = $st->fetch(\PDO::FETCH_NUM)) {
+        while ($row = $st->fetch(PDO::FETCH_NUM)) {
             $ret[] = $row;
         }
 
