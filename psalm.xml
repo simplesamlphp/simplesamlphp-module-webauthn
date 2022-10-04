@@ -5,7 +5,7 @@
     totallyTyped="false"
 >
     <projectFiles>
-        <directory name="lib" />
+        <directory name="src" />
         <directory name="www" />
     </projectFiles>
 
@@ -29,7 +29,7 @@
 
         <ParadoxicalCondition>
             <errorLevel type="suppress">
-                <file name="lib/WebAuthn/WebAuthnAbstractEvent.php" />
+                <file name="src/WebAuthn/WebAuthnAbstractEvent.php" />
             </errorLevel>
         </ParadoxicalCondition>
     </issueHandlers>
