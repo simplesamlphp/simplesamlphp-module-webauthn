@@ -17,7 +17,7 @@ class AAGUID
      *
      * @var array
      */
-    protected $dictionary = [];
+    protected array $dictionary = [];
 
 
     /**
@@ -29,9 +29,9 @@ class AAGUID
     /**
      * The singleton instance.
      *
-     * @var AAGUID
+     * @var static
      */
-    protected static $instance;
+    protected static AAGUID $instance;
 
 
     /**
@@ -60,9 +60,9 @@ class AAGUID
     /**
      * Get the singleton instance of the AAGUID dictionary.
      *
-     * @return AAGUID
+     * @return static
      */
-    public static function getInstance()
+    public static function getInstance(): self
     {
         if (!isset(self::$instance)) {
             self::$instance = new self();

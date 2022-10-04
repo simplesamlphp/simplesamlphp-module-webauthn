@@ -5,6 +5,7 @@ namespace SimpleSAML\Module\webauthn\WebAuthn;
 use Cose\Key\Ec2Key;
 use Cose\Key\RsaKey;
 use SimpleSAML\Logger;
+use SimpleSAML\Module\webauthn\WebAuthn\AAGUID;
 use SimpleSAML\Utils\Config as SSPConfig;
 
 /**
@@ -33,20 +34,20 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * the AAGUID of the newly registered authenticator
      * @var string
      */
-    protected $AAGUID;
+    protected string $AAGUID;
 
     /**
      * how sure are we about the AAGUID?
      * @var int
      */
-    protected $AAGUIDAssurance;
+    protected int $AAGUIDAssurance;
 
     /**
      * An array of known hardware tokens
      *
-     * @var AAGUID
+     * @var \SimpleSAML\Module\webauthn\WebAuthn\AAGUID
      */
-    protected $AAGUIDDictionary;
+    protected AAGUID $AAGUIDDictionary;
 
     /**
      * Initialize the event object.
