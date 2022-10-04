@@ -541,7 +541,8 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
          * STEP 13 of the validation procedure in § 7.1 of the spec: is the algorithm the expected one?
          */
         if (in_array($arrayPK['3'], self::PK_ALGORITHM)) { // we requested -7 or -257, so want to see it here
-            $this->pass("Public Key Algorithm is the expected one (-7 or -257).");
+            $this->algo = $arrayPK['3'];
+            $this->pass("Public Key Algorithm is expected (".implode(' or ', WebAuthnRegistrationEvent::PK_ALGORITHM).").");
         } else {
             $this->fail("Public Key Algorithm mismatch!");
         }

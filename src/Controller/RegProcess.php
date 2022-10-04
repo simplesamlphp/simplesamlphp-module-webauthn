@@ -181,6 +181,7 @@ class RegProcess
             $state['FIDO2Username'],
             $regObject->getCredentialId(),
             $regObject->getCredential(),
+            $regObject->getAlgo(),
             $currentCounterValue,
             $friendlyName
         );

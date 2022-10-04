@@ -17,6 +17,18 @@ You can install this module with composer:
 % composer require simplesamlphp/simplesamlphp-module-webauthn
 ```
 
+Upgrade from 0.11
+-----------------
+Note that the database schema has one additional column as of 2.0.0:
+
+    algo INT DEFAULT NULL,
+
+If you have a previous installation of the module, you need to add this column
+manually (
+ALTER TABLE credentials ADD COLUMN `algo` INT DEFAULT NULL AFTER `credential`;
+).
+The updated schema is compatible with the 0.11.x releases, so a roll-back to an
+older version is still possible without removing the column.
 
 How to setup the webauthn module
 -----------------------------------------
@@ -46,6 +58,7 @@ CREATE TABLE credentials (
     user_id VARCHAR(80) NOT NULL,
     credentialId VARCHAR(500) NOT NULL,
     credential MEDIUMBLOB NOT NULL,
+    algo INT DEFAULT NULL,
     signCounter INT NOT NULL,
     friendlyName VARCHAR(100) DEFAULT "Unnamed Token",
     UNIQUE (user_id,credentialId)

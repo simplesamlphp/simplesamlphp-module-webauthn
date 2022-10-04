@@ -42,11 +42,13 @@ class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent
         string $clientDataJSON,
         string $credentialId,
         string $publicKey,
+        int $algo,
         string $signature,
         bool $debugMode = false
     ) {
         $this->eventType = "AUTH";
         $this->credential = $publicKey;
+        $this->algo = $algo;
         $this->credentialId = $credentialId;
         parent::__construct($pubkeyCredType, $scope, $challenge, $idpEntityId, $authData, $clientDataJSON, $debugMode);
         $this->validateSignature($authData . $this->clientDataHash, $signature);
@@ -61,24 +63,19 @@ class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent
     {
         $keyArray = $this->cborDecode(hex2bin($this->credential));
         $keyObject = NULL;
-        try {
-            $keyObject = new Ec2Key($keyArray);
-        } catch (\Exception $e) {
-            // never mind
-        };
-        if (!is_object($keyObject)) {
-            try {
+        switch ($this->algo) {
+            case WebAuthnRegistrationEvent::PK_ALGORITHM_ECDSA:
+                $keyObject = new Ec2Key($keyArray);
+                break;
+            case WebAuthnRegistrationEvent::PK_ALGORITHM_RSA:
                 $keyObject = new RsaKey($keyArray);
-            } catch (\Exception $e) {
-                // never mind
-            };
-        }
-        if (!is_object($keyObject)) {
-            throw new \Exception("Unable to make something out of the incoming 'public key'!");
+                break;
+            default:
+                $this->fail("Incoming public key algorithm unknown and not supported!");
         }
         $keyResource = openssl_pkey_get_public($keyObject->asPEM());
         if ($keyResource === false) {
-            $this->fail("Unable to construct public key resource from PEM.");
+            $this->fail("Unable to construct public key resource from PEM (was algo type ". $this->algo .").");
         }
         /**
          * §7.2 STEP 17: validate signature

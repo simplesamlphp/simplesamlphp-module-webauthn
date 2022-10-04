@@ -173,17 +173,19 @@ class Database extends Store
         string $userId,
         string $credentialId,
         string $credential,
+        int $algo,
         int $signCounter,
         string $friendlyName
     ): bool {
         $st = $this->db->write(
             'INSERT INTO credentials ' .
-            '(user_id, credentialId, credential, signCounter, friendlyName) VALUES (:userId,:credentialId,' .
-            ':credential,:signCounter,:friendlyName)',
+            '(user_id, credentialId, credential, algo, signCounter, friendlyName) VALUES (:userId,:credentialId,' .
+            ':credential,:algo,:signCounter,:friendlyName)',
             [
                 'userId' => $userId,
                 'credentialId' => $credentialId,
                 'credential' => $credential,
+                'algo' => $algo,
                 'signCounter' => $signCounter,
                 'friendlyName' => $friendlyName
             ]
@@ -243,7 +245,7 @@ class Database extends Store
         $ret = [];
 
         $st = $this->db->read(
-            'SELECT credentialId, credential, signCounter, friendlyName FROM credentials WHERE user_id = :userId',
+            'SELECT credentialId, credential, signCounter, friendlyName, algo FROM credentials WHERE user_id = :userId',
             ['userId' => $userId]
         );
 

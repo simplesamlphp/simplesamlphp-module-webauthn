@@ -52,6 +52,14 @@ abstract class WebAuthnAbstractEvent
      * @var int
      */
     protected $counter;
+    
+    /**
+     * the authenticator's signature algorithm
+     *
+     * @var int
+     */
+    protected $algo;
+    
 
     /**
      * extensive debug information collection?
@@ -172,6 +180,14 @@ abstract class WebAuthnAbstractEvent
     public function getCredential(): string
     {
         return $this->credential;
+    }
+
+   /**
+     * @return int
+     */
+    public function getAlgo(): int
+    {
+        return $this->algo;
     }
 
     /**
