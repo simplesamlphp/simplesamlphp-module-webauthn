@@ -54,6 +54,22 @@ class Database extends Store
         parent::__construct($config);
         $this->config = $config;
         $this->db = \SimpleSAML\Database::getInstance(Configuration::loadFromArray($config));
+        $this->db->write("SET sql_notes = 0"); // ignore the warning "already exists"
+        $this->db->write("CREATE TABLE IF NOT EXISTS credentials (
+            creation_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            user_id VARCHAR(80) NOT NULL,
+            credentialId VARCHAR(500) NOT NULL,
+            credential MEDIUMBLOB NOT NULL,
+            algo INT DEFAULT NULL,
+            signCounter INT NOT NULL,
+            friendlyName VARCHAR(100) DEFAULT 'Unnamed Token',
+            UNIQUE (user_id,credentialId)
+            );");
+        $this->db->write("CREATE TABLE IF NOT EXISTS userstatus (
+            user_id VARCHAR(80) NOT NULL,
+            fido2Status ENUM('FIDO2Disabled','FIDO2Enabled') NOT NULL DEFAULT 'FIDO2Disabled',
+            UNIQUE (user_id)
+            );");
     }
 
     /**

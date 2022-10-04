@@ -48,29 +48,16 @@ Then you need to copy config-templates/module_webauthn.php to your config direct
 Using storage
 -------------
 
-You first need to setup the database. 
+The database schema sets itself up on first use automatically. The schema can be
+found in the sources at src/WebAuthN/Store/Database.php (__construct).
 
-Here is the initialization SQL script:
+If you want to trim down permissions for the database user, here is the minimal
+set of required permissions:
 
 ```sql
-CREATE TABLE credentials (
-    creation_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    user_id VARCHAR(80) NOT NULL,
-    credentialId VARCHAR(500) NOT NULL,
-    credential MEDIUMBLOB NOT NULL,
-    algo INT DEFAULT NULL,
-    signCounter INT NOT NULL,
-    friendlyName VARCHAR(100) DEFAULT "Unnamed Token",
-    UNIQUE (user_id,credentialId)
-);
 
 GRANT SELECT,INSERT,UPDATE,DELETE ON ...credentials TO '...dbuser'@'1.2.3.4' IDENTIFIED BY '...dbpass';
 
-CREATE TABLE userstatus (
-    user_id VARCHAR(80) NOT NULL,
-    fido2Status ENUM("FIDO2Disabled","FIDO2Enabled") NOT NULL DEFAULT "FIDO2Disabled",
-    UNIQUE (user_id)
-);
 
 GRANT SELECT ON ...userstatus TO '...dbuser'@'1.2.3.4' IDENTIFIED BY '...dbpass';
 ```
