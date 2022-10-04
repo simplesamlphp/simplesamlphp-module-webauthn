@@ -4,7 +4,7 @@ namespace SimpleSAML\Module\webauthn\WebAuthn\Store;
 
 use PDO;
 use SimpleSAML\Configuration;
-use SimpleSAML\Datadata as SSP_Database;
+use SimpleSAML\Database as SSP_Database;
 use SimpleSAML\Logger;
 use SimpleSAML\Module\webauthn\Store;
 
