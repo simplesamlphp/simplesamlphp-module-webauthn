@@ -103,7 +103,7 @@ class AuthProcess
         }
 
         $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php');
-        $debugEnabled = $moduleConfig->getBoolean('debug', false);
+        $debugEnabled = $moduleConfig->getOptionalBoolean('debug', false);
 
         /** @var array $state */
         $state = $this->authState::loadState($stateId, 'webauthn:request');

@@ -110,7 +110,7 @@ class Registration
     public function main(/** @scrutinizer ignore-unused */ Request $request): RunnableResponse
     {
         $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php');
-        $registrationAuthSource = $moduleConfig->getString('registration_auth_source', 'default-sp');
+        $registrationAuthSource = $moduleConfig->getOptionalString('registration_auth_source', 'default-sp');
 
         /** @psalm-var class-string $authSimple */
         $authSimple = $this->authSimple;
@@ -122,7 +122,7 @@ class Registration
         $state['Attributes'] = $attrs;
 
         $stateData = new StateData();
-        $stateData->requestTokenModel = $moduleConfig->getBoolean('request_tokenmodel', false);
+        $stateData->requestTokenModel = $moduleConfig->getOptionalBoolean('request_tokenmodel', false);
         try {
             $stateData->store = Store::parseStoreConfig($moduleConfig->getArray('store'));
         } catch (Exception $e) {
@@ -131,7 +131,7 @@ class Registration
             );
         }
 
-        $stateData->scope = $moduleConfig->getString('scope', null);
+        $stateData->scope = $moduleConfig->getOptionalString('scope', null);
         $baseurl = Utils\HTTP::getSelfHost();
         $hostname = parse_url($baseurl, PHP_URL_HOST);
         if ($hostname !== null) {
