@@ -97,7 +97,7 @@ class WebAuthn extends Auth\ProcessingFilter
         }
 
         // Set the derived scope so we can compare it to the sent host at a later point
-	$httpUtils = new Utils\HTTP();
+        $httpUtils = new Utils\HTTP();
         $baseurl = $httpUtils->getSelfHost();
         $hostname = parse_url($baseurl, PHP_URL_HOST);
         if ($hostname !== null) {
@@ -162,7 +162,7 @@ class WebAuthn extends Auth\ProcessingFilter
      *
      * @return void
      */
-    public function process(array &$state) : void
+    public function process(array &$state): void
     {
         Assert::keyExists($state, 'UserID');
         Assert::keyExists($state, 'Destination');
@@ -177,7 +177,9 @@ class WebAuthn extends Auth\ProcessingFilter
             return;
         }
 
-        $state['saml:AuthnContextClassRef'] = $this->authnContextClassRef ?? 'urn:rsa:names:tc:SAML:2.0:ac:classes:FIDO';
+        $state['saml:AuthnContextClassRef'] =
+            $this->authnContextClassRef ??
+            'urn:rsa:names:tc:SAML:2.0:ac:classes:FIDO';
         Logger::debug('webauthn: userid: ' . $state['Attributes'][$this->stateData->usernameAttrib][0]);
 
         $localToggle = !empty($state['Attributes'][$this->toggleAttrib])

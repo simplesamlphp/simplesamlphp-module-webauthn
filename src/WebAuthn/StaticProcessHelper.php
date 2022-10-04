@@ -12,7 +12,7 @@ class StaticProcessHelper
     {
         $id = Auth\State::saveState($state, 'webauthn:request');
         $url = Module::getModuleURL('webauthn/webauthn');
-	$httpUtils = new Utils\HTTP();
+        $httpUtils = new Utils\HTTP();
         $httpUtils->redirectTrustedURL($url, ['StateId' => $id]);
     }
 
