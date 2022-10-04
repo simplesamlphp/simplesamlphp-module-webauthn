@@ -140,7 +140,7 @@ class Registration
         }
         $stateData->usernameAttrib = $moduleConfig->getString('attrib_username');
         $stateData->displaynameAttrib = $moduleConfig->getString('attrib_displayname');
-        $stateData->useInflowRegistration = true;
+        $state['InRegistration'] = true;
 
         StaticProcessHelper::prepareState($stateData, $state);
 

@@ -96,8 +96,9 @@ class WebAuthn
 
         /** @var array $state */
         $state = $this->authState::loadState($stateId, 'webauthn:request');
+        $state['FIDO2AuthSuccessful'] = FALSE; // initialise properly
 
-        $templateFile = $state['UseInflowRegistration'] ? 'webauthn:webauthn.twig' : 'webauthn:authentication.twig';
+        $templateFile = ( $state['UseInflowRegistration'] || $state['InRegistration'] ) ? 'webauthn:webauthn.twig' : 'webauthn:authentication.twig';
 
         // Make, populate and layout consent form
         $t = new Template($this->config, $templateFile);
@@ -146,8 +147,9 @@ class WebAuthn
 
         $t->data['FIDO2AuthSuccessful'] = $state['FIDO2AuthSuccessful'];
         if (
-            count($state['FIDO2Tokens']) === 0 ||
-            ($state['FIDO2WantsRegister'] === true && $state['FIDO2AuthSuccessful'] !== false)
+            count($state['FIDO2Tokens']) === 0 || // no tokens
+            ($state['FIDO2WantsRegister'] === true && $state['FIDO2AuthSuccessful'] !== false ) || // authenticated and wants to change something
+            $state['UseInflowRegistration'] !== true // stand-alone registration active - can change without being authenticated with second factor
         ) {
             $t->data['regURL'] = Module::getModuleURL('webauthn/regprocess?StateId=' . urlencode($stateId));
             $t->data['delURL'] = Module::getModuleURL('webauthn/managetoken?StateId=' . urlencode($stateId));
