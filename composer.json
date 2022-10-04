@@ -25,7 +25,7 @@
     },
     "require-dev": {
         "lcobucci/jwt": "^3.3",
-        "simplesamlphp/simplesamlphp-test-framework": "^0.2.7"
+        "simplesamlphp/simplesamlphp-test-framework": "^1.2.1"
     },
     "config": {
         "allow-plugins": {
