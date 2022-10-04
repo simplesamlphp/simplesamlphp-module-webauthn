@@ -157,7 +157,7 @@ class WebAuthn
 
         $t->data['authForm'] = "";
         if (
-            count($state['FIDO2Tokens']) > 0 &&
+            count($state['FIDO2Tokens']) > 0 && $state['InRegistration'] === false &&
             ($state['FIDO2WantsRegister'] !== true || $state['FIDO2AuthSuccessful'] === false)
         ) {
             $t->data['authURL'] = Module::getModuleURL('webauthn/authprocess?StateId=' . urlencode($stateId));
