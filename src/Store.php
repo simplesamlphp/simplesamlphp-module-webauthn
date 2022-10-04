@@ -78,6 +78,7 @@ abstract class Store
         string $userId,
         string $credentialId,
         string $credential,
+        int $algo,
         int $signCounter,
         string $friendlyName
     ): bool;
