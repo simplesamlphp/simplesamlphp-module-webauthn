@@ -3,6 +3,7 @@
 namespace SimpleSAML\Module\webauthn;
 
 use Exception;
+use SimpleSAML\Assert\Assert;
 use SimpleSAML\Module;
 use SimpleSAML\Utils;
 
@@ -139,13 +140,8 @@ abstract class Store
             $config = Utils\Arrays::arrayize($config);
         }
 
-        if (!is_array($config)) {
-            throw new Exception('Invalid configuration for consent store option: ' . var_export($config, true));
-        }
-
-        if (!array_key_exists(0, $config)) {
-            throw new Exception('Consent store without name given.');
-        }
+        Assert::isArray($config, 'Invalid configuration for consent store option: ' . var_export($config, true));
+        Assert::keyExists(0, $config, 'Consent store without name given.');
 
         $className = Module::resolveClass(
             $config[0],
