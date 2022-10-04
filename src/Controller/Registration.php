@@ -132,14 +132,15 @@ class Registration
         }
 
         $stateData->scope = $moduleConfig->getOptionalString('scope', null);
-        $baseurl = Utils\HTTP::getSelfHost();
+        $httpUtils = new Utils\HTTP();
+        $baseurl = $httpUtils->getSelfHost();
         $hostname = parse_url($baseurl, PHP_URL_HOST);
         if ($hostname !== null) {
             $stateData->derivedScope = $hostname;
         }
         $stateData->usernameAttrib = $moduleConfig->getString('attrib_username');
         $stateData->displaynameAttrib = $moduleConfig->getString('attrib_displayname');
-        $stateData->useInflowRegistration = true;
+        $state['InRegistration'] = true;
 
         StaticProcessHelper::prepareState($stateData, $state);
 
@@ -148,7 +149,6 @@ class Registration
         $state['Source'] = $metadata;
         $state['IdPMetadata'] = $metadata;
         $state['Registration'] = true;
-        $state['FIDO2AuthSuccessful'] = $state['FIDO2Tokens'][0][0] ?? false;
         $state['FIDO2WantsRegister'] = true;
 
         return new RunnableResponse([StaticProcessHelper::class, 'saveStateAndRedirect'], [&$state]);
