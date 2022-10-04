@@ -75,7 +75,7 @@ class Database extends Store
         try {
             $this->db->read("SELECT COUNT(*) FROM userstatus");
         } catch (\Exception $e) {
-            $this->db->write($db, "CREATE TABLE IF NOT EXISTS userstatus (
+            $this->db->write("CREATE TABLE IF NOT EXISTS userstatus (
             user_id VARCHAR(80) NOT NULL,
             fido2Status ENUM('FIDO2Disabled','FIDO2Enabled') NOT NULL DEFAULT 'FIDO2Disabled',
             UNIQUE (user_id)
