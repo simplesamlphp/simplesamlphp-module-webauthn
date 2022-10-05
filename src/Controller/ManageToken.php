@@ -99,7 +99,8 @@ class ManageToken
 
         $state = $this->authState::loadState($stateId, 'webauthn:request');
 
-        if ($state['FIDO2AuthSuccessful'] === false) {
+        $ourState = WebAuthn::workflowStateMachine($state);
+        if ($ourState !== WebAuthn::STATE_MGMT) {
             throw new Exception("Attempt to access the token management page unauthenticated.");
         }
 

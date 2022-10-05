@@ -140,7 +140,6 @@ class Registration
         }
         $stateData->usernameAttrib = $moduleConfig->getString('attrib_username');
         $stateData->displaynameAttrib = $moduleConfig->getString('attrib_displayname');
-        $state['InRegistration'] = true;
 
         StaticProcessHelper::prepareState($stateData, $state);
 
@@ -148,6 +147,14 @@ class Registration
         $metadata = $metadataHandler->getMetaDataCurrent('saml20-idp-hosted');
         $state['Source'] = $metadata;
         $state['IdPMetadata'] = $metadata;
+        // inflow users are not allowed to enter the Registration page. If they
+        // did, kill the session
+        $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php')->toArray();
+
+        if ($moduleConfig['use_inflow_registration']) {
+            throw new Exception("Attempt to access the stand-alone registration page in inflow mode!");
+        }
+
         $state['Registration'] = true;
         $state['FIDO2WantsRegister'] = true;
 
