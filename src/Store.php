@@ -70,6 +70,8 @@ abstract class Store
      * @param string $userId        The user.
      * @param string $credentialId  The id identifying the credential.
      * @param string $credential    The credential.
+     * @param int    $algo          The algorithm used.
+     * @param int    $presenceLevel UV or UP?
      * @param int    $signCounter   The signature counter for this credential.
      * @param string $friendlyName  A user-supplied name for this token.
      *
@@ -142,7 +144,6 @@ abstract class Store
         }
 
         Assert::isArray($config, 'Invalid configuration for consent store option: ' . var_export($config, true));
-        Assert::keyExists(0, $config, 'Consent store without name given.');
 
         $className = Module::resolveClass(
             $config[0],

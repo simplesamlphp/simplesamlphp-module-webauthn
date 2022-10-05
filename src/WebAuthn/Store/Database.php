@@ -192,6 +192,8 @@ class Database extends Store
      * @param string $userId        The user.
      * @param string $credentialId  The id identifying the credential.
      * @param string $credential    The credential.
+     * @param int    $algo          The algorithm used.
+     * @param int    $presenceLevel UV or UP?
      * @param int    $signCounter   The signature counter for this credential.
      * @param string $friendlyName  A user-supplied name for this token.
      *
@@ -208,7 +210,7 @@ class Database extends Store
     ): bool {
         $st = $this->db->write(
             'INSERT INTO credentials ' .
-            '(user_id, credentialId, credential, algo, signCounter, friendlyName) VALUES (:userId,:credentialId,' .
+            '(user_id, credentialId, credential, algo, presenceLevel, signCounter, friendlyName) VALUES (:userId,:credentialId,' .
             ':credential,:algo,:presenceLevel,:signCounter,:friendlyName)',
             [
                 'userId' => $userId,
