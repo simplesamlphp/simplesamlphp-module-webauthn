@@ -15,9 +15,9 @@
             <ul>
                 {% for token in FIDO2Tokens %}
                     {% if FIDO2AuthSuccessful == false or FIDO2AuthSuccessful != token.0 %}
-                        <li class='othertoken'>{{ token.3|e }}</li>
+                        <li class='othertoken'>{{ token.3|e }}{% if token.5 == 4 %} <font color='red'>PasswordlessCapable</font> {%  endif  %}</li>
                     {% else %}
-                        <li class='currenttoken'>{{ token.3|e }} {{ '{webauthn:webauthn:currentToken}'|trans }}</li>
+                        <li class='currenttoken'>{{ token.3|e }}{% if token.5 == 4 %} <font color='red'>PasswordlessCapable</font> {%  endif  %} {{ '{webauthn:webauthn:currentToken}'|trans }}</li>
                     {% endif %}
                 {% endfor %}
             </ul>

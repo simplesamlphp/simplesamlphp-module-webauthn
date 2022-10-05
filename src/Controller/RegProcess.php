@@ -191,7 +191,9 @@ class RegProcess
             0 => $regObject->getCredentialId(),
             1 => $regObject->getCredential(),
             2 => $currentCounterValue,
-            3 => $friendlyName
+            3 => $friendlyName,
+            4 => $regObject->getAlgo(),
+            5 => $regObject->getPresenceLevel(),
         ];
 
         $id = $this->authState::saveState($state, 'webauthn:request');
