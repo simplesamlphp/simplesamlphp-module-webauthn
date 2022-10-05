@@ -89,7 +89,7 @@ class WebAuthn
         // if we don't have any credentials yet, allow user to register
         // regardless if in inflow or standalone (redirect to standalone if need
         // be)
-        if (count($state['FIDO2Tokens']) == 0) {
+        if (!isset($state['FIDO2Tokens']) || count($state['FIDO2Tokens']) == 0) {
             return self::STATE_MGMT;
         }
         // from here on we do have a credential to work with
