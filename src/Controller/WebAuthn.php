@@ -106,7 +106,8 @@ class WebAuthn
             return self::STATE_AUTH_ALLOWMGMT;
         } else { // in inflow, allow to check the management box; otherwise,
                  // only auth
-            return $state['UseInflowRegistration'] ? self::STATE_AUTH_ALLOWMGMT : self::STATE_AUTH_NOMGMT;
+            $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php')->toArray();
+            return $moduleConfig['use_inflow_registration'] ? self::STATE_AUTH_ALLOWMGMT : self::STATE_AUTH_NOMGMT;
         }
     }
 

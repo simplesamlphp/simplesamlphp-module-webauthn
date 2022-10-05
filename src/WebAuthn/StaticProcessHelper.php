@@ -29,6 +29,5 @@ class StaticProcessHelper
         $state['FIDO2SignupChallenge'] = hash('sha512', random_bytes(64));
         $state['FIDO2WantsRegister'] = false;
         $state['FIDO2AuthSuccessful'] = false;
-        $state['UseInflowRegistration'] = $stateData->useInflowRegistration;
     }
 }
