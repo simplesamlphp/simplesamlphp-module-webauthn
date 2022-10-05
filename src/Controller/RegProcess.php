@@ -110,7 +110,7 @@ class RegProcess
         $state = $this->authState::loadState($stateId, 'webauthn:request');
 
         // registering a credential is only allowed for new users or after being authenticated
-        if (count($state['FIDO2Tokens']) > 0 && $state['FIDO2AuthSuccessful'] === false) {
+        if (WebAuthn::workflowStateMachine($state) !== WebAuthn::STATE_MGMT) {
             throw new Exception("Attempt to register new token in unacceptable context.");
         }
 

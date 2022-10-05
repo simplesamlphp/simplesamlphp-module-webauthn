@@ -80,6 +80,35 @@ class WebAuthn
         $this->logger = $logger;
     }
 
+    const STATE_AUTH_NOMGMT = 1; // just authenticate user
+    const STATE_AUTH_ALLOWMGMT = 2; // allow to switch to mgmt page
+    const STATE_MGMT = 4; // show token management page
+
+
+    public static function workflowStateMachine($state) {
+        // if we don't have any credentials yet, allow user to register
+        // regardless if in inflow or standalone (redirect to standalone if need
+        // be)
+        if (count($state['FIDO2Tokens']) == 0) {
+            return self::STATE_MGMT;
+        }
+        // from here on we do have a credential to work with
+        //
+        // user indicated he wants to manage tokens. He did so either by
+        // visiting the Registration page, or by checking the box during
+        // inflow.
+        // If coming from inflow, allow management only if user is
+        // properly authenticated, otherwise send to auth page
+        if ($state['FIDO2WantsRegister']) {
+            if ($state['FIDO2AuthSuccessful'] || $state['Registration']) {
+                return self::STATE_MGMT;
+            }
+            return self::STATE_AUTH_ALLOWMGMT;
+        } else { // in inflow, allow to check the management box; otherwise,
+                 // only auth
+            return $state['UseInflowRegistration'] ? self::STATE_AUTH_ALLOWMGMT : self::STATE_AUTH_NOMGMT;
+        }
+    }
 
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
@@ -97,7 +126,7 @@ class WebAuthn
         /** @var array $state */
         $state = $this->authState::loadState($stateId, 'webauthn:request');
 
-        $templateFile = ( $state['UseInflowRegistration'] || $state['InRegistration'] ) ? 'webauthn:webauthn.twig' : 'webauthn:authentication.twig';
+        $templateFile = ( $this->workflowStateMachine($state) != self::STATE_AUTH_NOMGMT ) ? 'webauthn:webauthn.twig' : 'webauthn:authentication.twig';
 
         // Make, populate and layout consent form
         $t = new Template($this->config, $templateFile);
@@ -146,17 +175,16 @@ class WebAuthn
 
         $t->data['FIDO2AuthSuccessful'] = $state['FIDO2AuthSuccessful'];
         if (
-            count($state['FIDO2Tokens']) === 0 || // no tokens
-            ($state['FIDO2WantsRegister'] === true && $state['FIDO2AuthSuccessful'] !== false ) || // authenticated and wants to change something
-            $state['UseInflowRegistration'] !== true // stand-alone registration active - can change without being authenticated with second factor
+            $this->workflowStateMachine($state) == self::STATE_MGMT
         ) {
             $t->data['regURL'] = Module::getModuleURL('webauthn/regprocess?StateId=' . urlencode($stateId));
             $t->data['delURL'] = Module::getModuleURL('webauthn/managetoken?StateId=' . urlencode($stateId));
+
         }
 
         $t->data['authForm'] = "";
         if (
-            count($state['FIDO2Tokens']) > 0 && ['FIDO2WantsRegister'] !== true && $state['FIDO2AuthSuccessful'] === false
+            $this->workflowStateMachine($state) == self::STATE_AUTH_ALLOWMGMT || $this->workflowStateMachine($state) == self::STATE_AUTH_NOMGMT
         ) {
             $t->data['authURL'] = Module::getModuleURL('webauthn/authprocess?StateId=' . urlencode($stateId));
         }
