@@ -4,7 +4,7 @@ namespace SimpleSAML\Module\webauthn\WebAuthn\Store;
 
 use PDO;
 use SimpleSAML\Configuration;
-use SimpleSAML\Datadata as SSP_Database;
+use SimpleSAML\Database as SSP_Database;
 use SimpleSAML\Logger;
 use SimpleSAML\Module\webauthn\Store;
 
@@ -59,26 +59,28 @@ class Database extends Store
         try {
             $this->db->read("SELECT COUNT(*) FROM credentials");
         } catch (\Exception $e) {
-        $this->db->write("CREATE TABLE IF NOT EXISTS credentials (
-            creation_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            user_id VARCHAR(80) NOT NULL,
-            credentialId VARCHAR(500) NOT NULL,
-            credential MEDIUMBLOB NOT NULL,
-            algo INT DEFAULT NULL,
-            signCounter INT NOT NULL,
-            friendlyName VARCHAR(100) DEFAULT 'Unnamed Token',
-            UNIQUE (user_id,credentialId)
-            )");
-	}
+            $this->db->write("
+                CREATE TABLE IF NOT EXISTS credentials (
+                    creation_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    user_id VARCHAR(80) NOT NULL,
+                    credentialId VARCHAR(500) NOT NULL,
+                    credential MEDIUMBLOB NOT NULL,
+                    algo INT DEFAULT NULL,
+                    signCounter INT NOT NULL,
+                    friendlyName VARCHAR(100) DEFAULT 'Unnamed Token',
+                    UNIQUE (user_id,credentialId)
+                )
+            ");
+        }
         try {
             $this->db->read("SELECT COUNT(*) FROM userstatus");
         } catch (\Exception $e) {
-            $this->db->write($db, "CREATE TABLE IF NOT EXISTS userstatus (
+            $this->db->write("CREATE TABLE IF NOT EXISTS userstatus (
             user_id VARCHAR(80) NOT NULL,
             fido2Status ENUM('FIDO2Disabled','FIDO2Enabled') NOT NULL DEFAULT 'FIDO2Disabled',
             UNIQUE (user_id)
             )");
-	}
+        }
     }
 
     /**

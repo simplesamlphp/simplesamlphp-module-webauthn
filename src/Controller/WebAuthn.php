@@ -94,10 +94,13 @@ class WebAuthn
             throw new Error\BadRequest('Missing required StateId query parameter.');
         }
 
-        /** @var array $state */
         $state = $this->authState::loadState($stateId, 'webauthn:request');
 
-        $templateFile = ( $state['UseInflowRegistration'] || $state['InRegistration'] ) ? 'webauthn:webauthn.twig' : 'webauthn:authentication.twig';
+        if ($state['UseInflowRegistration'] || $state['InRegistration']) {
+            $templateFile = 'webauthn:webauthn.twig';
+        } else {
+            $templateFile = 'webauthn:authentication.twig';
+        }
 
         // Make, populate and layout consent form
         $t = new Template($this->config, $templateFile);
@@ -106,7 +109,7 @@ class WebAuthn
 
         $challenge = str_split($state['FIDO2SignupChallenge'], 2);
         $entityid = $state['Source']['entityid'];
-	$configUtils = new Utils\Config();
+        $configUtils = new Utils\Config();
         $username = str_split(
             hash('sha512', $state['FIDO2Username'] . '|' . $configUtils->getSecretSalt() . '|' . $entityid),
             2
@@ -146,9 +149,12 @@ class WebAuthn
 
         $t->data['FIDO2AuthSuccessful'] = $state['FIDO2AuthSuccessful'];
         if (
-            count($state['FIDO2Tokens']) === 0 || // no tokens
-            ($state['FIDO2WantsRegister'] === true && $state['FIDO2AuthSuccessful'] !== false ) || // authenticated and wants to change something
-            $state['UseInflowRegistration'] !== true // stand-alone registration active - can change without being authenticated with second factor
+            // no tokens
+            count($state['FIDO2Tokens']) === 0 ||
+            // authenticated and wants to change something
+            ($state['FIDO2WantsRegister'] === true && $state['FIDO2AuthSuccessful'] !== false) ||
+            // stand-alone registration active - can change without being authenticated with second factor
+            $state['UseInflowRegistration'] !== true
         ) {
             $t->data['regURL'] = Module::getModuleURL('webauthn/regprocess?StateId=' . urlencode($stateId));
             $t->data['delURL'] = Module::getModuleURL('webauthn/managetoken?StateId=' . urlencode($stateId));
@@ -156,7 +162,9 @@ class WebAuthn
 
         $t->data['authForm'] = "";
         if (
-            count($state['FIDO2Tokens']) > 0 && ['FIDO2WantsRegister'] !== true && $state['FIDO2AuthSuccessful'] === false
+            (count($state['FIDO2Tokens']) > 0) &&
+            (['FIDO2WantsRegister'] !== true) &&
+            ($state['FIDO2AuthSuccessful'] === false)
         ) {
             $t->data['authURL'] = Module::getModuleURL('webauthn/authprocess?StateId=' . urlencode($stateId));
         }

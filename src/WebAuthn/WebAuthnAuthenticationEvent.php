@@ -62,7 +62,7 @@ class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent
     private function validateSignature(string $sigData, string $signature): void
     {
         $keyArray = $this->cborDecode(hex2bin($this->credential));
-        $keyObject = NULL;
+        $keyObject = null;
         switch ($this->algo) {
             case WebAuthnRegistrationEvent::PK_ALGORITHM_ECDSA:
                 $keyObject = new Ec2Key($keyArray);
@@ -75,7 +75,7 @@ class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent
         }
         $keyResource = openssl_pkey_get_public($keyObject->asPEM());
         if ($keyResource === false) {
-            $this->fail("Unable to construct public key resource from PEM (was algo type ". $this->algo .").");
+            $this->fail("Unable to construct public key resource from PEM (was algo type " . $this->algo . ").");
         }
         /**
          * §7.2 STEP 17: validate signature

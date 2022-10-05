@@ -105,7 +105,6 @@ class AuthProcess
         $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php');
         $debugEnabled = $moduleConfig->getOptionalBoolean('debug', false);
 
-        /** @var array $state */
         $state = $this->authState::loadState($stateId, 'webauthn:request');
 
         $incomingID = bin2hex(WebAuthnAbstractEvent::base64urlDecode($request->request->get('response_id')));
@@ -150,10 +149,10 @@ class AuthProcess
         /**
          * §7.2 STEP 18 : detect physical object cloning on the token
          */
-	$counter = $authObject->getCounter();
-	if ($previousCounter == 0 && $counter == 0) {
-                // no cloning check, it is a brand new token
-	} elseif ($counter > $previousCounter) {
+        $counter = $authObject->getCounter();
+        if ($previousCounter == 0 && $counter == 0) {
+            // no cloning check, it is a brand new token
+        } elseif ($counter > $previousCounter) {
             // Signature counter was incremented compared to last time, good
             $store = $state['webauthn:store'];
             $store->updateSignCount($oneToken[0], $counter);
@@ -177,7 +176,7 @@ class AuthProcess
 
         if ($debugEnabled) {
             $response = new RunnableResponse(
-                function ($authObject, $state) {
+                function (WebAuthnAuthenticationEvent $authObject, array $state) {
                     echo $authObject->getDebugBuffer();
                     echo $authObject->getValidateBuffer();
                     echo "Debug mode, not continuing to " . ($state['FIDO2WantsRegister'] ? "credential registration page." : "destination.");

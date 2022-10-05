@@ -123,9 +123,9 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
             case "android-safetynet":
                 $this->validateAttestationFormatAndroidSafetyNet($attestationArray);
                 break;
-	    case "apple":
-		$this->validateAttestationFormatApple($attestationArray);
-		break;
+            case "apple":
+                $this->validateAttestationFormatApple($attestationArray);
+                break;
             case "tpm":
             case "android-key":
                 $this->fail("Attestation format " . $attestationArray['fmt'] . " validation not supported right now.");
@@ -161,10 +161,9 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      */
     private function validateAttestationFormatApple(array $attestationArray): void
     {
+        // found at: https://www.apple.com/certificateauthority/private/
 
-	// found at: https://www.apple.com/certificateauthority/private/
-
-	$APPLE_WEBAUTHN_ROOT_CA = "-----BEGIN CERTIFICATE-----
+        $APPLE_WEBAUTHN_ROOT_CA = "-----BEGIN CERTIFICATE-----
 MIICEjCCAZmgAwIBAgIQaB0BbHo84wIlpQGUKEdXcTAKBggqhkjOPQQDAzBLMR8w
 HQYDVQQDDBZBcHBsZSBXZWJBdXRobiBSb290IENBMRMwEQYDVQQKDApBcHBsZSBJ
 bmMuMRMwEQYDVQQIDApDYWxpZm9ybmlhMB4XDTIwMDMxODE4MjEzMloXDTQ1MDMx
@@ -179,93 +178,104 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
 1bWeT0vT
 -----END CERTIFICATE-----";
         // § 8.8 Bullet 1 of the draft spec at https://pr-preview.s3.amazonaws.com/alanwaketan/webauthn/pull/1491.html#sctn-apple-anonymous-attestation
-	// draft implemented in state of 11 Feb 2021
+        // draft implemented in state of 11 Feb 2021
 
-	// I can't help but notice that the verification procedure does NOTHING with CA certs from the chain, nor is there a root to validate to!
-	// Found the root CA with Google, see above, and will perform chain validation even if the spec doesn't say so.
+        // I can't help but notice that the verification procedure does NOTHING with CA certs from the chain, nor is there a root to validate to!
+        // Found the root CA with Google, see above, and will perform chain validation even if the spec doesn't say so.
 
-	// first, clear the openssl error backlog. We might need error data in case things go sideways.
-	while(openssl_error_string() !== false);
+        // first, clear the openssl error backlog. We might need error data in case things go sideways.
+        while (openssl_error_string() !== false);
 
         $stmtDecoded = $attestationArray['attStmt'];
-	if (!isset($stmtDecoded['x5c'])) {
-		$this->fail("Apple attestation statement does not contain an x5c attestation statement!");
-	}
-	// § 8.8 Bullet 2
+        if (!isset($stmtDecoded['x5c'])) {
+            $this->fail("Apple attestation statement does not contain an x5c attestation statement!");
+        }
+        // § 8.8 Bullet 2
         $nonceToHash = $attestationArray['authData'] . $this->clientDataHash;
-	// § 8.8 Bullet 3
-	$nonce = hash("sha256", $nonceToHash, TRUE); // does raw_output have to be FALSE or TRUE?
-        $certProps = openssl_x509_parse(Utils\Crypto::der2pem($stmtDecoded['x5c'][0]));	
-	// § 8.8 Bullet 4
+        // § 8.8 Bullet 3
+        $nonce = hash("sha256", $nonceToHash, true); // does raw_output have to be FALSE or TRUE?
+        $certProps = openssl_x509_parse(Utils\Crypto::der2pem($stmtDecoded['x5c'][0]));
+        // § 8.8 Bullet 4
         if (
-           !isset($certProps['extensions']['1.2.840.113635.100.8.2'])
-           || empty($certProps['extensions']['1.2.840.113635.100.8.2'])
-                ) {
-                    $this->fail( "The required nonce value is not present in the OID." );
-                }
-	$toCompare = substr($certProps['extensions']['1.2.840.113635.100.8.2'], 6);
-	if ($nonce != $toCompare) {
-		$this->fail("There is a mismatch between the nonce and the OID (XXX $nonce XXX , XXX $toCompare XXX ).");
-	}
+            !isset($certProps['extensions']['1.2.840.113635.100.8.2']) ||
+            empty($certProps['extensions']['1.2.840.113635.100.8.2'])
+        ) {
+            $this->fail("The required nonce value is not present in the OID.");
+        }
+        $toCompare = substr($certProps['extensions']['1.2.840.113635.100.8.2'], 6);
+        if ($nonce != $toCompare) {
+            $this->fail("There is a mismatch between the nonce and the OID (XXX $nonce XXX , XXX $toCompare XXX ).");
+        }
 
-	// chain validation first
-	foreach ( $stmtDecoded['x5c'] as $runIndex => $runCert ) {
-		if (isset($stmtDecoded['x5c'][$runIndex + 1])) { // there is a next cert, so follow the chain
-			$certResource = openssl_x509_read(Utils\Crypto::der2pem($runCert));
-			$signerPubKey = openssl_pkey_get_public(Utils\Crypto::der2pem($stmtDecoded['x5c'][$runIndex + 1]));
-			if (openssl_x509_verify($certResource, $signerPubKey) != 1) {
-				$this->fail("Error during chain validation of the attestation certificate (while validating cert #$runIndex, which is "
-                                    . Utils\Crypto::der2pem($runCert)
-                                    . "; next cert was "
-                                    . Utils\Crypto::der2pem($stmtDecoded['x5c'][$runIndex + 1]));
-			}
-		} else { // last cert, compare to the root
-			$certResource = openssl_x509_read(Utils\Crypto::der2pem($runCert));
-			$signerPubKey = openssl_pkey_get_public($APPLE_WEBAUTHN_ROOT_CA);
-			if (openssl_x509_verify($certResource, $signerPubKey) != 1) {
-                                $this->fail("Error during root CA validation of the attestation chain certificate, which is ".Utils\Crypto::der2pem($runCert));
-                        }
-		}
-	}
+        // chain validation first
+        foreach ($stmtDecoded['x5c'] as $runIndex => $runCert) {
+            if (isset($stmtDecoded['x5c'][$runIndex + 1])) { // there is a next cert, so follow the chain
+                $certResource = openssl_x509_read(Utils\Crypto::der2pem($runCert));
+                $signerPubKey = openssl_pkey_get_public(Utils\Crypto::der2pem($stmtDecoded['x5c'][$runIndex + 1]));
+                if (openssl_x509_verify($certResource, $signerPubKey) != 1) {
+                    $this->fail("Error during chain validation of the attestation certificate (while validating cert #$runIndex, which is "
+                        . Utils\Crypto::der2pem($runCert)
+                        . "; next cert was "
+                        . Utils\Crypto::der2pem($stmtDecoded['x5c'][$runIndex + 1]));
+                }
+            } else { // last cert, compare to the root
+                $certResource = openssl_x509_read(Utils\Crypto::der2pem($runCert));
+                $signerPubKey = openssl_pkey_get_public($APPLE_WEBAUTHN_ROOT_CA);
+                if (openssl_x509_verify($certResource, $signerPubKey) != 1) {
+                    $this->fail(sprintf(
+                        "Error during root CA validation of the attestation chain certificate, which is %s",
+                        Utils\Crypto::der2pem($runCert)
+                    ));
+                }
+            }
+        }
 
         $keyResource = openssl_pkey_get_public(Utils\Crypto::der2pem($stmtDecoded['x5c'][0]));
-        if ($keyResource === FALSE) {
-		$this->fail("Did not get a parseable X.509 structure out of the Apple attestation statement - x5c nr. 0 statement was: XXX "
-                    . $stmtDecoded['x5c'][0]
-                    . " XXX; PEM equivalent is "
-                    . Utils\Crypto::der2pem($stmtDecoded['x5c'][0])
-                    . ". OpenSSL error: "
-                    . openssl_error_string()
-                    );
-	}
-	// $this->credential is a public key in CBOR, not "PEM". We need to convert it first.
+        if ($keyResource === false) {
+            $this->fail(
+                "Did not get a parseable X.509 structure out of the Apple attestation statement - x5c nr. 0 statement was: XXX "
+                . $stmtDecoded['x5c'][0]
+                . " XXX; PEM equivalent is "
+                . Utils\Crypto::der2pem($stmtDecoded['x5c'][0])
+                . ". OpenSSL error: "
+                . openssl_error_string()
+            );
+        }
+
+        // $this->credential is a public key in CBOR, not "PEM". We need to convert it first.
         $keyArray = $this->cborDecode(hex2bin($this->credential));
         $keyObject = new Ec2Key($keyArray);
         $credentialResource = openssl_pkey_get_public($keyObject->asPEM());
 
-        if ($credentialResource === FALSE) {
-                $this->fail("Could not create a public key from CBOR credential. XXX "
-                    . $this->credential
-                    . " XXX; PEM equivalent is "
-                    . $keyObject->asPEM()
-                    . ". OpenSSL error: "
-                    . openssl_error_string()
-                    );
+        if ($credentialResource === false) {
+            $this->fail(
+                "Could not create a public key from CBOR credential. XXX "
+                . $this->credential
+                . " XXX; PEM equivalent is "
+                . $keyObject->asPEM()
+                . ". OpenSSL error: "
+                . openssl_error_string()
+            );
         }
-	// § 8.8 Bullet 5
-	$credentialDetails = openssl_pkey_get_details($credentialResource);
-	$keyDetails = openssl_pkey_get_details($keyResource);
-	if ( $credentialDetails['bits'] != $keyDetails['bits'] ||
-             $credentialDetails['key']  != $keyDetails['key']  ||
-             $credentialDetails['type'] != $keyDetails['type'] ) { 
-		$this->fail("The credential public key does not match the certificate public key in attestationData. ("
-              . $credentialDetails['key'] 
-              . " - "
-              . $keyDetails['key'] 
-              . ")");
-	}
-	$this->pass("Apple attestation format verification passed.");
-	return;
+
+        // § 8.8 Bullet 5
+        $credentialDetails = openssl_pkey_get_details($credentialResource);
+        $keyDetails = openssl_pkey_get_details($keyResource);
+        if (
+            $credentialDetails['bits'] != $keyDetails['bits'] ||
+            $credentialDetails['key']  != $keyDetails['key'] ||
+            $credentialDetails['type'] != $keyDetails['type']
+        ) {
+            $this->fail(
+                "The credential public key does not match the certificate public key in attestationData. ("
+                . $credentialDetails['key']
+                . " - "
+                . $keyDetails['key']
+                . ")"
+            );
+        }
+        $this->pass("Apple attestation format verification passed.");
+        return;
     }
 
     /**
@@ -386,7 +396,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         if (!in_array($stmtDecoded['alg'], self::PK_ALGORITHM)) {
             $this->fail("Unexpected algorithm type in packed basic attestation: " . $stmtDecoded['alg'] . ".");
         }
-        $keyObject = NULL;
+        $keyObject = null;
         switch ($stmtDecoded['alg']) {
             case self::PK_ALGORITHM_ECDSA:
                 $keyObject = new Ec2Key($this->cborDecode(hex2bin($this->credential)));
@@ -543,7 +553,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
          */
         if (in_array($arrayPK['3'], self::PK_ALGORITHM)) { // we requested -7 or -257, so want to see it here
             $this->algo = $arrayPK['3'];
-            $this->pass("Public Key Algorithm is expected (".implode(' or ', WebAuthnRegistrationEvent::PK_ALGORITHM).").");
+            $this->pass("Public Key Algorithm is expected (" . implode(' or ', WebAuthnRegistrationEvent::PK_ALGORITHM) . ").");
         } else {
             $this->fail("Public Key Algorithm mismatch!");
         }
