@@ -60,6 +60,14 @@ abstract class WebAuthnAbstractEvent
      */
     protected int $algo;
 
+    const PRESENCE_LEVEL_PRESENT = 1;
+    const PRESENCE_LEVEL_VERIFIED = 4;
+    const PRESENCE_LEVEL_NONE = 0;
+    /**
+     * UV or UP bit?
+     */
+    protected int $presenceLevel;
+
     /**
      * extensive debug information collection?
      *
@@ -164,6 +172,7 @@ abstract class WebAuthnAbstractEvent
          */
         $this->clientDataHash = $this->verifyClientDataJSON($clientDataJSON);
         $this->counter = $this->validateAuthData($authData);
+        $this->presenceLevel = self::PRESENCE_LEVEL_NONE;
     }
 
     /**
@@ -188,6 +197,14 @@ abstract class WebAuthnAbstractEvent
     public function getAlgo(): int
     {
         return $this->algo;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPresenceLevel(): int
+    {
+        return $this->presenceLevel;
     }
 
     /**
@@ -383,8 +400,12 @@ abstract class WebAuthnAbstractEvent
          * §7.1 STEP 11 + 12 : check user presence (this implementation does not insist on verification currently)
          * §7.2 STEP 13 + 14 : check user presence (this implementation does not insist on verification currently)
          */
-        if (((4 & ord($bitfield)) > 0) || ((1 & ord($bitfield)) > 0)) {
-            $this->pass("UV and/or UP indicated: User has token in his hands.");
+        if ((4 & ord($bitfield)) > 0) {
+            $this->presenceLevel = self::PRESENCE_LEVEL_VERIFIED;
+            $this->pass("UV indicated: User is personally identified by the token.");
+        } elseif ((1 & ord($bitfield)) > 0) {
+            $this->presenceLevel = self::PRESENCE_LEVEL_PRESENT;
+            $this->pass("UP indicated: someone is present and triggered the token.");
         } else {
             $this->fail("Neither UV nor UP asserted: user is possibly not present at computer.");
         }
