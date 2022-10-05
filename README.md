@@ -221,11 +221,10 @@ authenticator (§7.1 Step 7 / §7.2 Step 11 skip token binding information
 validation if present). That is because Yubikeys do not support token binding 
 and the corresponding functionality thus has no test case.
 
-This implementation does not distinguish between User Presence (user has proven
-to be near the authenticator) and User Verification (user has proven to be near
-the authenticator AND to have unlocked the authenticator with a personal asset
-such as PIN or fingerprint). Both variants are considered sufficient to 
-authenticate successfully (§7.1 steps 11 and 12 are joined into one condition)
+Both User Present and User Verified variants are considered sufficient to 
+authenticate successfully (§7.1 steps 11 and 12 are joined into one condition).
+The module logs into the credential database which of the two was used during
+registration time and does not allow downgrades during authentication time.
 
 The implementation requests ECDSA and RSA keys (algorithms -7, -257).
 
@@ -233,9 +232,13 @@ The implementation does not request any client extensions. The specification
 gives implementations a policy choice on what to do if a client sends extensions
 anyway: this implementation chose to then fail the registration/authentication.
 
-The implementation supports the attestation formats "none", "packed / x5c" and
-"packed / self", and "fido-u2f". Other attestation formats lead to a 
-registration failure.
+The implementation supports the attestation formats 
+  - "none" (No Attestation)
+  - "packed / x5c" (Packed Attestation, X.509 certificate)
+  - "packed / self" (Packed Attestation, Self-Attestation)
+  - "fido-u2f" (FIDO U2F Attestation)
+  - "apple" (Apple Anonymous Attestation) 
+Other attestation formats lead to a registration failure.
 
 For the attation type "packed / x5c", 
 * the optional OCSP checks are not performed (this is explicitly permitted in 
