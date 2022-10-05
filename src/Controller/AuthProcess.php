@@ -155,7 +155,7 @@ class AuthProcess
          * the lower security level. (level upgrades are of course OK.)
          */
         if ($oneToken[5] > $authObject->getPresenceLevel()) {
-            throw new Exception("Token was initially registered with higher identification guarantees than now authenticated with!");
+            throw new Exception("Token was initially registered with higher identification guarantees than now authenticated with (was: ".$oneToken[5]." now ".$authObject->getPresenceLevel()."!");
         }
 
         /**

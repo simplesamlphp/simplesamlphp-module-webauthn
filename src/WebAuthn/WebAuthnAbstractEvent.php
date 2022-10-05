@@ -149,6 +149,7 @@ abstract class WebAuthnAbstractEvent
         $this->challenge = $challenge;
         $this->idpEntityId = $idpEntityId;
         $this->debugMode = $debugMode;
+        $this->presenceLevel = self::PRESENCE_LEVEL_NONE;
         $this->debugBuffer .= "PublicKeyCredential.type: $pubkeyCredType<br/>";
         /**
          * This is not a required validation as per spec. Still odd that Firefox returns
@@ -172,7 +173,6 @@ abstract class WebAuthnAbstractEvent
          */
         $this->clientDataHash = $this->verifyClientDataJSON($clientDataJSON);
         $this->counter = $this->validateAuthData($authData);
-        $this->presenceLevel = self::PRESENCE_LEVEL_NONE;
     }
 
     /**
