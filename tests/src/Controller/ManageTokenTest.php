@@ -146,7 +146,7 @@ class ManageTokenTest extends TestCase
         });
 
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Attempt to access the token management page unauthenticated.');
+        $this->expectExceptionMessage('Unknown submit button state.');
 
         $c->main($request);
     }
