@@ -144,6 +144,7 @@ abstract class Store
         }
 
         Assert::isArray($config, 'Invalid configuration for consent store option: ' . var_export($config, true));
+        Assert::keyExists($config, 0, 'Consent store without name given.');
 
         $className = Module::resolveClass(
             $config[0],
