@@ -181,6 +181,7 @@ class RegProcess
             $regObject->getCredentialId(),
             $regObject->getCredential(),
             $regObject->getAlgo(),
+            $regObject->getPresenceLevel(),
             $currentCounterValue,
             $friendlyName
         );

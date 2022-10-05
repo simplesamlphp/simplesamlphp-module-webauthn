@@ -66,6 +66,7 @@ class Database extends Store
                     credentialId VARCHAR(500) NOT NULL,
                     credential MEDIUMBLOB NOT NULL,
                     algo INT DEFAULT NULL,
+                    presenceLevel INT DEFAULT NULL,
                     signCounter INT NOT NULL,
                     friendlyName VARCHAR(100) DEFAULT 'Unnamed Token',
                     UNIQUE (user_id,credentialId)
@@ -201,18 +202,20 @@ class Database extends Store
         string $credentialId,
         string $credential,
         int $algo,
+        int $presenceLevel,
         int $signCounter,
         string $friendlyName
     ): bool {
         $st = $this->db->write(
             'INSERT INTO credentials ' .
             '(user_id, credentialId, credential, algo, signCounter, friendlyName) VALUES (:userId,:credentialId,' .
-            ':credential,:algo,:signCounter,:friendlyName)',
+            ':credential,:algo,:presenceLevel,:signCounter,:friendlyName)',
             [
                 'userId' => $userId,
                 'credentialId' => $credentialId,
                 'credential' => $credential,
                 'algo' => $algo,
+                'presenceLevel' => $presenceLevel,
                 'signCounter' => $signCounter,
                 'friendlyName' => $friendlyName
             ]
@@ -272,7 +275,7 @@ class Database extends Store
         $ret = [];
 
         $st = $this->db->read(
-            'SELECT credentialId, credential, signCounter, friendlyName, algo FROM credentials WHERE user_id = :userId',
+            'SELECT credentialId, credential, signCounter, friendlyName, algo, presenceLevel FROM credentials WHERE user_id = :userId',
             ['userId' => $userId]
         );
 

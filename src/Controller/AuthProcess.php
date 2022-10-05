@@ -146,6 +146,18 @@ class AuthProcess
             $debugEnabled
         );
 
+        /** Custom check: if the token was initially registered with UV, but now
+         * authenticates only UP, we don't allow this downgrade.
+         *
+         * This is not typically allowed by authenticator implementations anyway
+         * (they typically require a full reset of the key to remove UV
+         * protections) but to be safe: find out and tell user to re-enroll with
+         * the lower security level. (level upgrades are of course OK.)
+         */
+        if ($oneToken[5] > $authObject->getPresenceLevel()) {
+            throw new Exception("Token was initially registered with higher identification guarantees than now authenticated with!");
+        }
+
         /**
          * §7.2 STEP 18 : detect physical object cloning on the token
          */
