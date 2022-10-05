@@ -123,10 +123,13 @@ class WebAuthn
             throw new Error\BadRequest('Missing required StateId query parameter.');
         }
 
-        /** @var array $state */
         $state = $this->authState::loadState($stateId, 'webauthn:request');
 
-        $templateFile = ( $this->workflowStateMachine($state) != self::STATE_AUTH_NOMGMT ) ? 'webauthn:webauthn.twig' : 'webauthn:authentication.twig';
+        if ( $this->workflowStateMachine($state) != self::STATE_AUTH_NOMGMT ) {
+            $templateFile = 'webauthn:webauthn.twig'; 
+        } else {
+            $templateFile = 'webauthn:authentication.twig';
+        }
 
         // Make, populate and layout consent form
         $t = new Template($this->config, $templateFile);
@@ -135,7 +138,7 @@ class WebAuthn
 
         $challenge = str_split($state['FIDO2SignupChallenge'], 2);
         $entityid = $state['Source']['entityid'];
-	$configUtils = new Utils\Config();
+        $configUtils = new Utils\Config();
         $username = str_split(
             hash('sha512', $state['FIDO2Username'] . '|' . $configUtils->getSecretSalt() . '|' . $entityid),
             2
@@ -174,9 +177,7 @@ class WebAuthn
         $t->data['frontendData'] = json_encode($frontendData);
 
         $t->data['FIDO2AuthSuccessful'] = $state['FIDO2AuthSuccessful'];
-        if (
-            $this->workflowStateMachine($state) == self::STATE_MGMT
-        ) {
+        if ( $this->workflowStateMachine($state) == self::STATE_MGMT ) {
             $t->data['regURL'] = Module::getModuleURL('webauthn/regprocess?StateId=' . urlencode($stateId));
             $t->data['delURL'] = Module::getModuleURL('webauthn/managetoken?StateId=' . urlencode($stateId));
 
