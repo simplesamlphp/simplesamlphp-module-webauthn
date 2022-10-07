@@ -543,8 +543,9 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         // finding out the number of bytes to CBOR decode appears non-trivial.
         // The simple case is if no ED is present as the CBOR data then goes to
         // the end of the byte sequence.
-        // Since we made sure above that no ED is in the sequence, take the rest
-        // of the sequence in its entirety.
+        // since we don't know the algoritm yet, we don't know how many bytes
+        // of credential CBOR follow. Let's read to the end; the CBOR decoder
+        // silently ignores trailing extensions (if any)
         $pubKeyCBOR = substr($attData, 18 + $credIdLen);
         $arrayPK = $this->cborDecode($pubKeyCBOR);
         $this->debugBuffer .= "pubKey in canonical form: <pre>" . print_r($arrayPK, true) . "</pre>";
@@ -559,6 +560,26 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         }
         $this->credentialId = bin2hex($credId);
         $this->credential = bin2hex($pubKeyCBOR);
+
+        // now that we know credential and its length, we can CBOR-decode the
+        // trailing extensions
+        switch ($this->algo) {
+            case self::PK_ALGORITHM_ECDSA:
+                $credentialLength = 77;
+                break;
+            case self::PK_ALGORITHM_RSA:
+                $this->fail("No credential length information for $this->algo");
+                // $credentialLength = 200;
+                break;
+            default:
+                $this->fail("No credential length information for $this->algo");
+        }
+        $extensions = substr($attData, 18 + $credIdLen + $credentialLength);
+        if (strlen($extensions != 0)) {
+            $this->pass("Found the following extensions (". strlen($extensions) ." bytes) during registration ceremony: " );
+        }
+
+
     }
 
     /**

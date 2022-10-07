@@ -176,12 +176,22 @@ class RegProcess
             $currentCounterValue = $regObject->getCounter();
         }
 
+        // did we get any client extensions?
+        $isResidentKey = 0;
+        if (strlen($request->request->get('clientext')) > 0 && count(json_decode($request->request->get('clientext'), true)) > 0 ) {
+            $extensions = json_decode($request->request->get('clientext'), true);
+            if ($extensions['credProps']['rk'] === true) {
+                $isResidentKey = 1;
+            }
+        }
+
         $store->storeTokenData(
             $state['FIDO2Username'],
             $regObject->getCredentialId(),
             $regObject->getCredential(),
             $regObject->getAlgo(),
             $regObject->getPresenceLevel(),
+            $isResidentKey,
             $currentCounterValue,
             $friendlyName
         );
@@ -194,6 +204,7 @@ class RegProcess
             3 => $friendlyName,
             4 => $regObject->getAlgo(),
             5 => $regObject->getPresenceLevel(),
+            6 => $isResidentKey
         ];
 
         $id = $this->authState::saveState($state, 'webauthn:request');

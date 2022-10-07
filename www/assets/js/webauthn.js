@@ -23,7 +23,7 @@ function ArrayBufferToString(buffer)
 
 function registrationButtonClick()
 {
-    alert("In normal registration mode.");
+//    alert("In normal registration mode.");
     navigator.credentials.create(publicKeyCredentialCreationOptions)
     .then((cred) => {
         console.log('NEW CREDENTIAL', cred);
@@ -32,6 +32,7 @@ function registrationButtonClick()
         document.getElementById('data').value = enc.decode(cred.response.clientDataJSON);
         document.getElementById('attobj').value = btoa(ArrayBufferToString(cred.response.attestationObject));
         document.getElementById('type').value = cred.response.type;
+        document.getElementById('clientext').value = JSON.stringify(cred.getClientExtensionResults());
         document.forms['regform'].submit();
     })
     .then((assertion) => {
@@ -45,7 +46,7 @@ function registrationButtonClick()
 
 function passwordlessRegistrationButtonClick()
 {
-    alert("In passwordless registration mode.");
+//    alert("In passwordless registration mode.");
     navigator.credentials.create(passwordlessPublicKeyCredentialCreationOptions)
     .then((cred) => {
         console.log('NEW CREDENTIAL', cred);
@@ -54,6 +55,7 @@ function passwordlessRegistrationButtonClick()
         document.getElementById('data').value = enc.decode(cred.response.clientDataJSON);
         document.getElementById('attobj').value = btoa(ArrayBufferToString(cred.response.attestationObject));
         document.getElementById('type').value = cred.response.type;
+        document.getElementById('clientext').value = JSON.stringify(cred.getClientExtensionResults());
         document.forms['regform'].submit();
     })
     .then((assertion) => {
@@ -77,6 +79,7 @@ function authButtonClick()
         document.getElementById('authdata').value = btoa(ArrayBufferToString(cred.response.authenticatorData));
         document.getElementById('sigdata').value = btoa(ArrayBufferToString(cred.response.signature));
         document.getElementById('type').value = cred.response.type;
+        document.getElementById('clientext').value = JSON.stringify(cred.getClientExtensionResults());
         document.forms['authform'].submit();
     })
     .then((assertion) => {
@@ -130,6 +133,9 @@ var passwordlessPublicKeyCredentialCreationOptions = {
         },
         timeout: 60000,
         attestation: frontendData['attestation'],
+        extensions: {
+            credProps: true
+        }
     }
 };
 

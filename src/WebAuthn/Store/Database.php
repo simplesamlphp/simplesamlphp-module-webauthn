@@ -67,6 +67,7 @@ class Database extends Store
                     credential MEDIUMBLOB NOT NULL,
                     algo INT DEFAULT NULL,
                     presenceLevel INT DEFAULT NULL,
+                    isResidentKey BOOL DEFAULT NULL,
                     signCounter INT NOT NULL,
                     friendlyName VARCHAR(100) DEFAULT 'Unnamed Token',
                     UNIQUE (user_id,credentialId)
@@ -205,19 +206,21 @@ class Database extends Store
         string $credential,
         int $algo,
         int $presenceLevel,
+        int $isResidentKey,
         int $signCounter,
         string $friendlyName
     ): bool {
         $st = $this->db->write(
             'INSERT INTO credentials ' .
-            '(user_id, credentialId, credential, algo, presenceLevel, signCounter, friendlyName) VALUES (:userId,:credentialId,' .
-            ':credential,:algo,:presenceLevel,:signCounter,:friendlyName)',
+            '(user_id, credentialId, credential, algo, presenceLevel, isResidentKey, signCounter, friendlyName) VALUES '
+          . '(:userId,:credentialId,:credential,:algo,:presenceLevel,:isResidentKey,:signCounter,:friendlyName)',
             [
                 'userId' => $userId,
                 'credentialId' => $credentialId,
                 'credential' => $credential,
                 'algo' => $algo,
                 'presenceLevel' => $presenceLevel,
+                'isResidentKey' => $isResidentKey,
                 'signCounter' => $signCounter,
                 'friendlyName' => $friendlyName
             ]
@@ -277,7 +280,7 @@ class Database extends Store
         $ret = [];
 
         $st = $this->db->read(
-            'SELECT credentialId, credential, signCounter, friendlyName, algo, presenceLevel FROM credentials WHERE user_id = :userId',
+            'SELECT credentialId, credential, signCounter, friendlyName, algo, presenceLevel, isResidentKey FROM credentials WHERE user_id = :userId',
             ['userId' => $userId]
         );
 

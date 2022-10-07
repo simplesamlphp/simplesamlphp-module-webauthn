@@ -23,11 +23,13 @@ Note that the database schema has one additional column as of 2.0.0:
 
     algo INT DEFAULT NULL,
     presenceLevel INT DEFAULT NULL,
+    isResidentKey BOOL DEFAULT NULL,
 
 If you have a previous installation of the module, you need to add this column
 manually (
 ALTER TABLE credentials ADD COLUMN `algo` INT DEFAULT NULL AFTER `credential`;
 ALTER TABLE credentials ADD COLUMN `presenceLevel` INT DEFAULT NULL AFTER `algo`;
+ALTER TABLE credentials ADD COLUMN `isResidentKey` BOOL DEFAULT NULL AFTER `presenceLevel`;
 ).
 The updated schema is compatible with the 0.11.x releases, so a roll-back to an
 older version is still possible without removing the column.

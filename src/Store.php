@@ -83,6 +83,7 @@ abstract class Store
         string $credential,
         int $algo,
         int $presenceLevel,
+        int $isResidentKey,
         int $signCounter,
         string $friendlyName
     ): bool;

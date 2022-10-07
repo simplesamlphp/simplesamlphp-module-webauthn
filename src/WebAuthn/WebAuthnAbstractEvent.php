@@ -322,15 +322,6 @@ abstract class WebAuthnAbstractEvent
             $this->warn("Validation of the present token binding data not implemented, continuing without!");
         }
         /**
-         * §7.1 STEP 14 (clientData part): we did not request any client extensions, and do not allow any to be present
-         * §7.2 STEP 15 (clientData part): we did not request any client extensions, and do not allow any to be present
-         */
-        if (!isset($clientData['clientExtensions']) || count($clientData['clientExtensions']) == 0) {
-            $this->pass("As expected, no client extensions.");
-        } else {
-            $this->fail("Incoming client extensions even though none were requested.");
-        }
-        /**
          * §7.1 STEP 8 : SHA-256 hashing the clientData
          * §7.2 STEP 16: SHA-256 hashing the clientData
          */
@@ -372,10 +363,15 @@ abstract class WebAuthnAbstractEvent
          * §7.1 STEP 14 (authData part): no extensions were requested, so none are allowed to be present
          * §7.2 STEP 15 (authData part): no extensions were requested, so none are allowed to be present
          */
+
         if ((128 & ord($bitfield)) > 0) {
-            $this->fail("ED: Extension Data Included, even though we did not request any.");
+            // so we get Extensions. We typically ignore all, but the 
+            // "credProtect" one may be interesting in the future.
+            $this->pass("ED: Extension Data included. Interesting bits may be extracted later.");
+            $extensionsPresent = TRUE;
         } else {
             $this->pass("ED: Extension Data not present.");
+            $extensionsPresent = FALSE;
         }
         switch ($this->eventType) {
             case "REG":
@@ -384,12 +380,23 @@ abstract class WebAuthnAbstractEvent
                 } else {
                     $this->fail("AT: not present, but required during registration.");
                 }
+                // REG events parse their registration-related Extensions, if
+                // any, in the WebAuthnRegistrationEvent subclass
                 break;
             case "AUTH":
                 if ((64 & ord($bitfield)) > 0) {
                     $this->fail("AT: Attested Credential Data Included.");
                 } else {
                     $this->pass("AT: not present, like it should be during an authentication.");
+                }
+                // AUTH events can also have extensions. Extensions, if any,
+                // would follow after the counter. We allow them to be present
+                // but don't currently do anything with them, so let's
+                // just make a useless extraction here as a reminder.
+                $extensionBytes = substr($authData, 37);
+                if (strlen($extensionBytes) > 0) {
+                    // assign into variable and process if needed
+                    $this->cborDecode($extensionBytes);
                 }
                 break;
             default:
