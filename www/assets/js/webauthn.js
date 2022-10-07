@@ -130,12 +130,16 @@ var passwordlessPublicKeyCredentialCreationOptions = {
             requireResidentKey: true,
             residentKey: "required",
             userVerification: "required",
-            credProtect: "userVerificationRequired"
+            credProtect: "userVerificationRequired",
         },
         timeout: 60000,
         attestation: frontendData['attestation'],
         extensions: {
-            credProps: true
+            credProps: true,
+            credProtect: {
+                credentialProtectionPolicy: "userVerificationRequired",
+                enforceCredentialProtectionPolicy: true
+            }
         }
     }
 };
