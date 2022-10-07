@@ -568,8 +568,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
                 $credentialLength = 77;
                 break;
             case self::PK_ALGORITHM_RSA:
-                $this->fail("No credential length information for $this->algo");
-                // $credentialLength = 200;
+                $credentialLength = 272;
                 break;
             default:
                 $this->fail("No credential length information for $this->algo");
