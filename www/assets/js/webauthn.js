@@ -129,7 +129,8 @@ var passwordlessPublicKeyCredentialCreationOptions = {
         authenticatorSelection: {
             requireResidentKey: true,
             residentKey: "required",
-            userVerification: "required"
+            userVerification: "required",
+            credProtect: "userVerificationRequired"
         },
         timeout: 60000,
         attestation: frontendData['attestation'],
