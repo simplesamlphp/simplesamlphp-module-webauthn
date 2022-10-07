@@ -23,7 +23,30 @@ function ArrayBufferToString(buffer)
 
 function registrationButtonClick()
 {
+    alert("In normal registration mode.");
     navigator.credentials.create(publicKeyCredentialCreationOptions)
+    .then((cred) => {
+        console.log('NEW CREDENTIAL', cred);
+        document.getElementById('resp').value = cred.id;
+        var enc = new TextDecoder('utf-8');
+        document.getElementById('data').value = enc.decode(cred.response.clientDataJSON);
+        document.getElementById('attobj').value = btoa(ArrayBufferToString(cred.response.attestationObject));
+        document.getElementById('type').value = cred.response.type;
+        document.forms['regform'].submit();
+    })
+    .then((assertion) => {
+        console.log('ASSERTION', assertion);
+    })
+    .catch((err) => {
+        alert("Something went wrong. It is possible that you are trying to use an invalid token.")
+        console.log('ERROR', err);
+    });
+}
+
+function passwordlessRegistrationButtonClick()
+{
+    alert("In passwordless registration mode.");
+    navigator.credentials.create(passwordlessPublicKeyCredentialCreationOptions)
     .then((cred) => {
         console.log('NEW CREDENTIAL', cred);
         document.getElementById('resp').value = cred.id;
@@ -65,6 +88,7 @@ function authButtonClick()
 }
 
 var frontendData = JSON.parse(document.getElementById('frontendData').getAttribute('content'));
+
 var publicKeyCredentialCreationOptions = {
     publicKey: {
         challenge: new Uint8Array(frontendData['challengeEncoded']).buffer,
@@ -86,6 +110,29 @@ var publicKeyCredentialCreationOptions = {
     }
 };
 
+var passwordlessPublicKeyCredentialCreationOptions = {
+    publicKey: {
+        challenge: new Uint8Array(frontendData['challengeEncoded']).buffer,
+        rp: {
+            name: frontendData['state']['Source']['entityid'],
+            id: frontendData['state']['FIDO2Scope'],
+        },
+        user: {
+            id: new Uint8Array(frontendData['usernameEncoded']).buffer,
+            name: frontendData['state']['FIDO2Username'],
+            displayName: frontendData['state']['FIDO2Displayname'],
+        },
+        pubKeyCredParams: [{alg: -7, type: 'public-key'},{alg: -257, type: 'public-key'}],
+        authenticatorSelection: {
+            requireResidentKey: true,
+            residentKey: "required",
+            userVerification: "required"
+        },
+        timeout: 60000,
+        attestation: frontendData['attestation'],
+    }
+};
+
 const publicKeyCredentialRequestOptions = {
     publicKey: {
         challenge: new Uint8Array(frontendData['challengeEncoded']).buffer,
@@ -97,7 +144,6 @@ const publicKeyCredentialRequestOptions = {
     }
 };
 
-
 window.addEventListener('DOMContentLoaded', () => {
     let regform = document.getElementById('regform');
     if (regform !== null) {
@@ -106,6 +152,15 @@ window.addEventListener('DOMContentLoaded', () => {
         document.getElementById('tokenname').addEventListener('keydown', (event) => {
             if (event.keyCode == 13) {
                 return false;
+            }
+        });
+        document.getElementById('passwordless').addEventListener('click', () => {
+            if (document.getElementById('passwordless').checked) {
+                document.getElementById('regformSubmit').removeEventListener('click', registrationButtonClick);
+                document.getElementById('regformSubmit').addEventListener('click', passwordlessRegistrationButtonClick);
+            } else {
+                document.getElementById('regformSubmit').removeEventListener('click', passwordlessRegistrationButtonClick);
+                document.getElementById('regformSubmit').addEventListener('click', registrationButtonClick);
             }
         });
     }
