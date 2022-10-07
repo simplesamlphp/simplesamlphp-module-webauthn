@@ -94,6 +94,7 @@ const publicKeyCredentialRequestOptions = {
         allowCredentials: frontendData['credentialIdEncoded'].map((oneId) => {
             return {id: new Uint8Array(oneId).buffer, type: 'public-key'};
         }),
+        userVerification: "discouraged"
     }
 };
 
