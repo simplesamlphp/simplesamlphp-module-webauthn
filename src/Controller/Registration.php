@@ -158,6 +158,6 @@ class Registration
         $state['Registration'] = true;
         $state['FIDO2WantsRegister'] = true;
 
-        return new RunnableResponse([StaticProcessHelper::class, 'saveStateAndRedirect'], [&$state]);
+        return new RunnableResponse([StaticProcessHelper::class, 'saveStateAndRedirect'], [$state]);
     }
 }

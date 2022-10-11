@@ -9,7 +9,7 @@ use SimpleSAML\Utils;
 
 class StaticProcessHelper
 {
-    public static function saveStateAndRedirect(array &$state): void
+    public static function saveStateAndRedirect(array $state): void
     {
         $id = Auth\State::saveState($state, 'webauthn:request');
         $url = Module::getModuleURL('webauthn/webauthn');
