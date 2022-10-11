@@ -79,54 +79,12 @@ class WebAuthn extends Auth\ProcessingFilter
          */
         parent::__construct($config, $reserved);
 
-        $this->stateData = new Module\webauthn\WebAuthn\StateData();
-
         $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php')->toArray();
-        try {
-            $this->stateData->store = Store::parseStoreConfig($moduleConfig['store']);
-        } catch (\Exception $e) {
-            Logger::error(
-                'webauthn: Could not create storage: ' .
-                $e->getMessage()
-            );
-        }
-
-        // Set the optional scope if set by configuration
-        if (array_key_exists('scope', $moduleConfig)) {
-            $this->stateData->scope = $moduleConfig['scope'];
-        }
-
-        // Set the derived scope so we can compare it to the sent host at a later point
-        $httpUtils = new Utils\HTTP();
-        $baseurl = $httpUtils->getSelfHost();
-        $hostname = parse_url($baseurl, PHP_URL_HOST);
-        if ($hostname !== null) {
-            $this->stateData->derivedScope = $hostname;
-        }
-
-        if (array_key_exists('attrib_username', $moduleConfig)) {
-            $this->stateData->usernameAttrib = $moduleConfig['attrib_username'];
-        } else {
-            throw new Error\CriticalConfigurationError('webauthn: it is required to set attrib_username in config.');
-        }
-
-        if (array_key_exists('attrib_displayname', $moduleConfig)) {
-            $this->stateData->displaynameAttrib = $moduleConfig['attrib_displayname'];
-        } else {
-            throw new Error\CriticalConfigurationError('webauthn: it is required to set attrib_displayname in config.');
-        }
-
-        if (array_key_exists('request_tokenmodel', $moduleConfig)) {
-            $this->stateData->requestTokenModel = $moduleConfig['request_tokenmodel'];
-        } else {
-            $this->stateData->requestTokenModel = false;
-        }
-        if (array_key_exists('default_enable', $moduleConfig)) {
-            $this->defaultEnabled = $moduleConfig['default_enable'];
-        } else {
-            $this->defaultEnabled = false;
-        }
-
+       
+        $initialStateData = new Module\webauthn\WebAuthn\StateData();
+        Module\webauthn\Controller\WebAuthn::loadModuleConfig($moduleConfig, $initialStateData);
+        $this->stateData = $initialStateData;
+        
         if (array_key_exists('force', $moduleConfig)) {
             $this->force = $moduleConfig['force'];
         } else {
@@ -150,6 +108,13 @@ class WebAuthn extends Auth\ProcessingFilter
         } else {
             $this->stateData->useInflowRegistration = true;
         }
+        if (array_key_exists('default_enable', $moduleConfig)) {
+            $this->defaultEnabled = $moduleConfig['default_enable'];
+        } else {
+            $this->defaultEnabled = false;
+        }
+
+
     }
 
     /**
@@ -164,9 +129,6 @@ class WebAuthn extends Auth\ProcessingFilter
      */
     public function process(array &$state): void
     {
-        Assert::keyExists($state, 'Destination');
-        Assert::keyExists($state['Destination'], 'entityid');
-        Assert::keyExists($state['Destination'], 'metadata-set');
         Assert::keyExists($state['Source'], 'entityid');
         Assert::keyExists($state['Source'], 'metadata-set');
 

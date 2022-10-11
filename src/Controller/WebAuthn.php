@@ -11,6 +11,7 @@ use SimpleSAML\Session;
 use SimpleSAML\Utils;
 use SimpleSAML\XHTML\Template;
 use Symfony\Component\HttpFoundation\Request;
+use SimpleSAML\Module\webauthn\Store;
 
 /**
  * Controller class for the webauthn module.
@@ -89,7 +90,10 @@ class WebAuthn
         // if we don't have any credentials yet, allow user to register
         // regardless if in inflow or standalone (redirect to standalone if need
         // be)
-        if (!isset($state['FIDO2Tokens']) || count($state['FIDO2Tokens']) == 0) {
+        // OTOH, if we are invoked for passwordless auth, we don't know the
+        // username nor whether the user has any credentials. The only thing
+        // we can do is authenticate -> final else
+        if ($state['FIDO2PasswordlessAuthMode'] != true && (!isset($state['FIDO2Tokens']) || count($state['FIDO2Tokens']) == 0)) {
             return self::STATE_MGMT;
         }
         // from here on we do have a credential to work with
@@ -111,6 +115,47 @@ class WebAuthn
         }
     }
 
+    public static function loadModuleConfig($moduleConfig, &$stateData): void {
+        try {
+            $stateData->store = Store::parseStoreConfig($moduleConfig['store']);
+        } catch (\Exception $e) {
+            Logger::error(
+                'webauthn: Could not create storage: ' .
+                $e->getMessage()
+            );
+        }
+
+        // Set the optional scope if set by configuration
+        if (array_key_exists('scope', $moduleConfig)) {
+            $stateData->scope = $moduleConfig['scope'];
+        }
+
+        // Set the derived scope so we can compare it to the sent host at a later point
+        $httpUtils = new Utils\HTTP();
+        $baseurl = $httpUtils->getSelfHost();
+        $hostname = parse_url($baseurl, PHP_URL_HOST);
+        if ($hostname !== null) {
+            $stateData->derivedScope = $hostname;
+        }
+
+        if (array_key_exists('attrib_username', $moduleConfig)) {
+            $stateData->usernameAttrib = $moduleConfig['attrib_username'];
+        } else {
+            throw new Error\CriticalConfigurationError('webauthn: it is required to set attrib_username in config.');
+        }
+
+        if (array_key_exists('attrib_displayname', $moduleConfig)) {
+            $stateData->displaynameAttrib = $moduleConfig['attrib_displayname'];
+        } else {
+            throw new Error\CriticalConfigurationError('webauthn: it is required to set attrib_displayname in config.');
+        }
+
+        if (array_key_exists('request_tokenmodel', $moduleConfig)) {
+            $stateData->requestTokenModel = $moduleConfig['request_tokenmodel'];
+        } else {
+            $stateData->requestTokenModel = false;
+        }
+    }
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @return \SimpleSAML\XHTML\Template  A Symfony Response-object.
@@ -138,10 +183,9 @@ class WebAuthn
         $t->data['FIDO2Tokens'] = $state['FIDO2Tokens'];
 
         $challenge = str_split($state['FIDO2SignupChallenge'], 2);
-        $entityid = $state['Source']['entityid'];
         $configUtils = new Utils\Config();
         $username = str_split(
-            hash('sha512', $state['FIDO2Username'] . '|' . $configUtils->getSecretSalt() . '|' . $entityid),
+            hash('sha512', $state['FIDO2Username'] . '|' . $configUtils->getSecretSalt()),
             2
         );
 
@@ -178,6 +222,7 @@ class WebAuthn
         $t->data['frontendData'] = json_encode($frontendData);
 
         $t->data['FIDO2AuthSuccessful'] = $state['FIDO2AuthSuccessful'];
+        $frontendData['FIDO2PasswordlessAuthMode'] = $state['FIDO2PasswordlessAuthMode'];
         if ( $this->workflowStateMachine($state) == self::STATE_MGMT ) {
             $t->data['regURL'] = Module::getModuleURL('webauthn/regprocess?StateId=' . urlencode($stateId));
             $t->data['delURL'] = Module::getModuleURL('webauthn/managetoken?StateId=' . urlencode($stateId));

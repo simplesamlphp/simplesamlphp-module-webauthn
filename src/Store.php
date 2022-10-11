@@ -74,6 +74,7 @@ abstract class Store
      * @param int    $presenceLevel UV or UP?
      * @param int    $signCounter   The signature counter for this credential.
      * @param string $friendlyName  A user-supplied name for this token.
+     * @param string $hashedId      hashed ID of the user
      *
      * @return bool
      */
@@ -85,7 +86,8 @@ abstract class Store
         int $presenceLevel,
         int $isResidentKey,
         int $signCounter,
-        string $friendlyName
+        string $friendlyName,
+        string $hashedId
     ): bool;
 
     /**
@@ -112,6 +114,14 @@ abstract class Store
      * @return array Array of all crypto data we have on file.
      */
     abstract public function getTokenData(string $userId): array;
+
+    /**
+     * Retrieve username, given a credential ID
+     *
+     * @param string $hashedId the credential ID
+     * @return string the username, if found (otherwise, empty string)
+     */
+    abstract public function getUsernameByHashedId(string $hashedId): string;
 
     /**
      * Get statistics for all consent given in the consent store

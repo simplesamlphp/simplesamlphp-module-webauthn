@@ -26,8 +26,8 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @package SimpleSAML\Module\webauthn
  */
-class AuthProcess
-{
+class AuthProcess {
+
     /** @var \SimpleSAML\Configuration */
     protected Configuration $config;
 
@@ -46,7 +46,6 @@ class AuthProcess
      */
     protected $logger = Logger::class;
 
-
     /**
      * Controller constructor.
      *
@@ -58,43 +57,37 @@ class AuthProcess
      * @throws \Exception
      */
     public function __construct(
-        Configuration $config,
-        Session $session
+            Configuration $config,
+            Session $session
     ) {
         $this->config = $config;
         $this->session = $session;
     }
-
 
     /**
      * Inject the \SimpleSAML\Auth\State dependency.
      *
      * @param \SimpleSAML\Auth\State $authState
      */
-    public function setAuthState(Auth\State $authState): void
-    {
+    public function setAuthState(Auth\State $authState): void {
         $this->authState = $authState;
     }
-
 
     /**
      * Inject the \SimpleSAML\Logger dependency.
      *
      * @param \SimpleSAML\Logger $logger
      */
-    public function setLogger(Logger $logger): void
-    {
+    public function setLogger(Logger $logger): void {
         $this->logger = $logger;
     }
-
 
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @return (\Symfony\Component\HttpFoundation\RedirectResponse|
      *         \SimpleSAML\HTTP\RunnableResponse) A Symfony Response-object.
      */
-    public function main(Request $request): Response
-    {
+    public function main(Request $request): Response {
         $this->logger::info('FIDO2 - Accessing WebAuthn enrollment validation');
 
         $stateId = $request->query->get('StateId');
@@ -108,6 +101,30 @@ class AuthProcess
         $state = $this->authState::loadState($stateId, 'webauthn:request');
 
         $incomingID = bin2hex(WebAuthnAbstractEvent::base64urlDecode($request->request->get('response_id')));
+
+        /**
+         * For passwordless auth, extract the userid from the response of the
+         * discoverable credential, look up whether the credential used is one
+         * that belongs to the claimed username
+         * 
+         * Fail auth if not found, otherwise treat this auth like any other
+         * (but check later whether UV was set during auth for the token at hand)
+         */
+        if ($state['FIDO2PasswordlessAuthMode'] === true) {
+            $usernameBuffer = "";
+            foreach (str_split(base64_decode($request->request->get('userHandle'))) as $oneChar) {
+                $usernameBuffer .= bin2hex($oneChar);
+            }
+            $store = $state['webauthn:store'];
+            $userForToken = $store->getUsernameByHashedId($usernameBuffer);
+            if ($userForToken !== "") {
+                $tokensForUser = $store->getTokenData($userForToken);
+                $state['FIDO2Username'] = $userForToken;
+                $state['FIDO2Tokens'] = $tokensForUser;
+            } else {
+                throw new Exception("Credential ID cannot be associated to any user!");
+            }
+        }
 
         /**
          * §7.2 STEP 2 - 4 : check that the credential is one of those the particular user owns
@@ -127,23 +144,23 @@ class AuthProcess
 
         if ($publicKey === false) {
             throw new Exception(
-                "User attempted to authenticate with an unknown credential ID. This should already have been prevented by the browser!"
+                            "User attempted to authenticate with an unknown credential ID. This should already have been prevented by the browser!"
             );
         }
 
         /** @psalm-var array $oneToken */
         $authObject = new WebAuthnAuthenticationEvent(
-            $request->request->get('type'),
-            ($state['FIDO2Scope'] === null ? $state['FIDO2DerivedScope'] : $state['FIDO2Scope']),
-            $state['FIDO2SignupChallenge'],
-            $state['IdPMetadata']['entityid'],
-            base64_decode($request->request->get('authenticator_data')),
-            base64_decode($request->request->get('client_data_raw')),
-            $oneToken[0],
-            $oneToken[1],
-            $oneToken[4], // algo
-            base64_decode($request->request->get('signature')),
-            $debugEnabled
+                $request->request->get('type'),
+                ($state['FIDO2Scope'] === null ? $state['FIDO2DerivedScope'] : $state['FIDO2Scope']),
+                $state['FIDO2SignupChallenge'],
+                $state['IdPMetadata']['entityid'],
+                base64_decode($request->request->get('authenticator_data')),
+                base64_decode($request->request->get('client_data_raw')),
+                $oneToken[0],
+                $oneToken[1],
+                $oneToken[4], // algo
+                base64_decode($request->request->get('signature')),
+                $debugEnabled
         );
 
         /** Custom check: if the token was initially registered with UV, but now
@@ -155,9 +172,13 @@ class AuthProcess
          * the lower security level. (level upgrades are of course OK.)
          */
         if ($oneToken[5] > $authObject->getPresenceLevel()) {
-            throw new Exception("Token was initially registered with higher identification guarantees than now authenticated with (was: ".$oneToken[5]." now ".$authObject->getPresenceLevel()."!");
+            throw new Exception("Token was initially registered with higher identification guarantees than now authenticated with (was: " . $oneToken[5] . " now " . $authObject->getPresenceLevel() . "!");
         }
 
+        // no matter what: if we are passwordless it MUST be presence-verified
+        if ($state['FIDO2PasswordlessAuthMode'] === true && $oneToken[5] != WebAuthnAbstractEvent::PRESENCE_LEVEL_VERIFIED) {
+            throw new Exception("Attempt to authenticate without User Verification in passwordless mode!");
+        }
         /**
          * §7.2 STEP 18 : detect physical object cloning on the token
          */
@@ -170,7 +191,7 @@ class AuthProcess
             $store->updateSignCount($oneToken[0], $counter);
         } else {
             throw new Exception(
-                "Signature counter less or equal to a previous authentication! Token cloning likely (old: $previousCounter, new: $counter)."
+                            "Signature counter less or equal to a previous authentication! Token cloning likely (old: $previousCounter, new: $counter)."
             );
         }
 
@@ -188,21 +209,32 @@ class AuthProcess
 
         if ($debugEnabled) {
             $response = new RunnableResponse(
-                function (WebAuthnAuthenticationEvent $authObject, array $state) {
-                    echo $authObject->getDebugBuffer();
-                    echo $authObject->getValidateBuffer();
-                    echo "Debug mode, not continuing to " . ($state['FIDO2WantsRegister'] ? "credential registration page." : "destination.");
-                },
-                [$authObject, $state]
+                    function (WebAuthnAuthenticationEvent $authObject, array $state) {
+                        echo $authObject->getDebugBuffer();
+                        echo $authObject->getValidateBuffer();
+                        echo "Debug mode, not continuing to " . ($state['FIDO2WantsRegister'] ? "credential registration page." : "destination.");
+                    },
+                    [$authObject, $state]
             );
         } else {
             if ($state['FIDO2WantsRegister']) {
                 $response = new RedirectResponse(
-                    Module::getModuleURL('webauthn/webauthn?StateId=' . urlencode($stateId))
+                        Module::getModuleURL('webauthn/webauthn?StateId=' . urlencode($stateId))
                 );
             } else {
                 $response = new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
             }
+        }
+
+        /**
+         * But what about SAML attributes? As an authproc, those came in by the
+         * first-factor authentication.
+         * In passwordless, we're on our own. 
+         * Assume the attributes are stored in the database and retrieve them
+         * from there.
+         */
+        if ($state['FIDO2PasswordlessAuthMode'] == true) {
+            // TODO
         }
 
         $response->headers->set('Expires', 'Thu, 19 Nov 1981 08:52:00 GMT');
@@ -211,17 +243,18 @@ class AuthProcess
 
         /** Symfony 5 style */
         /**
-        $response->setCache([
-            'must_revalidate'  => true,
-            'no_cache'         => true,
-            'no_store'         => true,
-            'no_transform'     => false,
-            'public'           => false,
-            'private'          => false,
-        ]);
-        $response->setExpires(new DateTime('Thu, 19 Nov 1981 08:52:00 GMT'));
-        */
-
+          $response->setCache([
+          'must_revalidate'  => true,
+          'no_cache'         => true,
+          'no_store'         => true,
+          'no_transform'     => false,
+          'public'           => false,
+          'private'          => false,
+          ]);
+          $response->setExpires(new DateTime('Thu, 19 Nov 1981 08:52:00 GMT'));
+         */
+//        throw new Exception("state is: ".print_r($state, true));
         return $response;
     }
+
 }

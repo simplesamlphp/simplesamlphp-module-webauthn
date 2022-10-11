@@ -30,6 +30,7 @@ manually (
 ALTER TABLE credentials ADD COLUMN `algo` INT DEFAULT NULL AFTER `credential`;
 ALTER TABLE credentials ADD COLUMN `presenceLevel` INT DEFAULT NULL AFTER `algo`;
 ALTER TABLE credentials ADD COLUMN `isResidentKey` BOOL DEFAULT NULL AFTER `presenceLevel`;
+ALTER TABLE credentials ADD COLUMN `hashedId` VARCHAR(100) DEFAULT '---' AFTER `friendlyName`;
 ).
 The updated schema is compatible with the 0.11.x releases, so a roll-back to an
 older version is still possible without removing the column.

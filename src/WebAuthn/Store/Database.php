@@ -70,6 +70,7 @@ class Database extends Store
                     isResidentKey BOOL DEFAULT NULL,
                     signCounter INT NOT NULL,
                     friendlyName VARCHAR(100) DEFAULT 'Unnamed Token',
+                    hashedId VARCHAR(100) DEFAULT '---',
                     UNIQUE (user_id,credentialId)
                 )
             ");
@@ -197,6 +198,7 @@ class Database extends Store
      * @param int    $presenceLevel UV or UP?
      * @param int    $signCounter   The signature counter for this credential.
      * @param string $friendlyName  A user-supplied name for this token.
+     * @param string $hashedId      hashed user ID
      *
      * @return true
      */
@@ -208,12 +210,13 @@ class Database extends Store
         int $presenceLevel,
         int $isResidentKey,
         int $signCounter,
-        string $friendlyName
+        string $friendlyName,
+        string $hashedId
     ): bool {
         $st = $this->db->write(
             'INSERT INTO credentials ' .
-            '(user_id, credentialId, credential, algo, presenceLevel, isResidentKey, signCounter, friendlyName) VALUES '
-          . '(:userId,:credentialId,:credential,:algo,:presenceLevel,:isResidentKey,:signCounter,:friendlyName)',
+            '(user_id, credentialId, credential, algo, presenceLevel, isResidentKey, signCounter, friendlyName, hashedId) VALUES '
+          . '(:userId,:credentialId,:credential,:algo,:presenceLevel,:isResidentKey,:signCounter,:friendlyName,:hashedId)',
             [
                 'userId' => $userId,
                 'credentialId' => $credentialId,
@@ -222,7 +225,8 @@ class Database extends Store
                 'presenceLevel' => $presenceLevel,
                 'isResidentKey' => $isResidentKey,
                 'signCounter' => $signCounter,
-                'friendlyName' => $friendlyName
+                'friendlyName' => $friendlyName,
+                'hashedId' => $hashedId
             ]
         );
 
@@ -290,4 +294,28 @@ class Database extends Store
 
         return $ret;
     }
+    
+    /**
+     * Retrieve username, given a credential ID
+     *
+     * @param string $hashedId the credential ID
+     * @return string the username, if found (otherwise, empty string)
+     */
+    public function getUsernameByHashedId(string $hashedId): string
+    {
+        $ret = [];
+
+        $st = $this->db->read(
+            'SELECT user_id FROM credentials WHERE hashedId = :hashId',
+            ['hashId' => $hashedId]
+        );
+
+        // return on first match, credential IDs are unique
+        while ($row = $st->fetch(PDO::FETCH_NUM)) {
+            return $row[0];
+        }
+
+        return "";
+    }
+
 }

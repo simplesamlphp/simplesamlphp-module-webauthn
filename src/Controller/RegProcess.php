@@ -185,6 +185,12 @@ class RegProcess
             }
         }
 
+        // we also need to store the hased user_id in case we need to retrieve
+        // tokens in passwordless mode
+        // use identical hashing as in JS generation step
+        $configUtils = new Utils\Config();
+        $username = hash('sha512', $state['FIDO2Username'] . '|' . $configUtils->getSecretSalt());
+       
         $store->storeTokenData(
             $state['FIDO2Username'],
             $regObject->getCredentialId(),
@@ -193,7 +199,8 @@ class RegProcess
             $regObject->getPresenceLevel(),
             $isResidentKey,
             $currentCounterValue,
-            $friendlyName
+            $friendlyName,
+            $username,
         );
 
         // make sure $state gets the news, the token is to be displayed to the user on the next page

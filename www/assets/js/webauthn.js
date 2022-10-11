@@ -90,6 +90,30 @@ function authButtonClick()
     });
 }
 
+function passwordlessAuthButtonClick()
+{
+    navigator.credentials.get(passwordlessPublicKeyCredentialRequestOptions)
+    .then((cred) => {
+        console.log('AUTH', cred);
+        document.getElementById('resp').value = cred.id;
+        var enc = new TextDecoder('utf-8');
+        document.getElementById('data_raw_b64').value = btoa(ArrayBufferToString(cred.response.clientDataJSON));
+        document.getElementById('data').value = enc.decode(cred.response.clientDataJSON);
+        document.getElementById('authdata').value = btoa(ArrayBufferToString(cred.response.authenticatorData));
+        document.getElementById('sigdata').value = btoa(ArrayBufferToString(cred.response.signature));
+        document.getElementById('userHandle').value = btoa(ArrayBufferToString(cred.response.userHandle));
+        document.getElementById('type').value = cred.response.type;
+        document.getElementById('clientext').value = JSON.stringify(cred.getClientExtensionResults());
+        document.forms['authform'].submit();
+    })
+    .then((assertion) => {
+        console.log('ASSERTION', assertion);
+    })
+    .catch((err) => {
+        console.log('ERROR', err);
+    });
+}
+
 var frontendData = JSON.parse(document.getElementById('frontendData').getAttribute('content'));
 
 var publicKeyCredentialCreationOptions = {
@@ -156,6 +180,16 @@ const publicKeyCredentialRequestOptions = {
     }
 };
 
+const passwordlessPublicKeyCredentialRequestOptions = {
+    publicKey: {
+        challenge: new Uint8Array(frontendData['challengeEncoded']).buffer,
+        rpId: frontendData['state']['FIDO2Scope'],
+        timeout: 60000,
+        userVerification: "required"
+    }
+};
+
+
 window.addEventListener('DOMContentLoaded', () => {
     let regform = document.getElementById('regform');
     if (regform !== null) {
@@ -178,7 +212,11 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     let authform = document.getElementById('authform');
     if (authform !== null) {
-        document.getElementById('authformSubmit').addEventListener('click', authButtonClick);
+        if (frontendData['FIDO2PasswordlessAuthMode'] === false) {
+            document.getElementById('authformSubmit').addEventListener('click', authButtonClick);
+        } else {
+            document.getElementById('authformSubmit').addEventListener('click', passwordlessAuthButtonClick);
+        }
         authform.addEventListener('submit', () => false);
     }
 });
