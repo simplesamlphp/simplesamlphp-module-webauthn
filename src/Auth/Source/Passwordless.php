@@ -43,7 +43,6 @@ class Passwordless extends Source {
     }
 
     public function authenticate(array &$state): void {
-    //    Assert::keyExists($state['Source'], 'entityid');
     //    Assert::keyExists($state['Source'], 'metadata-set');
 
         $state['saml:AuthnContextClassRef'] = $this->authnContextClassRef ??

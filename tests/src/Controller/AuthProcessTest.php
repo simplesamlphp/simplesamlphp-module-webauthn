@@ -87,9 +87,6 @@ class AuthProcessTest extends TestCase
                     'FIDO2SignupChallenge' => 'abc123',
                     'FIDO2AuthSuccessful' => true,
                     'requestTokenModel' => 'something',
-                    'Source' => [
-                        'entityid' => 'https://idp.example.com',
-                    ],
                 ];
             }
         });

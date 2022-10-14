@@ -120,7 +120,7 @@ var publicKeyCredentialCreationOptions = {
     publicKey: {
         challenge: new Uint8Array(frontendData['challengeEncoded']).buffer,
         rp: {
-            name: frontendData['state']['Source']['entityid'],
+            name: "Restena DEV",
             id: frontendData['state']['FIDO2Scope'],
         },
         user: {
@@ -141,7 +141,7 @@ var passwordlessPublicKeyCredentialCreationOptions = {
     publicKey: {
         challenge: new Uint8Array(frontendData['challengeEncoded']).buffer,
         rp: {
-            name: frontendData['state']['Source']['entityid'],
+            name: "Restena DEV",
             id: frontendData['state']['FIDO2Scope'],
         },
         user: {

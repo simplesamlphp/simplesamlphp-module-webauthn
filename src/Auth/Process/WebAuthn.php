@@ -129,7 +129,6 @@ class WebAuthn extends Auth\ProcessingFilter
      */
     public function process(array &$state): void
     {
-        Assert::keyExists($state['Source'], 'entityid');
         Assert::keyExists($state['Source'], 'metadata-set');
 
         if (!array_key_exists($this->stateData->usernameAttrib, $state['Attributes'])) {

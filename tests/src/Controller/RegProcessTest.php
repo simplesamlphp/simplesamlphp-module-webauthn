@@ -91,9 +91,6 @@ class RegProcessTest extends TestCase
                     'FIDO2Tokens' => [0 => 'A1B2C3', 1 => 'D4E5F6'],
                     'FIDO2SignupChallenge' => 'abc123',
                     'FIDO2AuthSuccessful' => true,
-                    'IdPMetadata' => [
-                        'entityid' => 'https://idp.example.com',
-                    ],
                 ];
             }
         });

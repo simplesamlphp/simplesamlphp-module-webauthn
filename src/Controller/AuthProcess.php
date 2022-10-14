@@ -154,7 +154,6 @@ class AuthProcess {
                 $request->request->get('type'),
                 ($state['FIDO2Scope'] === null ? $state['FIDO2DerivedScope'] : $state['FIDO2Scope']),
                 $state['FIDO2SignupChallenge'],
-                $state['IdPMetadata']['entityid'],
                 base64_decode($request->request->get('authenticator_data')),
                 base64_decode($request->request->get('client_data_raw')),
                 $oneToken[0],
@@ -227,16 +226,15 @@ class AuthProcess {
             }
         }
 
-        /**
-         * But what about SAML attributes? As an authproc, those came in by the
-         * first-factor authentication.
-         * In passwordless, we're on our own. 
-         * Assume the attributes are stored in the database and retrieve them
-         * from there.
-         */
         if ($state['FIDO2PasswordlessAuthMode'] == true) {
-            $state['Attributes'][$state['FIDO2AttributeStoringUsername']] = $state['FIDO2UserName'];
-            // nwo properly return our final state to the framework
+            /**
+             * But what about SAML attributes? As an authproc, those came in by the
+             * first-factor authentication.
+             * In passwordless, we're on our own. The one thing we know is the
+             * username.
+             */
+            $state['Attributes'][$state['FIDO2AttributeStoringUsername']] = [ $state['FIDO2Username'] ];
+            // now properly return our final state to the framework
             Source::completeAuth($state);
         }
 

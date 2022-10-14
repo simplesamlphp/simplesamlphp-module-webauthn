@@ -7,6 +7,7 @@ use CBOR\OtherObject;
 use CBOR\Tag;
 use CBOR\StringStream;
 
+use SimpleSAML\Utils\HTTP as HTTPHelper;
 /**
  * FIDO2/WebAuthn Authentication Processing filter
  *
@@ -38,13 +39,6 @@ abstract class WebAuthnAbstractEvent
      * @var string
      */
     private string $challenge;
-
-    /**
-     * Our IdP EntityId
-     *
-     * @var string
-     */
-    private string $idpEntityId;
 
     /**
      * the authenticator's signature counter
@@ -131,7 +125,6 @@ abstract class WebAuthnAbstractEvent
      * @param string $pubkeyCredType  PublicKeyCredential.type
      * @param string $scope           the scope of the event
      * @param string $challenge       the challenge which was used to trigger this event
-     * @param string $idpEntityId     the entity ID of our IdP
      * @param string $authData        the authData / authenticatorData structure which is present in all types of events
      * @param string $clientDataJSON  the client data JSON string which is present in all types of events
      * @param bool   $debugMode       shall we collect and output some extensive debugging information along the way?
@@ -140,14 +133,12 @@ abstract class WebAuthnAbstractEvent
         string $pubkeyCredType,
         string $scope,
         string $challenge,
-        string $idpEntityId,
         string $authData,
         string $clientDataJSON,
         bool $debugMode = false
     ) {
         $this->scope = $scope;
         $this->challenge = $challenge;
-        $this->idpEntityId = $idpEntityId;
         $this->debugMode = $debugMode;
         $this->presenceLevel = self::PRESENCE_LEVEL_NONE;
         $this->debugBuffer .= "PublicKeyCredential.type: $pubkeyCredType<br/>";
@@ -305,8 +296,9 @@ abstract class WebAuthnAbstractEvent
          * §7.1 STEP 6 : check if incoming origin matches our hostname (taken from IdP metadata prefix)
          * §7.2 STEP 10: check if incoming origin matches our hostname (taken from IdP metadata prefix)
          */
-        $slash = strpos($this->idpEntityId, '/', 8);
-        $expectedOrigin = ($slash !== false) ? substr($this->idpEntityId, 0, $slash) : $slash;
+        $httpHeler = new HTTPHelper();
+        $slash = strpos($httpHeler->getBaseURL(), '/', 8);
+        $expectedOrigin = ($slash !== false) ? substr($httpHeler->getBaseURL(), 0, $slash) : $slash;
         if ($clientData['origin'] === $expectedOrigin) {
             $this->pass("Origin matches");
         } else {

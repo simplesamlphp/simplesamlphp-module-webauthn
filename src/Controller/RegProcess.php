@@ -122,7 +122,6 @@ class RegProcess
             $request->request->get('type'),
             $fido2Scope,
             $state['FIDO2SignupChallenge'],
-            $state['IdPMetadata']['entityid'],
             base64_decode($request->request->get('attestation_object')),
             $request->request->get('response_id'),
             $request->request->get('attestation_client_data_json'),

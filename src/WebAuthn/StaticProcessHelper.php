@@ -38,11 +38,11 @@ class StaticProcessHelper
         $state['webauthn:store'] = $stateData->store;
         $state['FIDO2Scope'] = $stateData->scope;
         $state['FIDO2DerivedScope'] = $stateData->derivedScope;
+        $state['FIDO2AttributeStoringUsername'] = $stateData->usernameAttrib;
         $state['FIDO2SignupChallenge'] = hash('sha512', random_bytes(64));
         $state['FIDO2PasswordlessAuthMode'] = true;
         $state['FIDO2AuthSuccessful'] = false;     
         
         $state['FIDO2WantsRegister'] = false;
-        $state['Source']['entityid'] = "UNKNOWN";
     }
 }

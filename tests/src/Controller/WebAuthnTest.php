@@ -88,9 +88,6 @@ class WebAuthnTest extends TestCase
                     'FIDO2WantsRegister' => false,
                     'FIDO2AuthSuccessful' => false,
                     'requestTokenModel' => 'something',
-                    'Source' => [
-                        'entityid' => 'https://idp.example.com',
-                    ],
                 ];
             }
         });

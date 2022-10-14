@@ -57,7 +57,6 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * @param string $pubkeyCredType  PublicKeyCredential.type
      * @param string $scope           the scope of the event
      * @param string $challenge       the challenge which was used to trigger this event
-     * @param string $idpEntityId     the entity ID of our IdP
      * @param string $attestationData the attestation data CBOR blob
      * @param string $responseId      the response ID
      * @param string $clientDataJSON  the client data JSON string which is present in all types of events
@@ -67,7 +66,6 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         string $pubkeyCredType,
         string $scope,
         string $challenge,
-        string $idpEntityId,
         string $attestationData,
         string $responseId,
         string $clientDataJSON,
@@ -80,7 +78,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         $attestationArray = $this->cborDecode($attestationData);
         $authData = $attestationArray['authData'];
         $this->eventType = "REG";
-        parent::__construct($pubkeyCredType, $scope, $challenge, $idpEntityId, $authData, $clientDataJSON, $debugMode);
+        parent::__construct($pubkeyCredType, $scope, $challenge, $authData, $clientDataJSON, $debugMode);
 
         $this->AAGUIDDictionary = AAGUID::getInstance();
 
