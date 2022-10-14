@@ -5,6 +5,7 @@ namespace SimpleSAML\Module\webauthn\Controller;
 use Datetime;
 use Exception;
 use SimpleSAML\Auth;
+use SimpleSAML\Auth\Source;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error;
 use SimpleSAML\HTTP\RunnableResponse;
@@ -234,7 +235,9 @@ class AuthProcess {
          * from there.
          */
         if ($state['FIDO2PasswordlessAuthMode'] == true) {
-            // TODO
+            $state['Attributes'][$state['FIDO2AttributeStoringUsername']] = $state['FIDO2UserName'];
+            // nwo properly return our final state to the framework
+            Source::completeAuth($state);
         }
 
         $response->headers->set('Expires', 'Thu, 19 Nov 1981 08:52:00 GMT');

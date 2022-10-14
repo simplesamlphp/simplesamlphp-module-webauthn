@@ -24,6 +24,7 @@ class StaticProcessHelper
         $state['FIDO2Tokens'] = $stateData->store->getTokenData($state['Attributes'][$stateData->usernameAttrib][0]);
         $state['FIDO2Scope'] = $stateData->scope;
         $state['FIDO2DerivedScope'] = $stateData->derivedScope;
+        $state['FIDO2AttributeStoringUsername'] = $stateData->usernameAttrib;
         $state['FIDO2Username'] = $state['Attributes'][$stateData->usernameAttrib][0];
         $state['FIDO2Displayname'] = $state['Attributes'][$stateData->displaynameAttrib][0];
         $state['FIDO2SignupChallenge'] = hash('sha512', random_bytes(64));
