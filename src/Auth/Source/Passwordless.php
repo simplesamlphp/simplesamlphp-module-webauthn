@@ -27,14 +27,25 @@ class Passwordless extends Source {
      */
     private StateData $stateData;
 
+    /**
+     * @var string|null AuthnContextClassRef
+     */
+    private ?string $authnContextClassRef = null;
+
+    /**
+     * @var Configuration $authSourceConfig
+     */
+    private Configuration $authSourceConfig;
+    
     public function __construct(array $info, array $config) {
         // Call the parent constructor first, as required by the interface
         parent::__construct($info, $config);
 
-        $this->ldapConfig = Configuration::loadFromArray(
+        $this->authSourceConfig = Configuration::loadFromArray(
                         $config,
                         'authsources[' . var_export($this->authId, true) . ']'
         );
+        $this->authnContextClassRef = $this->authSourceConfig->getOptionalString("authncontextclassref",'urn:rsa:names:tc:SAML:2.0:ac:classes:FIDO');
         $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php')->toArray();
 
         $initialStateData = new StateData();
@@ -43,10 +54,7 @@ class Passwordless extends Source {
     }
 
     public function authenticate(array &$state): void {
-    //    Assert::keyExists($state['Source'], 'metadata-set');
-
-        $state['saml:AuthnContextClassRef'] = $this->authnContextClassRef ??
-                'urn:rsa:names:tc:SAML:2.0:ac:classes:FIDO';
+        $state['saml:AuthnContextClassRef'] = $this->authnContextClassRef;
 
         StaticProcessHelper::prepareStatePasswordlessAuth($this->stateData, $state);
         StaticProcessHelper::saveStateAndRedirect($state);

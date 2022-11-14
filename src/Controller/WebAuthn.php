@@ -111,7 +111,7 @@ class WebAuthn
         } else { // in inflow, allow to check the management box; otherwise,
                  // only auth
             $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php')->toArray();
-            return $moduleConfig['use_inflow_registration'] ? self::STATE_AUTH_ALLOWMGMT : self::STATE_AUTH_NOMGMT;
+            return $moduleConfig['registration']['use_inflow_registration'] ? self::STATE_AUTH_ALLOWMGMT : self::STATE_AUTH_NOMGMT;
         }
     }
 
@@ -150,8 +150,8 @@ class WebAuthn
             throw new Error\CriticalConfigurationError('webauthn: it is required to set attrib_displayname in config.');
         }
 
-        if (array_key_exists('request_tokenmodel', $moduleConfig)) {
-            $stateData->requestTokenModel = $moduleConfig['request_tokenmodel'];
+        if (array_key_exists('request_tokenmodel', $moduleConfig['registration'])) {
+            $stateData->requestTokenModel = $moduleConfig['registration']['request_tokenmodel'];
         } else {
             $stateData->requestTokenModel = false;
         }

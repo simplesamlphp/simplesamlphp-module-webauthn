@@ -85,34 +85,19 @@ class WebAuthn extends Auth\ProcessingFilter
         Module\webauthn\Controller\WebAuthn::loadModuleConfig($moduleConfig, $initialStateData);
         $this->stateData = $initialStateData;
         
-        if (array_key_exists('force', $moduleConfig)) {
-            $this->force = $moduleConfig['force'];
-        } else {
-            $this->force = true;
-        }
-        if (array_key_exists('attrib_toggle', $moduleConfig)) {
-            $this->toggleAttrib = $moduleConfig['attrib_toggle'];
-        } else {
-            $this->toggleAttrib = 'toggle';
-        }
-        if (array_key_exists('use_database', $moduleConfig)) {
-            $this->useDatabase = $moduleConfig['use_database'];
-        } else {
-            $this->useDatabase = true;
-        }
-        if (array_key_exists('authnContextClassRef', $moduleConfig)) {
-            $this->authnContextClassRef = $moduleConfig['authnContextClassRef'];
-        }
-        if (array_key_exists('use_inflow_registration', $moduleConfig)) {
-            $this->stateData->useInflowRegistration = $moduleConfig['use_inflow_registration'];
+        // switched to authsource config for 2.0
+        $this->force = $config['force'] ?? true;
+        $this->toggleAttrib = $config['attrib_toggle'] ?? 'toggle';
+        $this->useDatabase = $config['use_database'] ?? true;
+        $this->defaultEnabled = $config['default_enable'] ?? false;
+        $this->authnContextClassRef = $config['authncontextclassref'] ?? null;
+        
+        if (array_key_exists('use_inflow_registration', $moduleConfig['registration'])) {
+            $this->stateData->useInflowRegistration = $moduleConfig['registration']['use_inflow_registration'];
         } else {
             $this->stateData->useInflowRegistration = true;
         }
-        if (array_key_exists('default_enable', $moduleConfig)) {
-            $this->defaultEnabled = $moduleConfig['default_enable'];
-        } else {
-            $this->defaultEnabled = false;
-        }
+        
 
 
     }

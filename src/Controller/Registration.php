@@ -110,7 +110,8 @@ class Registration
     public function main(/** @scrutinizer ignore-unused */ Request $request): RunnableResponse
     {
         $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php');
-        $registrationAuthSource = $moduleConfig->getOptionalString('registration_auth_source', 'default-sp');
+        $registrationConfig = $moduleConfig->getArray('registration');
+        $registrationAuthSource = $registrationConfig['auth_source'] ?? 'default-sp';
 
         /** @psalm-var class-string $authSimple */
         $authSimple = $this->authSimple;
@@ -122,7 +123,7 @@ class Registration
         $state['Attributes'] = $attrs;
 
         $stateData = new StateData();
-        $stateData->requestTokenModel = $moduleConfig->getOptionalBoolean('request_tokenmodel', false);
+        $stateData->requestTokenModel = $registrationConfig['request_tokenmodel'] ?? false;
         try {
             $stateData->store = Store::parseStoreConfig($moduleConfig->getArray('store'));
         } catch (Exception $e) {
@@ -151,7 +152,7 @@ class Registration
         // did, kill the session
         $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php')->toArray();
 
-        if ($moduleConfig['use_inflow_registration']) {
+        if ($moduleConfig['registration']['use_inflow_registration']) {
             throw new Exception("Attempt to access the stand-alone registration page in inflow mode!");
         }
 
