@@ -335,6 +335,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
             $this->fail("TPM Attestation: only TPM 2.0 is supported, different version requested!");
         }
         // TODO need to discern pubArea - what is the format?
+        $this->debugBuffer .= "pubArea: ".bin2hex($stmtDecoded['pubArea']);
         $tpmPubAreaParameters = $stmtDecoded['pubArea']['parameters'];
         $tpmPubAreaUnique = $stmtDecoded['pubArea']['unique'];
         // TODO compare keys
