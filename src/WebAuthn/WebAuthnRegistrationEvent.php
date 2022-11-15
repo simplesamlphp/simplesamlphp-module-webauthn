@@ -125,6 +125,8 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
                 $this->validateAttestationFormatApple($attestationArray);
                 break;
             case "tpm":
+                $this->validateAttestationFormatTpm($attestationArray);
+                break;
             case "android-key":
                 $this->fail("Attestation format " . $attestationArray['fmt'] . " validation not supported right now.");
                 break;
@@ -296,6 +298,135 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         }
     }
 
+    // some constants from the TPM 2.0 spec
+    const TPM_GENERATED_VALUE = 0xff544347;
+    const TPM_ST_ATTEST_CERTIFY = 0x8017;
+
+    /**
+     * returns a TPM2B_NAME as [1] and the number of bytes the parser advances as [0]
+     * 
+     * @param string $input bytes
+     * @return array
+     */
+    private function tpmNameExtractionHelper(string $input) : array {
+        $nameSize = substr($input,0,2);
+        if ($nameSize == 0) {
+            return [2, ""];
+        } elseif ($nameSize == 4) { // this is a "nameHandle";
+            return [6, substr($input,2,4)]; // this is a "nameHandle";
+        } else {
+            return [2 + $nameSize, substr($input,2,$nameSize)]; // this is a concatenation of a digest identifier and a digest value
+        }
+    }
+    
+    /**
+     * @param array $attestationArray
+     */
+    private function validateAttestationFormatTpm(array $attestationArray): void
+    {
+
+        // §8.3 Verification procedure
+        //
+        // Step 1: CBOR-decode
+        $stmtDecoded = $attestationArray['attStmt'];
+        $this->debugBuffer .= "AttStmt: " . print_r($stmtDecoded, true) . "<br/>";
+        // WIP: Step 2 - pubArea decoding
+        if ($stmtDecoded['ver'] != "2.0") {
+            $this->fail("TPM Attestation: only TPM 2.0 is supported, different version requested!");
+        }
+        // TODO need to discern pubArea - what is the format?
+        $tpmPubAreaParameters = $stmtDecoded['pubArea']['parameters'];
+        $tpmPubAreaUnique = $stmtDecoded['pubArea']['unique'];
+        // TODO compare keys
+        if ($this->credential != ($tpmPubAreaParameters & $tpmPubAreaUnique)) { // stub
+            $this->fail("TPM Attestation: credentialPublicKey and TPM-delivered key are not identical!");
+        }
+        $attToBeSigned = $attestationArray['authData'].$this->clientDataHash;
+        // verify certInfo correctness
+        //'magic' is the first 4 bytes of certInfo
+        if (substr($stmtDecoded['certInfo'],0,4) != self::TPM_GENERATED_VALUE) {
+            $this->fail("TPM Attestation: certInfo - magic - value not correct!");
+        }
+        // 'type' is the next two bytes
+        if (substr($stmtDecoded['certInfo'],4,2) != self::TPM_ST_ATTEST_CERTIFY) {
+            $this->fail("TPM Attestation: certInfo - type - value not correct!");
+        }
+        // take note of the qualifiedSigner (size is 2 bytes; name variable)
+        list($parserAt, $qualifiedSigner) = $this->tpmNameExtractionHelper(substr($stmtDecoded['certInfo'],6));
+                
+        // hash signature check
+        $alg = $stmtDecoded['alg'];
+        if (!in_array($alg, self::PK_ALGORITHM)) {
+            $this->fail("Unexpected algorithm type in TPM attestation: " . $stmtDecoded['alg'] . ".");
+        }
+        switch($alg) {
+            case self::PK_ALGORITHM_RSA:
+            case self::PK_ALGORITHM_ECDSA:
+                $attToBeSignedHash = hash("sha256", $attToBeSigned);
+                break;
+            default:
+            $this->fail("Unexpected algorithm type in TPM attestation (2): $alg");
+        }
+        // 'extraData' comes right after the qualifiedSigner
+        $extraDataSize = substr($stmtDecoded['certInfo'],$parserAt,2);
+        if (substr($stmtDecoded['certInfo'],$parserAt+2,$extraDataSize) != $attToBeSignedHash) {
+            $this->fail("TPM Attestation: certInfo - extraData - wrong hash value!");
+        }
+        $parserAt += 2+$extraDataSize;
+        // jump over clockInfo
+        $parserAt += 8 /* (clock, 64 bit) */ + 4 + 4 /* (resetCount and restartCount) */ + 1 /* (YES_NO field) */;
+        // jump over firmwareVersion (64 bit)
+        $parserAt += 8;
+        // all the rest is 'attested'
+        $attested = substr($stmtDecoded['certInfo'],$parserAt);
+        // parse and validate 'attested'
+        list($parserAt, $attestedName) = $this->tpmNameExtractionHelper($attested);
+        list($parserAt, $attestedQualifiedName) = $this->tpmNameExtractionHelper(substr($attested,$parserAt));
+        // compare with pubArea name (TPM_ALG_ID are always 2 bytes long [Table 9 of TPM Part 2])
+        $type = substr($stmtDecoded['pubArea'],0,2);
+        if ($type != 0x000b) { // SHA-256
+            $this->fail("TPM Attestation: we kind of expected SHA-256 here.");
+        }
+        $nameAlg = substr($stmtDecoded['pubArea'],2,32); // the hash
+        if ($attestedName != $nameAlg) { // TODO, compare with the name part of pubArea. Read that Part1 section 16.
+            $this->fail("TPM Attestation: certInfo - attested - wrong content!");
+            // "name" contains valid name for pubArea, using nameAlg
+        }
+        if (!isset($stmtDecoded['x5c'])) {
+            $this->fail("TPM Attestation: x5c not present!");
+        }
+        $keyResource = openssl_pkey_get_public($this->der2pem($stmtDecoded['x5c'][0]));
+        if ($keyResource === false) {
+            $this->fail("Unable to construct public key resource from PEM.");
+        }
+        if (openssl_verify($stmtDecoded['certInfo'], $stmtDecoded['sig'], $keyResource, OPENSSL_ALGO_SHA256) !== 1) {
+            $this->fail("TPM attestation failed - signature incorrect.");
+        }
+        // verify cert requirements
+        $certProps = openssl_x509_parse($this->der2pem($stmtDecoded['x5c'][0]));
+        if (
+            $certProps['version'] !== 2 || /** §8.3.1 Bullet 1 */
+            (isset($certProps['subject']) && count($certProps['subject']) > 0) || /** §8.3.1 Bullet 2 [empty Subject] */
+            false || /** TODO §8.3.1 Bullet 3 [subjectAltName] */
+            !strstr($certProps['extensions']['extendedKeyUsage'],'2.23.133.8.3') || /** §8.3.1 Bullet 4 EKU */
+            !isset($certProps['extensions']['basicConstraints']) || /** §8.3.1 Bullet 5 */
+            strstr("CA:FALSE", $certProps['extensions']['basicConstraints']) === false /** §8.3.1 Bullet 5 */
+            // not checking AIA, as it is optional
+        ) {
+            $this->fail("TPM attestation failed - bad certificate properties.");
+        }
+        if (isset($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4'])) {
+            if (strtolower($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4']) != strtolower($this->AAGUID)) {
+                $this->fail("TPM attestation failed - AAGUID mismatch.");
+            }
+        }
+        // we are supposed to return AttCA but haven't checked any PKI trust path?
+        // bad spec or bad understanding?
+        $this->AAGUIDAssurance = self::AAGUID_ASSURANCE_LEVEL_ATTCA;
+        $this->pass("TPM attestation passed.");
+        return;
+    }
+        
     /**
      * @param array $attestationArray
      * @return void
