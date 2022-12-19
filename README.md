@@ -98,6 +98,12 @@ will be forced into 2FA.
      * setting the more accurate REFEDS identifier below instead.
      * 
      * Defaults to 'urn:rsa:names:tc:SAML:2.0:ac:classes:FIDO' if not set
+     * 
+     * If you authenticate towards Microsoft 365 SPs which may trigger their
+     * own variant of 2FA, then you can tell them to skip this by
+     * - setting the SP tenant parameter "supportsMFA" to "true"
+     * - returning the AuthnContextClassRef 
+     *   "http://schemas.microsoft.com/claims/multipleauthn"
      */
     
     // 'authncontextclassref' => 'https://refeds.org/profile/mfa',
@@ -125,6 +131,12 @@ The authsource takes the following parameters in authsources.php:
         'webauthn:Passwordless',
     /*
      * Defaults to 'urn:rsa:names:tc:SAML:2.0:ac:classes:FIDO' if not set
+     *
+     * If you authenticate towards Microsoft 365 SPs which may trigger their
+     * own variant of 2FA, then you can tell them to skip this by
+     * - setting the SP tenant parameter "supportsMFA" to "true"
+     * - returning the AuthnContextClassRef 
+     *   "http://schemas.microsoft.com/claims/multipleauthn"
      */
     
     //  'authncontextclassref' => 'https://refeds.org/profile/mfa',
