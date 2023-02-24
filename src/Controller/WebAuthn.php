@@ -116,14 +116,7 @@ class WebAuthn
     }
 
     public static function loadModuleConfig($moduleConfig, &$stateData): void {
-        try {
-            $stateData->store = Store::parseStoreConfig($moduleConfig['store']);
-        } catch (\Exception $e) {
-            Logger::error(
-                'webauthn: Could not create storage: ' .
-                $e->getMessage()
-            );
-        }
+        $stateData->store = Store::parseStoreConfig($moduleConfig['store']);
 
         // Set the optional scope if set by configuration
         if (array_key_exists('scope', $moduleConfig)) {
