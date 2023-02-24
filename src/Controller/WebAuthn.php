@@ -81,9 +81,9 @@ class WebAuthn
         $this->logger = $logger;
     }
 
-    const STATE_AUTH_NOMGMT = 1; // just authenticate user
-    const STATE_AUTH_ALLOWMGMT = 2; // allow to switch to mgmt page
-    const STATE_MGMT = 4; // show token management page
+    public const STATE_AUTH_NOMGMT = 1; // just authenticate user
+    public const STATE_AUTH_ALLOWMGMT = 2; // allow to switch to mgmt page
+    public const STATE_MGMT = 4; // show token management page
 
 
     public static function workflowStateMachine($state) {
@@ -156,6 +156,8 @@ class WebAuthn
             $stateData->requestTokenModel = false;
         }
     }
+
+
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @return \SimpleSAML\XHTML\Template  A Symfony Response-object.
@@ -172,7 +174,7 @@ class WebAuthn
         $state = $this->authState::loadState($stateId, 'webauthn:request');
 
         if ( $this->workflowStateMachine($state) != self::STATE_AUTH_NOMGMT ) {
-            $templateFile = 'webauthn:webauthn.twig'; 
+            $templateFile = 'webauthn:webauthn.twig';
         } else {
             $templateFile = 'webauthn:authentication.twig';
         }

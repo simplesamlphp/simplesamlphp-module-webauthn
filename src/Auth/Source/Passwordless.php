@@ -36,7 +36,7 @@ class Passwordless extends Source {
      * @var Configuration $authSourceConfig
      */
     private Configuration $authSourceConfig;
-    
+
     public function __construct(array $info, array $config) {
         // Call the parent constructor first, as required by the interface
         parent::__construct($info, $config);

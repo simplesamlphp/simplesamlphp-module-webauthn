@@ -32,7 +32,7 @@ class StaticProcessHelper
         $state['FIDO2AuthSuccessful'] = false;
         $state['FIDO2PasswordlessAuthMode'] = false;
     }
-    
+
     public static function prepareStatePasswordlessAuth(StateData $stateData, array &$state): void
     {
         $state['webauthn:store'] = $stateData->store;
