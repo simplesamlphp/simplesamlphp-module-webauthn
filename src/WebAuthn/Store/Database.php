@@ -213,7 +213,7 @@ class Database extends Store
         string $friendlyName,
         string $hashedId
     ): bool {
-        $st = $this->db->write(
+        $this->db->write(
             'INSERT INTO credentials ' .
             '(user_id, credentialId, credential, algo, presenceLevel, isResidentKey, signCounter, friendlyName, hashedId) VALUES '
           . '(:userId,:credentialId,:credential,:algo,:presenceLevel,:isResidentKey,:signCounter,:friendlyName,:hashedId)',
@@ -242,7 +242,7 @@ class Database extends Store
      */
     public function deleteTokenData(string $credentialId): bool
     {
-        $st = $this->db->write(
+        $this->db->write(
             'DELETE FROM credentials WHERE credentialId = :credentialId',
             ['credentialId' => $credentialId]
         );
@@ -262,7 +262,7 @@ class Database extends Store
      */
     public function updateSignCount(string $credentialId, int $signCounter): bool
     {
-        $st = $this->db->write(
+        $this->db->write(
             'UPDATE credentials SET signCounter = :signCounter WHERE credentialId = :credentialId',
             ['signCounter' => $signCounter, 'credentialId' => $credentialId]
         );
@@ -303,8 +303,6 @@ class Database extends Store
      */
     public function getUsernameByHashedId(string $hashedId): string
     {
-        $ret = [];
-
         $st = $this->db->read(
             'SELECT user_id FROM credentials WHERE hashedId = :hashId',
             ['hashId' => $hashedId]

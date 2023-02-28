@@ -23,7 +23,7 @@ class Passwordless extends Source {
     /**
      * An object with all the parameters that will be needed in the process
      *
-     * @var Module\webauthn\WebAuthn\StateData
+     * @var \SimpleSAML\Module\webauthn\WebAuthn\StateData
      */
     private StateData $stateData;
 

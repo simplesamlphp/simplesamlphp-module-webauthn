@@ -85,8 +85,10 @@ class AuthProcess {
 
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
-     * @return (\Symfony\Component\HttpFoundation\RedirectResponse|
-     *         \SimpleSAML\HTTP\RunnableResponse) A Symfony Response-object.
+     * @return (
+     *   \Symfony\Component\HttpFoundation\RedirectResponse|
+     *   \SimpleSAML\HTTP\RunnableResponse
+     * ) A Symfony Response-object.
      */
     public function main(Request $request): Response {
         $this->logger::info('FIDO2 - Accessing WebAuthn enrollment validation');

@@ -151,7 +151,8 @@ abstract class Store
     public static function parseStoreConfig($config): Store
     {
         if (is_string($config)) {
-            $config = Utils\Arrays::arrayize($config);
+            $arrayUtils = new Utils\Arrays();
+            $config = $arrayUtils->arrayize($config);
         }
 
         Assert::isArray($config, 'Invalid configuration for consent store option: ' . var_export($config, true));

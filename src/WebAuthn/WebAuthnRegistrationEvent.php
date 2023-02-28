@@ -6,6 +6,7 @@ use Cose\Key\Ec2Key;
 use Cose\Key\RsaKey;
 use SimpleSAML\Logger;
 use SimpleSAML\Module\webauthn\WebAuthn\AAGUID;
+use SimpleSAML\Utils;
 use SimpleSAML\Utils\Config as SSPConfig;
 
 /**
@@ -191,8 +192,9 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         // § 8.8 Bullet 2
         $nonceToHash = $attestationArray['authData'] . $this->clientDataHash;
         // § 8.8 Bullet 3
+        $cryptoUtils = new Utils\Crypto();
         $nonce = hash("sha256", $nonceToHash, true); // does raw_output have to be FALSE or TRUE?
-        $certProps = openssl_x509_parse(Utils\Crypto::der2pem($stmtDecoded['x5c'][0]));
+        $certProps = openssl_x509_parse($cryptoUtils->der2pem($stmtDecoded['x5c'][0]));
         // § 8.8 Bullet 4
         if (
             !isset($certProps['extensions']['1.2.840.113635.100.8.2']) ||
@@ -208,33 +210,33 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         // chain validation first
         foreach ($stmtDecoded['x5c'] as $runIndex => $runCert) {
             if (isset($stmtDecoded['x5c'][$runIndex + 1])) { // there is a next cert, so follow the chain
-                $certResource = openssl_x509_read(Utils\Crypto::der2pem($runCert));
-                $signerPubKey = openssl_pkey_get_public(Utils\Crypto::der2pem($stmtDecoded['x5c'][$runIndex + 1]));
+                $certResource = openssl_x509_read($cryptoUtils->der2pem($runCert));
+                $signerPubKey = openssl_pkey_get_public($cryptoUtils->der2pem($stmtDecoded['x5c'][$runIndex + 1]));
                 if (openssl_x509_verify($certResource, $signerPubKey) != 1) {
                     $this->fail("Error during chain validation of the attestation certificate (while validating cert #$runIndex, which is "
-                        . Utils\Crypto::der2pem($runCert)
+                        . $cryptoUtils->der2pem($runCert)
                         . "; next cert was "
-                        . Utils\Crypto::der2pem($stmtDecoded['x5c'][$runIndex + 1]));
+                        . $cryptoUtils->der2pem($stmtDecoded['x5c'][$runIndex + 1]));
                 }
             } else { // last cert, compare to the root
-                $certResource = openssl_x509_read(Utils\Crypto::der2pem($runCert));
+                $certResource = openssl_x509_read($cryptoUtils->der2pem($runCert));
                 $signerPubKey = openssl_pkey_get_public($APPLE_WEBAUTHN_ROOT_CA);
                 if (openssl_x509_verify($certResource, $signerPubKey) != 1) {
                     $this->fail(sprintf(
                         "Error during root CA validation of the attestation chain certificate, which is %s",
-                        Utils\Crypto::der2pem($runCert)
+                        $cryptoUtils->der2pem($runCert)
                     ));
                 }
             }
         }
 
-        $keyResource = openssl_pkey_get_public(Utils\Crypto::der2pem($stmtDecoded['x5c'][0]));
+        $keyResource = openssl_pkey_get_public($cryptoUtils->der2pem($stmtDecoded['x5c'][0]));
         if ($keyResource === false) {
             $this->fail(
                 "Did not get a parseable X.509 structure out of the Apple attestation statement - x5c nr. 0 statement was: XXX "
                 . $stmtDecoded['x5c'][0]
                 . " XXX; PEM equivalent is "
-                . Utils\Crypto::der2pem($stmtDecoded['x5c'][0])
+                . $cryptoUtils->der2pem($stmtDecoded['x5c'][0])
                 . ". OpenSSL error: "
                 . openssl_error_string()
             );
@@ -572,7 +574,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
                 $this->fail("No credential length information for $this->algo");
         }
         $extensions = substr($attData, 18 + $credIdLen + $credentialLength);
-        if (strlen($extensions != 0)) {
+        if (strlen($extensions) !== 0) {
             $this->pass("Found the following extensions (". strlen($extensions) ." bytes) during registration ceremony: " );
         }
 
