@@ -360,11 +360,10 @@ abstract class WebAuthnAbstractEvent
             // so we get Extensions. We typically ignore all, but the 
             // "credProtect" one may be interesting in the future.
             $this->pass("ED: Extension Data included. Interesting bits may be extracted later.");
-            $extensionsPresent = TRUE;
         } else {
             $this->pass("ED: Extension Data not present.");
-            $extensionsPresent = FALSE;
         }
+
         switch ($this->eventType) {
             case "REG":
                 if ((64 & ord($bitfield)) > 0) {
