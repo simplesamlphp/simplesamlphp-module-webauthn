@@ -85,7 +85,8 @@ class WebAuthnTest extends TestCase
                     'FIDO2Scope' => 'Ducktown',
                     'FIDO2Tokens' => [0 => 'A1B2C3', 1 => 'D4E5F6'],
                     'FIDO2SignupChallenge' => 'A1B2C3',
-                    'FIDO2WantsRegister' => false,
+		    'FIDO2WantsRegister' => false,
+		    'FIDO2PasswordlessAuthMode' => false,
                     'FIDO2AuthSuccessful' => false,
                     'requestTokenModel' => 'something',
                 ];
