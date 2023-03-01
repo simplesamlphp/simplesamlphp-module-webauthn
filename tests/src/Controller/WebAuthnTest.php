@@ -66,7 +66,9 @@ class WebAuthnTest extends TestCase
             {
                 // do nothing
             }
-        };
+	};
+        Configuration::setPreLoadedConfig($this->config, 'config.php');
+        Configuration::setPreLoadedConfig($this->module_config, 'module_webauthn.php');
     }
 
 
