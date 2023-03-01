@@ -80,7 +80,8 @@ class ManageTokenTest extends TestCase
             public static function loadState(string $id, string $stage, bool $allowMissing = false): ?array
             {
                 return [
-                    'FIDO2AuthSuccessful' => true,
+			'FIDO2AuthSuccessful' => true,
+			'FIDO2PasswordlessAuthMode' => false,
                 ];
             }
         });
@@ -140,7 +141,8 @@ class ManageTokenTest extends TestCase
             public static function loadState(string $id, string $stage, bool $allowMissing = false): ?array
             {
                 return [
-                    'FIDO2AuthSuccessful' => true,
+			'FIDO2AuthSuccessful' => true,
+			'FIDO2PasswordlessAuthMode' => false,
                 ];
             }
         });
