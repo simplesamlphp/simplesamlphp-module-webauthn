@@ -99,7 +99,8 @@ class WebAuthnTest extends TestCase
 		    'FIDO2WantsRegister' => false,
 		    'FIDO2PasswordlessAuthMode' => false,
                     'FIDO2AuthSuccessful' => false,
-                    'requestTokenModel' => 'something',
+		    'requestTokenModel' => 'something',
+		    'Source' => 'There is no real auth source in this test.',
                 ];
             }
         });
