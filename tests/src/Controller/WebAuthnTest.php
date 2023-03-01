@@ -50,6 +50,9 @@ class WebAuthnTest extends TestCase
             'simplesaml'
         );
 
+	$this->moduleConfig = [];
+	$this->moduleConfig['registration']['use_inflow_registration'] = true;
+
         $this->session = Session::getSessionFromRequest();
 
         $this->logger = new class () extends Logger {
