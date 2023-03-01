@@ -174,7 +174,8 @@ class ManageTokenTest extends TestCase
                     'FIDO2AuthSuccessful' => false,
                     'FIDO2Tokens' => [0 => "foo"],
                     'FIDO2WantsRegister' => false,
-                    'UseInflowRegistration' => false,
+		    'UseInflowRegistration' => false,
+		    'FIDO2PasswordlessAuthMode' => false,
                 ];
             }
         });
