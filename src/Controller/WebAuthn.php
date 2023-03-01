@@ -213,11 +213,11 @@ class WebAuthn
         $t->data['showExitButton'] = !array_key_exists('Registration', $state);
         $frontendData['usernameEncoded'] = $usernameEncoded;
         $frontendData['attestation'] = $state['requestTokenModel'] ? "indirect" : "none";
-        $frontendData['credentialIdEncoded'] = $credentialIdEncoded;
+	$frontendData['credentialIdEncoded'] = $credentialIdEncoded;
+	$frontendData['FIDO2PasswordlessAuthMode'] = $state['FIDO2PasswordlessAuthMode'];
         $t->data['frontendData'] = json_encode($frontendData);
 
         $t->data['FIDO2AuthSuccessful'] = $state['FIDO2AuthSuccessful'];
-        $frontendData['FIDO2PasswordlessAuthMode'] = $state['FIDO2PasswordlessAuthMode'];
         if ( $this->workflowStateMachine($state) == self::STATE_MGMT ) {
             $t->data['regURL'] = Module::getModuleURL('webauthn/regprocess?StateId=' . urlencode($stateId));
             $t->data['delURL'] = Module::getModuleURL('webauthn/managetoken?StateId=' . urlencode($stateId));
