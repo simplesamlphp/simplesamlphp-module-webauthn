@@ -27,6 +27,9 @@ class ManageTokenTest extends TestCase
     /** @var \SimpleSAML\Configuration */
     protected Configuration $config;
 
+    /** @var \SimpleSAML\Configuration */
+    protected $module_config;
+
     /** @var \SimpleSAML\Logger */
     protected Logger $logger;
 
@@ -50,6 +53,16 @@ class ManageTokenTest extends TestCase
             '[ARRAY]',
             'simplesaml'
         );
+
+        $this->module_config = [];
+        $this->module_config = Configuration::loadFromArray(
+                [
+                        'registration' => ['use_inflow_registration' => true],
+                ]);
+
+        Configuration::setPreLoadedConfig($this->config, 'config.php');
+        Configuration::setPreLoadedConfig($this->module_config, 'module_webauthn.php');
+
 
         $this->session = Session::getSessionFromRequest();
 
