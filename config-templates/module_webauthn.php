@@ -12,7 +12,7 @@ $config = [
         'database.password' => 'sdfsdf',
     ],
 
-    'attrib_username' => 'urn:oid:1.3.6.1.4.1.23735.100.0',
+    'identifyingAttribute' => 'uid',
     'attrib_displayname' => 'urn:oid:2.5.4.3',
 
     /* FIDO2 is phishing-resistent by binding generated credentials to a scope.

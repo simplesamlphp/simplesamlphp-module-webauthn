@@ -131,10 +131,10 @@ class WebAuthn
             $stateData->derivedScope = $hostname;
         }
 
-        if (array_key_exists('attrib_username', $moduleConfig)) {
-            $stateData->usernameAttrib = $moduleConfig['attrib_username'];
+        if (array_key_exists('identifyingAttribute', $moduleConfig)) {
+            $stateData->usernameAttrib = $moduleConfig['identifyingAttribute'];
         } else {
-            throw new Error\CriticalConfigurationError('webauthn: it is required to set attrib_username in config.');
+            throw new Error\CriticalConfigurationError('webauthn: it is required to set identifyingAttribute in config.');
         }
 
         if (array_key_exists('attrib_displayname', $moduleConfig)) {

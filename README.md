@@ -35,6 +35,9 @@ ALTER TABLE credentials ADD COLUMN `hashedId` VARCHAR(100) DEFAULT '---' AFTER `
 The updated schema is compatible with the 0.11.x releases, so a roll-back to an
 older version is still possible without removing the column.
 
+Also note that the parameter attribute_username was changed to identifyingAttribute
+to achieve better consistency with other authproc filters.
+
 How to setup the webauthn module as an authprocfilter
 -----------------------------------------------------
 You need to enable the module's authprocfilter at a priority level

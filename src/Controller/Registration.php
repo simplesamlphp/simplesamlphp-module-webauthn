@@ -139,7 +139,7 @@ class Registration
         if ($hostname !== null) {
             $stateData->derivedScope = $hostname;
         }
-        $stateData->usernameAttrib = $moduleConfig->getString('attrib_username');
+        $stateData->usernameAttrib = $moduleConfig->getString('identifyingAttribute');
         $stateData->displaynameAttrib = $moduleConfig->getString('attrib_displayname');
 
         StaticProcessHelper::prepareState($stateData, $state);
