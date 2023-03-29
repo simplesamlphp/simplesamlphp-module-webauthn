@@ -87,7 +87,9 @@ abstract class Store
         int $isResidentKey,
         int $signCounter,
         string $friendlyName,
-        string $hashedId
+        string $hashedId,
+        string $aaguid,
+        string $attLevel
     ): bool;
 
     /**

@@ -46,6 +46,10 @@ class StateData
      * @var boolean
      */
     public bool $requestTokenModel;
+    
+    public string $minCertLevel;
+    public array $aaguidWhitelist;
+    public array $attFmtWhitelist;
 
     /**
      * @var bool an attribute which determines whether you will be able to register and manage tokens

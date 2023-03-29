@@ -38,19 +38,60 @@ $config = [
      * given user.
      */
     'registration' => [
-        /* the following will interactively ask the user if he is willing to
-         * share manufacturer and model information during credential 
-         * registration. The user can decline, in which case registration will 
-         * still succeed but vendor and model will be logged as 
-         * "unknown model [unknown vendor]"
-         *
-         * When not requesting this, there is one less user interaction during
-         * the registration process; and no model information will be saved.
-         *
-         * defaults to "false"
+       
+        /*
+         * You can specify which authenticators are considered acceptable.
+         * This can be done with the following two configuration parameters.
+         * 
+         * They are additive; if either the level is acceptable OR the authenti-
+         * cator is in the whitelist, OR the attestation format matches,
+         * registration will succeed.
          */
-        'request_tokenmodel' => true,
+        
+        /*
+         * Do you require authenticators to be FIDO Certified, and if so, which
+         * certification level?
+         * 
+         * Setting this to anything but "0" will require the user to accept that
+         * make and model are sent during the registration process, so that the
+         * characteristics of the authenticator can be verified.
+         * 
+         * "0" is probably acceptable for second-factor use, but most certainly
+         * not for Passwordless.
+         * 
+         * Possible values:
+         * "0" =>     no restriction (even authenticators which are NOT FIDO 
+         *            Certified are acceptable!)
+         * "1" =>     FIDO Certified Level 1
+         * "1plus" => FIDO Certified Level 1+
+         * "2" =>     FIDO Certified Level 2
+         * "3" =>     FIDO Certified Level 3
+         */
+        'minimum_certification_level' => "2",
 
+        /*
+         * If you specify a level above, you may want to make exceptions for
+         * specific authenticators that are not on that level. This array
+         * holds all the authenticators that are considered acceptable by 
+         * exception.
+         * 
+         */
+        'aaguid_whitelist' => [ ],
+        
+        /*
+         * Some authenticators are more equal than others. Apple TouchID and
+         * FaceID set their AAGUID to all-zeroes so can't be whitelisted. But
+         * they do send their attestation data in a Apple-specific attestation
+         * format. So seeing that format means an Apple product is identified.
+         * Since these authenticators are quite common, here is an option that
+         * allows to whitelist authenticators by their attestation format. 
+         * 
+         * The example is the obvious and single really useful value.
+         * 
+         * https://webkit.org/blog/11312/meet-face-id-and-touch-id-for-the-web/
+         */
+        'attestation_format_whitelist' => ['apple'],
+        
         /* optional parameter which determines whether you will be able to 
          * register and manage tokens while authenticating or you want to use 
          * the standalone registration page for these purposes. 

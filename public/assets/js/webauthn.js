@@ -157,7 +157,7 @@ var passwordlessPublicKeyCredentialCreationOptions = {
             credProtect: "userVerificationRequired",
         },
         timeout: 60000,
-        attestation: frontendData['attestation'],
+        attestation: 'direct',
         extensions: {
             credProps: true,
             credProtect: {

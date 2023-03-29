@@ -123,7 +123,11 @@ class Registration
         $state['Attributes'] = $attrs;
 
         $stateData = new StateData();
-        $stateData->requestTokenModel = $registrationConfig['request_tokenmodel'] ?? false;
+        $stateData->requestTokenModel = ($registrationConfig['minimum_certification_level'] == "0" ? false : true);
+        $stateData->minCertLevel = $registrationConfig['minimum_certification_level'];
+        $stateData->aaguidWhitelist = $registrationConfig['aaguid_whitelist'];
+        $stateData->attFmtWhitelist = $registrationConfig['attestation_format_whitelist'];
+        
         try {
             $stateData->store = Store::parseStoreConfig($moduleConfig->getArray('store'));
         } catch (Exception $e) {

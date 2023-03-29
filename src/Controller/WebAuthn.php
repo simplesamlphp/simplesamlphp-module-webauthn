@@ -143,8 +143,12 @@ class WebAuthn
             throw new Error\CriticalConfigurationError('webauthn: it is required to set attrib_displayname in config.');
         }
 
-        if (array_key_exists('request_tokenmodel', $moduleConfig['registration'])) {
-            $stateData->requestTokenModel = $moduleConfig['registration']['request_tokenmodel'];
+        if (array_key_exists('minimum_certification_level', $moduleConfig['registration'])) {
+            $stateData->requestTokenModel = ($moduleConfig['registration']['minimum_certification_level'] == "0" ? false : true);
+            $stateData->minCertLevel = $moduleConfig['registration']['minimum_certification_level'];
+            $stateData->aaguidWhitelist = $moduleConfig['registration']['aaguid_whitelist'];
+            $stateData->attFmtWhitelist = $moduleConfig['registration']['attestation_format_whitelist'];
+
         } else {
             $stateData->requestTokenModel = false;
         }

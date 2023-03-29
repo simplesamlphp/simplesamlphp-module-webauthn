@@ -125,9 +125,9 @@ class RegProcess
             base64_decode($request->request->get('attestation_object')),
             $request->request->get('response_id'),
             $request->request->get('attestation_client_data_json'),
+            $state['authenticatorAcceptability'],
             $debugEnabled
         );
-
         // at this point, we need to talk to the DB
         /**
          * STEP 19 of the validation procedure in § 7.1 of the spec: see if this credential is already registered
@@ -142,19 +142,15 @@ class RegProcess
         // THAT'S IT. This is a valid credential and can be enrolled to the user.
         $friendlyName = $request->request->get('tokenname');
 
-        // if we have requested the token model, add it to the name
-        if ($state['requestTokenModel']) {
+        // if we know the token model, add it to the name
             $model = Translate::noop('unknown model');
-            $vendor = Translate::noop('unknown vendor');
             $aaguiddict = AAGUID::getInstance();
             if ($aaguiddict->hasToken($regObject->getAAGUID())) {
                 $token = $aaguiddict->get($regObject->getAAGUID());
-                $model = $token['model'];
-                $vendor = $token['O'];
+                $model = $token['metadataStatement']['description'];
             }
-            $friendlyName .= " ($model [$vendor])";
-        }
-
+            $friendlyName .= " ($model)";
+        
         /**
          * STEP 20 of the validation procedure in § 7.1 of the spec: store credentialId, credential,
          * signCount and associate with user
@@ -189,7 +185,6 @@ class RegProcess
         // use identical hashing as in JS generation step
         $configUtils = new Utils\Config();
         $username = hash('sha512', $state['FIDO2Username'] . '|' . $configUtils->getSecretSalt());
-       
         $store->storeTokenData(
             $state['FIDO2Username'],
             $regObject->getCredentialId(),
@@ -200,6 +195,8 @@ class RegProcess
             $currentCounterValue,
             $friendlyName,
             $username,
+            $regObject->getAAGUID(),
+            $regObject->getAttestationLevel()
         );
 
         // make sure $state gets the news, the token is to be displayed to the user on the next page

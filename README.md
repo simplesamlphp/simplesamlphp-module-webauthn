@@ -22,27 +22,6 @@ You can install this module with composer:
 % composer require simplesamlphp/simplesamlphp-module-webauthn
 ```
 
-Upgrade from 0.11
------------------
-Note that the database schema has one additional column as of 2.0.0:
-
-    algo INT DEFAULT NULL,
-    presenceLevel INT DEFAULT NULL,
-    isResidentKey BOOL DEFAULT NULL,
-
-If you have a previous installation of the module, you need to add this column
-manually (
-ALTER TABLE credentials ADD COLUMN `algo` INT DEFAULT NULL AFTER `credential`;
-ALTER TABLE credentials ADD COLUMN `presenceLevel` INT DEFAULT NULL AFTER `algo`;
-ALTER TABLE credentials ADD COLUMN `isResidentKey` BOOL DEFAULT NULL AFTER `presenceLevel`;
-ALTER TABLE credentials ADD COLUMN `hashedId` VARCHAR(100) DEFAULT '---' AFTER `friendlyName`;
-).
-The updated schema is compatible with the 0.11.x releases, so a roll-back to an
-older version is still possible without removing the column.
-
-Also note that the parameter attribute_username was changed to identifyingAttribute
-to achieve better consistency with other authproc filters.
-
 How to setup the webauthn module as an authprocfilter
 -----------------------------------------------------
 You need to enable the module's authprocfilter at a priority level
@@ -235,8 +214,10 @@ Options
 `registration / auth_source`
 :    Optional parameter to define how the user authenticates to the dedicated registration page. Defaults to "default-sp"; ignored if inflow registration was configured.
 
-`registration / request_tokenmodel`
-:    The following will interactively ask the user if he is willing to share manufacturer and model information during credential registration. The user can decline, in which case registration will still succeed but vendor and model will be logged as "unknown model [unknown vendor]". When not requesting this, there is one less user interaction during the registration process; and no model information will be saved. Defaults to "false".
+`registration / minimum_certification_level`
+`registration / aaguid_whitelist`
+`registration / attestation_format_whitelist`
+:    These options steer which authenticators are considered acceptable for registration at the deployment.
 
 User Experience / Workflow
 --------------------------
@@ -264,15 +245,18 @@ still single factor authentication because anyone with the user's password can
 register any token. That is in the nature of things. It could be avoided with
 an out-of-band registration process (in the same scope).
 
-If the standalone registration page is used, the user can't optionally enroll and manage tokens while logging in.
-The standalone registration page can be found under webauthn/registration.php, it requires authentication
-and after that you are redirected to a page where you can manage tokens.
+If the standalone registration page is used, the user can't optionally enroll 
+and manage tokens while logging in.
+The standalone registration page can be found under <basedir>module.php/webauthn/registration, 
+it requires authentication (with the auth source registration_auth_source) and 
+after that you are redirected to a page where you can manage tokens.
 
 Device model detection
 ----------------------
-The option `registration / request_tokenmodel` can be used to get a token's 
-so-called AAGUID which uniquely identifies the model and manufacturer (it is not
-a serial number). 
+The option `registration / minimum_certification_level` can be used to get a 
+token's so-called AAGUID which uniquely identifies the model and manufacturer
+(it is not a serial number). You can then make decisions about the acceptability
+of a certain authenticator model.
 
 Mapping the AAGUID to a cleartext model and manufacturer name is done by having
 (or not) meta-information about the AAGUID. The FIDO Alliance operates a
@@ -281,14 +265,12 @@ manufacturers are not required to submit their AAGUIDs and metadata to that MDS,
 and indeed, some manufacturers are missing.
 
 The module contains a full list of AAGUIDs and relevant metadata as pulled from
-the FIDO MDS. It also has a limited amount of manually curated information of
-some AAGUIDs which are not in the FIDO MDS, namely for Yubico products and 
-Microsoft. This list is in the `config/webauthn-aaguid.json` file, and this file
-needs to be moved to your SimpleSAMLphp configuration directory.
+the FIDO MDS. This list is in the `config/webauthn-aaguid.json` file, and this 
+file needs to be moved to your SimpleSAMLphp configuration directory.
 
 If you want, you can also manually update this file, if you believe there might
-be new models listed. In order to do that, run the `bin/updateMetadata.php` script
-like this:
+be new models listed. In order to do that, run the `bin/updateMetadata.php` 
+script like this:
 
 ```bash
 % php bin/updateMetadata.php <blob file>
@@ -312,13 +294,13 @@ You can disable the module entirely by not listing it as an authprocfilter.
 You can disable the module by default by setting default_enable = false. You can
 then enable WebAuthn second-factor authentication for individual users by adding
 them with status "FIDO2Enabled" to the `userstatus` table or if you don't want to
-use the `userstatus` table, you can send an attribute whose name is stored in `attrib_toggle`
-for this.
+use the `userstatus` table, you can send an attribute whose name is stored in 
+`attrib_toggle` for this.
 
 If the module is enabled by default, you can selectively disable WebAuthn 
 second-factor authentication by adding the username with status FIDO2Disabled to
-the `userstatus` table or if you don't want to use the `userstatus` table, you can
-send an attribute whose name is stored in `attrib_toggle` for this.
+the `userstatus` table or if you don't want to use the `userstatus` table, you
+can send an attribute whose name is stored in `attrib_toggle` for this.
 
 Limitations / Design Decisions
 ------------------------------
@@ -328,11 +310,15 @@ validation if present). That is because Yubikeys do not support token binding
 and the corresponding functionality thus has no test case.
 
 Both User Present and User Verified variants are considered sufficient to 
-authenticate successfully (§7.1 steps 11 and 12 are joined into one condition).
+authenticate successfully in second-factor scenarios (§7.1 steps 11 and 12 are
+joined into one condition).
 The module logs into the credential database which of the two was used during
 registration time and does not allow downgrades during authentication time.
+Passwordless authentication always requires User Verified during registration
+and authentication transactions.
 
-The implementation requests ECDSA and RSA keys (algorithms -7, -257).
+The implementation requests and supports ECDSA and RSA keys (algorithms -7, 
+-257).
 
 The implementation does not request any client extensions. The specification
 gives implementations a policy choice on what to do if a client sends extensions
@@ -351,13 +337,12 @@ For the attation type "packed / x5c",
   the spec due to other means of revocation checking in the FIDO MDS).
 
 For both "packed / x5c" and "fido-u2f":
-* due to the lack of any externally provided knowledge about CAs(???) all
-  attestations are classified as "Basic" (i.e. no "AttCA" level)
+* all attestations are classified as "Basic" (i.e. no "AttCA" level); i.e. 
+  validation as per §7.1 Step 18 is not executed. 
 
-Given the sorry state of completeness of the FIDO MDS, only very few attestation
-root CAs are known and validation as per §7.1 Step 18 would often fail. That
-step is therefore ignored. All the "None", "Self" and "Basic" attestation levels
-are considered acceptable; meaning §7.1 Step 21 does not apply.
+* Regarding §7.1 Step 21: When minimum certification levels are configured, 
+  "Self" and "Basic" attestation levels are considered acceptable; "None" is
+  not acceptable.
 
 If the implementation detects signs of physical object cloning (not incremented
 signature counter), it follows the policy of failing authentication.

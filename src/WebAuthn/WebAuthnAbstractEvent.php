@@ -164,7 +164,6 @@ abstract class WebAuthnAbstractEvent
          */
         $this->clientDataHash = $this->verifyClientDataJSON($clientDataJSON);
         $this->counter = $this->validateAuthData($authData);
-        $this->presenceLevel = self::PRESENCE_LEVEL_NONE;
     }
 
     /**

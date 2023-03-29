@@ -8,6 +8,7 @@ use SimpleSAML\Logger;
 use SimpleSAML\Module\webauthn\WebAuthn\AAGUID;
 use SimpleSAML\Utils;
 use SimpleSAML\Utils\Config as SSPConfig;
+use \Exception;
 
 /**
  * FIDO2/WebAuthn Authentication Processing filter
@@ -18,18 +19,18 @@ use SimpleSAML\Utils\Config as SSPConfig;
  * @author Stefan Winter <stefan.winter@restena.lu>
  * @package SimpleSAMLphp
  */
-class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
-{
+class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
+
     /**
      * Public key algorithm supported. This is -7 - ECDSA with curve P-256, or -275 (RS256)
      */
     public const PK_ALGORITHM_ECDSA = "-7";
     public const PK_ALGORITHM_RSA = "-257";
-    public const PK_ALGORITHM = [ self::PK_ALGORITHM_ECDSA, self::PK_ALGORITHM_RSA ];
-    public const AAGUID_ASSURANCE_LEVEL_NONE = 0;
-    public const AAGUID_ASSURANCE_LEVEL_SELF = 1;
-    public const AAGUID_ASSURANCE_LEVEL_BASIC = 2;
-    public const AAGUID_ASSURANCE_LEVEL_ATTCA = 3;
+    public const PK_ALGORITHM = [self::PK_ALGORITHM_ECDSA, self::PK_ALGORITHM_RSA];
+    public const AAGUID_ASSURANCE_LEVEL_NONE = 'None';
+    public const AAGUID_ASSURANCE_LEVEL_SELF = 'Self';
+    public const AAGUID_ASSURANCE_LEVEL_BASIC = 'Basic';
+    public const AAGUID_ASSURANCE_LEVEL_ATTCA = 'AttCA';
 
     /**
      * the AAGUID of the newly registered authenticator
@@ -39,9 +40,9 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
 
     /**
      * how sure are we about the AAGUID?
-     * @var int
+     * @var string
      */
-    protected int $AAGUIDAssurance;
+    protected string $AAGUIDAssurance;
 
     /**
      * An array of known hardware tokens
@@ -49,6 +50,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * @var \SimpleSAML\Module\webauthn\WebAuthn\AAGUID
      */
     protected AAGUID $AAGUIDDictionary;
+    protected string $AttFmt;
 
     /**
      * Initialize the event object.
@@ -64,13 +66,14 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * @param bool $debugMode         print debugging statements?
      */
     public function __construct(
-        string $pubkeyCredType,
-        string $scope,
-        string $challenge,
-        string $attestationData,
-        string $responseId,
-        string $clientDataJSON,
-        bool $debugMode = false
+            string $pubkeyCredType,
+            string $scope,
+            string $challenge,
+            string $attestationData,
+            string $responseId,
+            string $clientDataJSON,
+            array $acceptabilityPolicy,
+            bool $debugMode = false
     ) {
         $this->debugBuffer .= "attestationData raw: " . $attestationData . "<br/>";
         /**
@@ -89,6 +92,68 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         $this->validateAttestationData($attestationData);
         // the following function sets the credential properties
         $this->debugBuffer .= "Attestation Data (bin2hex): " . bin2hex(substr($authData, 37)) . "<br/>";
+        // now check if the authenticator is acceptable as per policy
+        $this->verifyAcceptability($acceptabilityPolicy);
+    }
+
+    private function verifyAcceptability($acceptabilityPolicy) {
+        if (in_array($this->AAGUID, $acceptabilityPolicy['aaguidWhitelist'])) {
+            return;
+        }
+
+        // if we care about the attestation at all, make sure we have a confidence
+        // level beyond "None".
+        if ($acceptabilityPolicy['minCertLevel'] != "0" && $this->AAGUIDAssurance == self::AAGUID_ASSURANCE_LEVEL_NONE) {
+            throw new Exception("Authenticator did not provide a useful attestation level.");
+        }
+
+        if (in_array($this->AttFmt, $acceptabilityPolicy['attFmtWhitelist'])) {
+            return;
+        }
+
+        $aaguidDb = AAGUID::getInstance();
+        if (!$aaguidDb->hasToken($this->AAGUID)) {
+            throw new Exception("Authenticator with AAGUID " . $this->AAGUID . " is not known to the FIDO MDS3 database.");
+        }
+        $authenticatorData = $aaguidDb->get($this->AAGUID);
+        $certification = $authenticatorData['statusReports'][0]['status'];
+
+        if ($certification == "REVOKED") {
+            throw new Exception("FIDO Alliance has REVOKED certification of this device. It cannot be registered.");
+        }
+
+        switch ($acceptabilityPolicy['minCertLevel']) {
+            case "0":
+                return;
+            case "1":
+                // note: always full string match - there is also a level NOT_FIDO_CERTIFIED !
+                if ($certification == "FIDO_CERTIFIED" || $certification == "FIDO_CERTIFIED_L1") {
+                    return;
+                }
+            // intentional fall-thorugh, higher levels are also okay
+            case "1plus":
+                if ($certification == "FIDO_CERTIFIED_L1plus") {
+                    return;
+                }
+            // intentional fall-thorugh, higher levels are also okay
+            case "2":
+                if ($certification == "FIDO_CERTIFIED_L2") {
+                    return;
+                }
+            // intentional fall-thorugh, higher levels are also okay
+            case "3":
+                if ($certification == "FIDO_CERTIFIED_L3") {
+                    return;
+                }
+            // intentional fall-thorugh, higher levels are also okay
+            case "3plus":
+                if ($certification == "FIDO_CERTIFIED_L3plus") {
+                    return;
+                }
+                throw new Exception("Authenticator must have Certification Level " . $acceptabilityPolicy['minCertLevel'] . " but has $certification");
+            default:
+                throw new Exception("Configuration error: unknown minimum certification level " . $acceptabilityPolicy['minCertLevel']);
+        }
     }
 
     /**
@@ -96,8 +161,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * @param string $attestationData
      * @return void
      */
-    private function validateAttestationData(string $attestationData): void
-    {
+    private function validateAttestationData(string $attestationData): void {
         /**
          * STEP 9 of the validation procedure in § 7.1 of the spec: CBOR-decode the attestationObject
          */
@@ -109,6 +173,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         /**
          * STEP 15 of the validation procedure in § 7.1 of the spec: verify attStmt values
          */
+        $this->AttFmt = $attestationArray['fmt'];
         switch ($attestationArray['fmt']) {
             case "none":
                 $this->validateAttestationFormatNone($attestationArray);
@@ -133,14 +198,14 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
                 $this->fail("Unknown attestation format.");
                 break;
         }
+        $this->AttFmt = $attestationArray['fmt'];
     }
 
     /**
      * @param array $attestationArray
      * @return void
      */
-    private function validateAttestationFormatNone(array $attestationArray): void
-    {
+    private function validateAttestationFormatNone(array $attestationArray): void {
         // § 8.7 of the spec
         /**
          * § 7.1 Step 16 && §8.7 Verification Procedure: stmt must be an empty array
@@ -158,8 +223,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
     /**
      * @param array $attestationArray
      */
-    private function validateAttestationFormatApple(array $attestationArray): void
-    {
+    private function validateAttestationFormatApple(array $attestationArray): void {
         // found at: https://www.apple.com/certificateauthority/private/
 
         $APPLE_WEBAUTHN_ROOT_CA = "-----BEGIN CERTIFICATE-----
@@ -178,10 +242,8 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
 -----END CERTIFICATE-----";
         // § 8.8 Bullet 1 of the draft spec at https://pr-preview.s3.amazonaws.com/alanwaketan/webauthn/pull/1491.html#sctn-apple-anonymous-attestation
         // draft implemented in state of 11 Feb 2021
-
         // I can't help but notice that the verification procedure does NOTHING with CA certs from the chain, nor is there a root to validate to!
         // Found the root CA with Google, see above, and will perform chain validation even if the spec doesn't say so.
-
         // first, clear the openssl error backlog. We might need error data in case things go sideways.
         while (openssl_error_string() !== false);
 
@@ -197,8 +259,8 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         $certProps = openssl_x509_parse($cryptoUtils->der2pem($stmtDecoded['x5c'][0]));
         // § 8.8 Bullet 4
         if (
-            !isset($certProps['extensions']['1.2.840.113635.100.8.2']) ||
-            empty($certProps['extensions']['1.2.840.113635.100.8.2'])
+                !isset($certProps['extensions']['1.2.840.113635.100.8.2']) ||
+                empty($certProps['extensions']['1.2.840.113635.100.8.2'])
         ) {
             $this->fail("The required nonce value is not present in the OID.");
         }
@@ -214,17 +276,17 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
                 $signerPubKey = openssl_pkey_get_public($cryptoUtils->der2pem($stmtDecoded['x5c'][$runIndex + 1]));
                 if (openssl_x509_verify($certResource, $signerPubKey) != 1) {
                     $this->fail("Error during chain validation of the attestation certificate (while validating cert #$runIndex, which is "
-                        . $cryptoUtils->der2pem($runCert)
-                        . "; next cert was "
-                        . $cryptoUtils->der2pem($stmtDecoded['x5c'][$runIndex + 1]));
+                            . $cryptoUtils->der2pem($runCert)
+                            . "; next cert was "
+                            . $cryptoUtils->der2pem($stmtDecoded['x5c'][$runIndex + 1]));
                 }
             } else { // last cert, compare to the root
                 $certResource = openssl_x509_read($cryptoUtils->der2pem($runCert));
                 $signerPubKey = openssl_pkey_get_public($APPLE_WEBAUTHN_ROOT_CA);
                 if (openssl_x509_verify($certResource, $signerPubKey) != 1) {
                     $this->fail(sprintf(
-                        "Error during root CA validation of the attestation chain certificate, which is %s",
-                        $cryptoUtils->der2pem($runCert)
+                                    "Error during root CA validation of the attestation chain certificate, which is %s",
+                                    $cryptoUtils->der2pem($runCert)
                     ));
                 }
             }
@@ -233,12 +295,12 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         $keyResource = openssl_pkey_get_public($cryptoUtils->der2pem($stmtDecoded['x5c'][0]));
         if ($keyResource === false) {
             $this->fail(
-                "Did not get a parseable X.509 structure out of the Apple attestation statement - x5c nr. 0 statement was: XXX "
-                . $stmtDecoded['x5c'][0]
-                . " XXX; PEM equivalent is "
-                . $cryptoUtils->der2pem($stmtDecoded['x5c'][0])
-                . ". OpenSSL error: "
-                . openssl_error_string()
+                    "Did not get a parseable X.509 structure out of the Apple attestation statement - x5c nr. 0 statement was: XXX "
+                    . $stmtDecoded['x5c'][0]
+                    . " XXX; PEM equivalent is "
+                    . $cryptoUtils->der2pem($stmtDecoded['x5c'][0])
+                    . ". OpenSSL error: "
+                    . openssl_error_string()
             );
         }
 
@@ -249,12 +311,12 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
 
         if ($credentialResource === false) {
             $this->fail(
-                "Could not create a public key from CBOR credential. XXX "
-                . $this->credential
-                . " XXX; PEM equivalent is "
-                . $keyObject->asPEM()
-                . ". OpenSSL error: "
-                . openssl_error_string()
+                    "Could not create a public key from CBOR credential. XXX "
+                    . $this->credential
+                    . " XXX; PEM equivalent is "
+                    . $keyObject->asPEM()
+                    . ". OpenSSL error: "
+                    . openssl_error_string()
             );
         }
 
@@ -262,16 +324,16 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         $credentialDetails = openssl_pkey_get_details($credentialResource);
         $keyDetails = openssl_pkey_get_details($keyResource);
         if (
-            $credentialDetails['bits'] != $keyDetails['bits'] ||
-            $credentialDetails['key']  != $keyDetails['key'] ||
-            $credentialDetails['type'] != $keyDetails['type']
+                $credentialDetails['bits'] != $keyDetails['bits'] ||
+                $credentialDetails['key'] != $keyDetails['key'] ||
+                $credentialDetails['type'] != $keyDetails['type']
         ) {
             $this->fail(
-                "The credential public key does not match the certificate public key in attestationData. ("
-                . $credentialDetails['key']
-                . " - "
-                . $keyDetails['key']
-                . ")"
+                    "The credential public key does not match the certificate public key in attestationData. ("
+                    . $credentialDetails['key']
+                    . " - "
+                    . $keyDetails['key']
+                    . ")"
             );
         }
         $this->pass("Apple attestation format verification passed.");
@@ -281,8 +343,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
     /**
      * @param array $attestationArray
      */
-    private function validateAttestationFormatPacked(array $attestationArray): void
-    {
+    private function validateAttestationFormatPacked(array $attestationArray): void {
         $stmtDecoded = $attestationArray['attStmt'];
         $this->debugBuffer .= "AttStmt: " . print_r($stmtDecoded, true) . "<br/>";
         /**
@@ -302,8 +363,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
      * @param array $attestationArray
      * @return void
      */
-    private function validateAttestationFormatPackedX5C(array $attestationArray): void
-    {
+    private function validateAttestationFormatPackedX5C(array $attestationArray): void {
         $stmtDecoded = $attestationArray['attStmt'];
         /**
          * §8.2 Step 2: check x5c attestation
@@ -327,48 +387,51 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         $certProps = openssl_x509_parse($this->der2pem($stmtDecoded['x5c'][0]));
         $this->debugBuffer .= "Attestation Certificate:" . print_r($certProps, true) . "<br/>";
         if (
-            $certProps['version'] !== 2 || /** §8.2.1 Bullet 1 */
-            $certProps['subject']['OU'] !== "Authenticator Attestation" || /** §8.2.1 Bullet 2 [Subject-OU] */
-            !isset($certProps['subject']['CN']) || /** §8.2.1 Bullet 2 [Subject-CN] */
-            !isset($certProps['extensions']['basicConstraints']) ||
-            strstr("CA:FALSE", $certProps['extensions']['basicConstraints']) === false /** §8.2.1 Bullet 4 */
+                $certProps['version'] !== 2 || /** §8.2.1 Bullet 1 */
+                $certProps['subject']['OU'] !== "Authenticator Attestation" || /** §8.2.1 Bullet 2 [Subject-OU] */
+                !isset($certProps['subject']['CN']) || /** §8.2.1 Bullet 2 [Subject-CN] */
+                !isset($certProps['extensions']['basicConstraints']) ||
+                strstr("CA:FALSE", $certProps['extensions']['basicConstraints']) === false /** §8.2.1 Bullet 4 */
         ) {
             $this->fail("Attestation certificate properties are no good.");
         }
 
         if ($this->AAGUIDDictionary->hasToken($this->AAGUID)) {
             $token = $this->AAGUIDDictionary->get($this->AAGUID);
-            if (
-                $certProps['subject']['O'] !== $token['O'] ||
-                // §8.2.1 Bullet 2 [Subject-O]
-                $certProps['subject']['C'] !== $token['C']
-                // §8.2ubject-C]
-            ) {
-                $this->fail("AAGUID does not match vendor data.");
-            }
-            if ($token['multi'] === true) { // need to check the OID
+            /**
+             * Checking the OID is not programmatically possible. Text per spec:
+             * "If the related attetation root certificate is used for multiple
+             * authenticator models, the Extension OID ... MUST be present."
+             * 
+             * FIDO MDS3 metadata does not disclose whether the root CAs are
+             * used for multiple models.
+             */
+            /* if ($token['multi'] === true) { // need to check the OID
                 if (
-                    !isset($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4'])
-                    || empty($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4'])
-                ) { /** §8.2.1 Bullet 3 */
+                        !isset($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4']) || empty($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4'])
+                ) { // §8.2.1 Bullet 3
                     $this->fail(
-                        "This vendor uses one cert for multiple authenticator model attestations, but lacks the AAGUID OID."
+                            "This vendor uses one cert for multiple authenticator model attestations, but lacks the AAGUID OID."
                     );
                 }
                 /**
                  * §8.2 Step 2 Bullet 3: compare AAGUID values
                  */
-                $AAGUIDFromOid = substr(bin2hex($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4']), 4);
+                /* $AAGUIDFromOid = substr(bin2hex($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4']), 4);
                 $this->debugBuffer .= "AAGUID from OID = $AAGUIDFromOid<br/>";
                 if (strtolower($AAGUIDFromOid) !== strtolower($this->AAGUID)) {
                     $this->fail("AAGUID mismatch between attestation certificate and attestation statement.");
                 }
-            }
+            }*/
             // we would need to verify the attestation certificate against a known-good
             // root CA certificate to get more than basic
             /*
              * §7.1 Step 17 is to look at $token['RootPEMs']
              */
+            foreach ($token['metadataStatement']['attestationRootCertificates'] as $oneRoot) {
+                $caData = openssl_x509_parse("-----BEGIN CERTIFICATE-----\n$oneRoot\n-----END CERTIFICATE-----", true);
+                
+            }
             /*
              * §7.1 Step 18 is skipped, and we unconditionally return "only" Basic.
              */
@@ -387,8 +450,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
      * @param array $attestationArray
      * @return void
      */
-    private function validateAttestationFormatPackedSelf(array $attestationArray): void
-    {
+    private function validateAttestationFormatPackedSelf(array $attestationArray): void {
         $stmtDecoded = $attestationArray['attStmt'];
         /**
          * §8.2 Step 4 Bullet 1: check algorithm
@@ -402,7 +464,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
                 $keyObject = new Ec2Key($this->cborDecode(hex2bin($this->credential)));
                 $keyResource = openssl_pkey_get_public($keyObject->asPEM());
                 if ($keyResource === false) {
-                      $this->fail("Unable to construct ECDSA public key resource from PEM.");
+                    $this->fail("Unable to construct ECDSA public key resource from PEM.");
                 };
                 break;
             case self::PK_ALGORITHM_RSA:
@@ -436,8 +498,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
      * @param array $attestationData the incoming attestation data
      * @return void
      */
-    private function validateAttestationFormatFidoU2F(array $attestationData): void
-    {
+    private function validateAttestationFormatFidoU2F(array $attestationData): void {
         /**
          * §8.6 Verification Step 1 is a NOOP: if we're here, the attStmt was
          * already successfully CBOR decoded
@@ -470,10 +531,10 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
          * §8.6 Verification Step 4: encode the public key in ANSI X9.62 format
          */
         if (
-            isset($this->credential[-2]) &&
-            strlen($this->credential[-2]) === 32 &&
-            isset($this->credential[-3]) &&
-            strlen($this->credential[-3]) === 32
+                isset($this->credential[-2]) &&
+                strlen($this->credential[-2]) === 32 &&
+                isset($this->credential[-3]) &&
+                strlen($this->credential[-3]) === 32
         ) {
             $publicKeyU2F = chr(4) . $this->credential[-2] . $this->credential[-3];
         } else {
@@ -509,8 +570,8 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
      * @param array $attestationData the incoming attestation data
      * @return void
      */
-    private function validateAttestationFormatAndroidSafetyNet(array $attestationData): void
-    {
+    private function validateAttestationFormatAndroidSafetyNet(array $attestationData): void {
+        
     }
 
     /**
@@ -519,8 +580,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
      * @param string $responseId the response ID
      * @return void
      */
-    private function validateAttestedCredentialData(string $attData, string $responseId): void
-    {
+    private function validateAttestedCredentialData(string $attData, string $responseId): void {
         $aaguid = substr($attData, 0, 16);
         $credIdLenBytes = substr($attData, 16, 2);
         $credIdLen = intval(bin2hex($credIdLenBytes), 16);
@@ -534,8 +594,8 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
             $this->pass("Credential IDs in authenticator response and in attestation data match.");
         } else {
             $this->fail(
-                "Mismatch of credentialId (" . bin2hex($credId) . ") vs. response ID (" .
-                bin2hex(WebAuthnAbstractEvent::base64urlDecode($responseId)) . ")."
+                    "Mismatch of credentialId (" . bin2hex($credId) . ") vs. response ID (" .
+                    bin2hex(WebAuthnAbstractEvent::base64urlDecode($responseId)) . ")."
             );
         }
         // so far so good. Now extract the actual public key from its COSE
@@ -575,10 +635,8 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         }
         $extensions = substr($attData, 18 + $credIdLen + $credentialLength);
         if (strlen($extensions) !== 0) {
-            $this->pass("Found the following extensions (". strlen($extensions) ." bytes) during registration ceremony: " );
+            $this->pass("Found the following extensions (" . strlen($extensions) . " bytes) during registration ceremony: ");
         }
-
-
     }
 
     /**
@@ -587,8 +645,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
      * @param string $derData blob of DER data
      * @return string the PEM representation of the certificate
      */
-    private function der2pem(string $derData): string
-    {
+    private function der2pem(string $derData): string {
         $pem = chunk_split(base64_encode($derData), 64, "\n");
         $pem = "-----BEGIN CERTIFICATE-----\n" . $pem . "-----END CERTIFICATE-----\n";
         return $pem;
@@ -597,8 +654,15 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
     /**
      * @return string
      */
-    public function getAAGUID()
-    {
+    public function getAAGUID() {
         return $this->AAGUID;
     }
+
+        /**
+     * @return string
+     */
+    public function getAttestationLevel() {
+        return $this->AAGUIDAssurance;
+    }
+
 }

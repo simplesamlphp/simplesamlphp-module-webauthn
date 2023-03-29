@@ -9,10 +9,7 @@ $blobContent = json_decode(base64_decode(str_replace('_', '/', str_replace('-', 
 $outFormat = [];
 foreach ($blobContent['entries'] as $oneEntry) {
     if (isset($oneEntry['aaguid'])) {
-        $outFormat[str_replace('-', '', $oneEntry['aaguid'])] = [
-            "model" => $oneEntry["metadataStatement"]["description"],
-            "RootPEMs" => $oneEntry["metadataStatement"]["attestationRootCertificates"]
-        ];
+        $outFormat[str_replace('-', '', $oneEntry['aaguid'])] = $oneEntry;
     }
 }
 echo json_encode($outFormat, JSON_PRETTY_PRINT);

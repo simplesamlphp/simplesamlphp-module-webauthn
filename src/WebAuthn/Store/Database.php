@@ -71,6 +71,8 @@ class Database extends Store
                     signCounter INT NOT NULL,
                     friendlyName VARCHAR(100) DEFAULT 'Unnamed Token',
                     hashedId VARCHAR(100) DEFAULT '---',
+                    aaguid VARCHAR(64) DEFAULT NULL,
+                    attLevel ENUM('None','Basic','Self', AttCA') NOT NULL DEFAULT 'None',
                     UNIQUE (user_id,credentialId)
                 )
             ");
@@ -211,12 +213,14 @@ class Database extends Store
         int $isResidentKey,
         int $signCounter,
         string $friendlyName,
-        string $hashedId
+        string $hashedId,
+        string $aaguid,
+        string $attLevel    
     ): bool {
         $this->db->write(
             'INSERT INTO credentials ' .
-            '(user_id, credentialId, credential, algo, presenceLevel, isResidentKey, signCounter, friendlyName, hashedId) VALUES '
-          . '(:userId,:credentialId,:credential,:algo,:presenceLevel,:isResidentKey,:signCounter,:friendlyName,:hashedId)',
+            '(user_id, credentialId, credential, algo, presenceLevel, isResidentKey, signCounter, friendlyName, hashedId, aaguid, attLevel) VALUES '
+          . '(:userId,:credentialId,:credential,:algo,:presenceLevel,:isResidentKey,:signCounter,:friendlyName,:hashedId,:aaguid,:attLevel)',
             [
                 'userId' => $userId,
                 'credentialId' => $credentialId,
@@ -226,7 +230,9 @@ class Database extends Store
                 'isResidentKey' => $isResidentKey,
                 'signCounter' => $signCounter,
                 'friendlyName' => $friendlyName,
-                'hashedId' => $hashedId
+                'hashedId' => $hashedId,
+                'aaguid' => $aaguid,
+                'attLevel' => $attLevel,
             ]
         );
 
