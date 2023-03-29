@@ -1,4 +1,4 @@
-/vendor/
-/composer.lock
-/lib/WebAuthn/restena.php
-/nbproject/
+vendor/
+composer.lock
+lib/WebAuthn/restena.php
+nbproject/
