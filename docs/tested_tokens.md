@@ -4,8 +4,8 @@ The following tokens were tested against the implementation and found to work
 Attestation modes (None, Indirect)
 ----------------------------------
 
-  * Yubikey 5 NFC
-  * Yubikey 5C
+  * [Yubikey 5 NFC](https://www.yubico.com/product/yubikey-5-nfc/)
+  * [Yubikey 5C](https://www.yubico.com/product/yubikey-5c/)
   * [Security Key by Yubico](https://support.yubico.com/support/solutions/articles/15000006900-security-key-by-yubico)
   * [Security Key NFC by Yubico](https://support.yubico.com/support/solutions/articles/15000019469-security-key-nfc)
   * [Feitian BioPass FIDO2](https://www.ftsafe.com/Products/FIDO/Bio)

@@ -27,6 +27,9 @@ class ManageTokenTest extends TestCase
     /** @var \SimpleSAML\Configuration */
     protected Configuration $config;
 
+    /** @var \SimpleSAML\Configuration */
+    protected $module_config;
+
     /** @var \SimpleSAML\Logger */
     protected Logger $logger;
 
@@ -50,6 +53,16 @@ class ManageTokenTest extends TestCase
             '[ARRAY]',
             'simplesaml'
         );
+
+        $this->module_config = [];
+        $this->module_config = Configuration::loadFromArray(
+                [
+                        'registration' => ['use_inflow_registration' => true],
+                ]);
+
+        Configuration::setPreLoadedConfig($this->config, 'config.php');
+        Configuration::setPreLoadedConfig($this->module_config, 'module_webauthn.php');
+
 
         $this->session = Session::getSessionFromRequest();
 
@@ -80,7 +93,8 @@ class ManageTokenTest extends TestCase
             public static function loadState(string $id, string $stage, bool $allowMissing = false): ?array
             {
                 return [
-                    'FIDO2AuthSuccessful' => true,
+			'FIDO2AuthSuccessful' => true,
+			'FIDO2PasswordlessAuthMode' => false,
                 ];
             }
         });
@@ -140,7 +154,8 @@ class ManageTokenTest extends TestCase
             public static function loadState(string $id, string $stage, bool $allowMissing = false): ?array
             {
                 return [
-                    'FIDO2AuthSuccessful' => true,
+			'FIDO2AuthSuccessful' => true,
+			'FIDO2PasswordlessAuthMode' => false,
                 ];
             }
         });
@@ -174,7 +189,8 @@ class ManageTokenTest extends TestCase
                     'FIDO2AuthSuccessful' => false,
                     'FIDO2Tokens' => [0 => "foo"],
                     'FIDO2WantsRegister' => false,
-                    'UseInflowRegistration' => false,
+		    'UseInflowRegistration' => false,
+		    'FIDO2PasswordlessAuthMode' => false,
                 ];
             }
         });

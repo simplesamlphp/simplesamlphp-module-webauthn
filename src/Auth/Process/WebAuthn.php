@@ -79,77 +79,27 @@ class WebAuthn extends Auth\ProcessingFilter
          */
         parent::__construct($config, $reserved);
 
-        $this->stateData = new Module\webauthn\WebAuthn\StateData();
-
         $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php')->toArray();
-        try {
-            $this->stateData->store = Store::parseStoreConfig($moduleConfig['store']);
-        } catch (\Exception $e) {
-            Logger::error(
-                'webauthn: Could not create storage: ' .
-                $e->getMessage()
-            );
-        }
-
-        // Set the optional scope if set by configuration
-        if (array_key_exists('scope', $moduleConfig)) {
-            $this->stateData->scope = $moduleConfig['scope'];
-        }
-
-        // Set the derived scope so we can compare it to the sent host at a later point
-        $httpUtils = new Utils\HTTP();
-        $baseurl = $httpUtils->getSelfHost();
-        $hostname = parse_url($baseurl, PHP_URL_HOST);
-        if ($hostname !== null) {
-            $this->stateData->derivedScope = $hostname;
-        }
-
-        if (array_key_exists('attrib_username', $moduleConfig)) {
-            $this->stateData->usernameAttrib = $moduleConfig['attrib_username'];
-        } else {
-            throw new Error\CriticalConfigurationError('webauthn: it is required to set attrib_username in config.');
-        }
-
-        if (array_key_exists('attrib_displayname', $moduleConfig)) {
-            $this->stateData->displaynameAttrib = $moduleConfig['attrib_displayname'];
-        } else {
-            throw new Error\CriticalConfigurationError('webauthn: it is required to set attrib_displayname in config.');
-        }
-
-        if (array_key_exists('request_tokenmodel', $moduleConfig)) {
-            $this->stateData->requestTokenModel = $moduleConfig['request_tokenmodel'];
-        } else {
-            $this->stateData->requestTokenModel = false;
-        }
-        if (array_key_exists('default_enable', $moduleConfig)) {
-            $this->defaultEnabled = $moduleConfig['default_enable'];
-        } else {
-            $this->defaultEnabled = false;
-        }
-
-        if (array_key_exists('force', $moduleConfig)) {
-            $this->force = $moduleConfig['force'];
-        } else {
-            $this->force = true;
-        }
-        if (array_key_exists('attrib_toggle', $moduleConfig)) {
-            $this->toggleAttrib = $moduleConfig['attrib_toggle'];
-        } else {
-            $this->toggleAttrib = 'toggle';
-        }
-        if (array_key_exists('use_database', $moduleConfig)) {
-            $this->useDatabase = $moduleConfig['use_database'];
-        } else {
-            $this->useDatabase = true;
-        }
-        if (array_key_exists('authnContextClassRef', $moduleConfig)) {
-            $this->authnContextClassRef = $moduleConfig['authnContextClassRef'];
-        }
-        if (array_key_exists('use_inflow_registration', $moduleConfig)) {
-            $this->stateData->useInflowRegistration = $moduleConfig['use_inflow_registration'];
+       
+        $initialStateData = new Module\webauthn\WebAuthn\StateData();
+        Module\webauthn\Controller\WebAuthn::loadModuleConfig($moduleConfig, $initialStateData);
+        $this->stateData = $initialStateData;
+        
+        // switched to authsource config for 2.0
+        $this->force = $config['force'] ?? true;
+        $this->toggleAttrib = $config['attrib_toggle'] ?? 'toggle';
+        $this->useDatabase = $config['use_database'] ?? true;
+        $this->defaultEnabled = $config['default_enable'] ?? false;
+        $this->authnContextClassRef = $config['authncontextclassref'] ?? null;
+        
+        if (array_key_exists('use_inflow_registration', $moduleConfig['registration'])) {
+            $this->stateData->useInflowRegistration = $moduleConfig['registration']['use_inflow_registration'];
         } else {
             $this->stateData->useInflowRegistration = true;
         }
+        
+
+
     }
 
     /**
@@ -164,13 +114,6 @@ class WebAuthn extends Auth\ProcessingFilter
      */
     public function process(array &$state): void
     {
-        Assert::keyExists($state, 'UserID');
-        Assert::keyExists($state, 'Destination');
-        Assert::keyExists($state['Destination'], 'entityid');
-        Assert::keyExists($state['Destination'], 'metadata-set');
-        Assert::keyExists($state['Source'], 'entityid');
-        Assert::keyExists($state['Source'], 'metadata-set');
-
         if (!array_key_exists($this->stateData->usernameAttrib, $state['Attributes'])) {
             Logger::warning('webauthn: cannot determine if user needs second factor, missing attribute "' .
                 $this->stateData->usernameAttrib . '".');

@@ -53,7 +53,7 @@ class RegistrationTest extends TestCase
         Configuration::setPreLoadedConfig(
             Configuration::loadFromArray(
                 [
-                    'attrib_username' => 'uid',
+                    'identifyingAttribute' => 'uid',
                     'attrib_displayname' => 'displayName',
                     'store' => [
                         'webauthn:Database',

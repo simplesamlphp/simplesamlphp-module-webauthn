@@ -85,11 +85,9 @@ class AuthProcessTest extends TestCase
                     'FIDO2Scope' => 'Ducktown',
                     'FIDO2Tokens' => [],
                     'FIDO2SignupChallenge' => 'abc123',
-                    'FIDO2AuthSuccessful' => true,
+		    'FIDO2AuthSuccessful' => true,
+		    'FIDO2PasswordlessAuthMode' => false,
                     'requestTokenModel' => 'something',
-                    'Source' => [
-                        'entityid' => 'https://idp.example.com',
-                    ],
                 ];
             }
         });

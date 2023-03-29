@@ -15,9 +15,9 @@
             <ul>
                 {% for token in FIDO2Tokens %}
                     {% if FIDO2AuthSuccessful == false or FIDO2AuthSuccessful != token.0 %}
-                        <li class='othertoken'>{{ token.3|e }}</li>
+                        <li class='othertoken'>{{ token.3|e }}{% if token.5 == 4 and token.6 == true %} <font color='red'>PasswordlessCapable</font> {%  endif  %}</li>
                     {% else %}
-                        <li class='currenttoken'>{{ token.3|e }} {{ '{webauthn:webauthn:currentToken}'|trans }}</li>
+                        <li class='currenttoken'>{{ token.3|e }}{% if token.5 == 4 and token.6 == true %} <font color='red'>PasswordlessCapable</font> {%  endif  %} {{ '{webauthn:webauthn:currentToken}'|trans }}</li>
                     {% endif %}
                 {% endfor %}
             </ul>
@@ -29,11 +29,15 @@
             <input type='hidden' id='data' name='attestation_client_data_json' value='nix'/>
             <input type='hidden' id='attobj' name='attestation_object' value='mehrnix'/>
             <input type='hidden' id='type' name='type' value='something'/>
+            <input type='hidden' id='clientext' name='clientext' value=''/>
             <input type='hidden' id='operation' name='operation' value='REG'/>
             <button type='button' id='regformSubmit'>{{ '{webauthn:webauthn:newTokenButton}'|trans }}</button>
             <label for='tokenname'>{{ '{webauthn:webauthn:newTokenName}'|trans }}</label>
             <input type='text' id='tokenname' name='tokenname' size='40'
                 value='{{ '{webauthn:webauthn:newTokenDefaultName}'|trans }} {{ "now"|date('Y-m-d') }}' />
+            <input type='checkbox' id='passwordless' name='passwordless'/>
+            
+            <label for='passwordless'>Register for Passwordless?</label>
         </form>
         <div class='space'></div>
         {% if FIDO2Tokens|length > 0 %}
@@ -64,8 +68,9 @@
             <input type='hidden' id='data' name='attestation_client_data_json' value='nix'/>
             <input type='hidden' id='authdata' name='authenticator_data' value='mehrnix'/>
             <input type='hidden' id='sigdata' name='signature' value='evenmorenix'/>
-            <!-- ignoring <input type='hidden' id='userhandle' name='userhandle' value='someuser'/> -->
+            <input type='hidden' id='userHandle' name='userHandle' value='unknownuserid' />
             <input type='hidden' id='type' name='type' value='something'/>
+            <input type='hidden' id='clientext' name='clientext' value=''/>
             <input type='hidden' id='operation' name='operation' value='AUTH'/>
             <input type='checkbox' id='credentialChange' name='credentialChange'>
             <label for='credentialChange'>

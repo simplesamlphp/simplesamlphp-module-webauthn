@@ -23,29 +23,127 @@ Note that the database schema has one additional column as of 2.0.0:
 
     algo INT DEFAULT NULL,
     presenceLevel INT DEFAULT NULL,
+    isResidentKey BOOL DEFAULT NULL,
 
 If you have a previous installation of the module, you need to add this column
 manually (
 ALTER TABLE credentials ADD COLUMN `algo` INT DEFAULT NULL AFTER `credential`;
 ALTER TABLE credentials ADD COLUMN `presenceLevel` INT DEFAULT NULL AFTER `algo`;
+ALTER TABLE credentials ADD COLUMN `isResidentKey` BOOL DEFAULT NULL AFTER `presenceLevel`;
+ALTER TABLE credentials ADD COLUMN `hashedId` VARCHAR(100) DEFAULT '---' AFTER `friendlyName`;
 ).
 The updated schema is compatible with the 0.11.x releases, so a roll-back to an
 older version is still possible without removing the column.
 
-How to setup the webauthn module
------------------------------------------
+Also note that the parameter attribute_username was changed to identifyingAttribute
+to achieve better consistency with other authproc filters.
+
+How to setup the webauthn module as an authprocfilter
+-----------------------------------------------------
 You need to enable the module's authprocfilter at a priority level
 so that it takes place AFTER the first-factor authentication. E.g. at 100 and
 if standalone registration and name2oid are used together, then the WebAuthn
  auth proc filter has to run after name2oid.
 
+The authproc filter takes a number of optional parameter that steer which users
+will be forced into 2FA.
+
 ```php
 100 => [
-        'class' => 'webauthn:WebAuthn',
+    'class' => 'webauthn:WebAuthn',
+
+    /* should FIDO2 be enabled by default for all users? If not, users need to
+     * be white-listed in the database - other users simply pass through the
+     * filter without being subjected to 2FA.
+     *
+     * defaults to "disabled by default" === false
+     */
+    'default_enable' => false,
+
+    /* only if default_enable is false:
+     * the toggle to turn on 2FA can either be a database lookup in the module's
+     * internal database or be dependent on the existence or absence of a
+     * user attribute as retrieved in the first-factor auth. The following
+     * options control which variant to use.
+     */
+
+    /*
+     * this parameter determines if the database will be used to check
+     * whether to trigger second factor authentication or use the "attrib_toggle" instead.
+     * Default value of this attribute is true
+     */
+    'use_database' => true,
+
+    /* this parameter is used only if "use_database" is false. If the value of
+     * "force" is true then we trigger WebAuthn only if "attrib_toggle" from the
+     * user is not empty. If the value of "force" is false then we switch the value of
+     * "default_enable" only if "attrib_toggle" from the user is not empty.
+     * Default falue is true.
+     */
+    'force' => true,
+
+    /* this parameter stores the name of the attribute that is sent with user and which
+     * determines whether to trigger WebAuthn.
+     * Default value is 'toggle'
+     */
+    'attrib_toggle' => 'toggle',
+
+    /**
+     * The module can be configured to assert that MFA was executed towards the 
+     * SP by setting an appropriate <AuthnContextClassRef> tag in the response.
+     * The original SAML 2.0 spec in that regard contains only contexts which
+     * are rather useless in a FIDO2 context.
+     * 
+     * FIDO alliance has its own to indicate that a FIDO key was used, and it
+     * is the default if unset. The semantics does not indicate then that an
+     * additional authentication besides the FIDO key was used (i.e. your
+     * first-factor authsource authentication). Thus, you may want to consider
+     * setting the more accurate REFEDS identifier below instead.
+     * 
+     * Defaults to 'urn:rsa:names:tc:SAML:2.0:ac:classes:FIDO' if not set
+     * 
+     * If you authenticate towards Microsoft 365 SPs which may trigger their
+     * own variant of 2FA, then you can tell them to skip this by
+     * - setting the SP tenant parameter "supportsMFA" to "true"
+     * - returning the AuthnContextClassRef 
+     *   "http://schemas.microsoft.com/claims/multipleauthn"
+     */
+    
+    // 'authncontextclassref' => 'https://refeds.org/profile/mfa',
+
     ],
 ```
 Then you need to copy config-templates/module_webauthn.php to your config directory
  and adjust settings accordingly. See the file for parameters description.
+
+How to set up Passwordless authentication
+-----------------------------------------
+In passwordless mode, the module provides an AuthSource, to be configured as
+usual in simpleSAMLphp's config/authsources.php
+
+Users' FIDO2 Keys need to be registered with the "Passwordless" checkbox set -
+this triggers the mandatory registration with a second factor intrinsic to the
+key (fingerprint, face recognition, transaction PIN, etc. ).
+
+This authsource takes little configuration because authentications happen before
+the username is known - so no user-specific configuration is possible.
+
+The authsource takes the following parameters in authsources.php:
+
+    'name-your-source' => [
+        'webauthn:Passwordless',
+    /*
+     * Defaults to 'urn:rsa:names:tc:SAML:2.0:ac:classes:FIDO' if not set
+     *
+     * If you authenticate towards Microsoft 365 SPs which may trigger their
+     * own variant of 2FA, then you can tell them to skip this by
+     * - setting the SP tenant parameter "supportsMFA" to "true"
+     * - returning the AuthnContextClassRef 
+     *   "http://schemas.microsoft.com/claims/multipleauthn"
+     */
+    
+    //  'authncontextclassref' => 'https://refeds.org/profile/mfa',
+    ],
 
 Using storage
 -------------
@@ -113,9 +211,6 @@ Options
 -------
 `scope`
 :    FIDO2 is phishing-resistent by binding generated credentials to a scope. Browsers will only invoke the registration/authentication if the scope matches the principal domain name the user is currently visiting. If not specified, the scope will be the hostname of the IdP as per its metadata. It is permissible to widen the scope up to the prinicpal domain though (e.g. authentication service is "saml.example.com" => scope can be extended to "example.com"; but not "examp1e.com". A registered FIDO2 token can then also be used on other servers in the same domain. If configuring this item, be sure that the authentication server name and the desired scope are a suffix match.
-
-`request_tokenmodel`
-:    The following will interactively ask the user if he is willing to share manufacturer and model information during credential registration. The user can decline, in which case registration will still succeed but vendor and model will be logged as "unknown model [unknown vendor]". When not requesting this, there is one less user interaction during the registration process; and no model information will be saved. Defaults to "false".
     
 `default_enable`
 :    Should WebAuthn be enabled by default for all users? If not, users need to be white-listed in the database - other users simply pass through the filter without being subjected to 2FA. Defaults to "disabled by default" === false    
@@ -129,8 +224,14 @@ Options
 `use_database`
 :    This parameter determines if the database will be used to check whether to trigger second factor authentication or use the "attrib_toggle" instead. Default value of this attribute is true.
 
-`use_inflow_registration`
+`registration / use_inflow_registration`
 :    Optional parameter which determines whether you will be able to register and manage tokens while authenticating or you want to use the standalone registration page for these purposes. If set to false => standalone registration page, if true => inflow registration. If this parameter is not explicitly set, the value is considered to be true.
+
+`registration / auth_source`
+:    Optional parameter to define how the user authenticates to the dedicated registration page. Defaults to "default-sp"; ignored if inflow registration was configured.
+
+`registration / request_tokenmodel`
+:    The following will interactively ask the user if he is willing to share manufacturer and model information during credential registration. The user can decline, in which case registration will still succeed but vendor and model will be logged as "unknown model [unknown vendor]". When not requesting this, there is one less user interaction during the registration process; and no model information will be saved. Defaults to "false".
 
 User Experience / Workflow
 --------------------------
@@ -164,9 +265,9 @@ and after that you are redirected to a page where you can manage tokens.
 
 Device model detection
 ----------------------
-The option `request_tokenmodel` can be used to get a token's so-called AAGUID
-which uniquely identifies the model and manufacturer (it is not a serial 
-number). 
+The option `registration / request_tokenmodel` can be used to get a token's 
+so-called AAGUID which uniquely identifies the model and manufacturer (it is not
+a serial number). 
 
 Mapping the AAGUID to a cleartext model and manufacturer name is done by having
 (or not) meta-information about the AAGUID. The FIDO Alliance operates a

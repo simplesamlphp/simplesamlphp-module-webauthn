@@ -7,6 +7,7 @@ use CBOR\OtherObject;
 use CBOR\Tag;
 use CBOR\StringStream;
 
+use SimpleSAML\Utils\HTTP as HTTPHelper;
 /**
  * FIDO2/WebAuthn Authentication Processing filter
  *
@@ -38,13 +39,6 @@ abstract class WebAuthnAbstractEvent
      * @var string
      */
     private string $challenge;
-
-    /**
-     * Our IdP EntityId
-     *
-     * @var string
-     */
-    private string $idpEntityId;
 
     /**
      * the authenticator's signature counter
@@ -131,7 +125,6 @@ abstract class WebAuthnAbstractEvent
      * @param string $pubkeyCredType  PublicKeyCredential.type
      * @param string $scope           the scope of the event
      * @param string $challenge       the challenge which was used to trigger this event
-     * @param string $idpEntityId     the entity ID of our IdP
      * @param string $authData        the authData / authenticatorData structure which is present in all types of events
      * @param string $clientDataJSON  the client data JSON string which is present in all types of events
      * @param bool   $debugMode       shall we collect and output some extensive debugging information along the way?
@@ -140,15 +133,14 @@ abstract class WebAuthnAbstractEvent
         string $pubkeyCredType,
         string $scope,
         string $challenge,
-        string $idpEntityId,
         string $authData,
         string $clientDataJSON,
         bool $debugMode = false
     ) {
         $this->scope = $scope;
         $this->challenge = $challenge;
-        $this->idpEntityId = $idpEntityId;
         $this->debugMode = $debugMode;
+        $this->presenceLevel = self::PRESENCE_LEVEL_NONE;
         $this->debugBuffer .= "PublicKeyCredential.type: $pubkeyCredType<br/>";
         /**
          * This is not a required validation as per spec. Still odd that Firefox returns
@@ -305,8 +297,9 @@ abstract class WebAuthnAbstractEvent
          * §7.1 STEP 6 : check if incoming origin matches our hostname (taken from IdP metadata prefix)
          * §7.2 STEP 10: check if incoming origin matches our hostname (taken from IdP metadata prefix)
          */
-        $slash = strpos($this->idpEntityId, '/', 8);
-        $expectedOrigin = ($slash !== false) ? substr($this->idpEntityId, 0, $slash) : $slash;
+        $httpHeler = new HTTPHelper();
+        $slash = strpos($httpHeler->getBaseURL(), '/', 8);
+        $expectedOrigin = ($slash !== false) ? substr($httpHeler->getBaseURL(), 0, $slash) : $slash;
         if ($clientData['origin'] === $expectedOrigin) {
             $this->pass("Origin matches");
         } else {
@@ -320,15 +313,6 @@ abstract class WebAuthnAbstractEvent
             $this->pass("No optional token binding data to validate.");
         } else {
             $this->warn("Validation of the present token binding data not implemented, continuing without!");
-        }
-        /**
-         * §7.1 STEP 14 (clientData part): we did not request any client extensions, and do not allow any to be present
-         * §7.2 STEP 15 (clientData part): we did not request any client extensions, and do not allow any to be present
-         */
-        if (!isset($clientData['clientExtensions']) || count($clientData['clientExtensions']) == 0) {
-            $this->pass("As expected, no client extensions.");
-        } else {
-            $this->fail("Incoming client extensions even though none were requested.");
         }
         /**
          * §7.1 STEP 8 : SHA-256 hashing the clientData
@@ -372,11 +356,15 @@ abstract class WebAuthnAbstractEvent
          * §7.1 STEP 14 (authData part): no extensions were requested, so none are allowed to be present
          * §7.2 STEP 15 (authData part): no extensions were requested, so none are allowed to be present
          */
+
         if ((128 & ord($bitfield)) > 0) {
-            $this->fail("ED: Extension Data Included, even though we did not request any.");
+            // so we get Extensions. We typically ignore all, but the 
+            // "credProtect" one may be interesting in the future.
+            $this->pass("ED: Extension Data included. Interesting bits may be extracted later.");
         } else {
             $this->pass("ED: Extension Data not present.");
         }
+
         switch ($this->eventType) {
             case "REG":
                 if ((64 & ord($bitfield)) > 0) {
@@ -384,12 +372,23 @@ abstract class WebAuthnAbstractEvent
                 } else {
                     $this->fail("AT: not present, but required during registration.");
                 }
+                // REG events parse their registration-related Extensions, if
+                // any, in the WebAuthnRegistrationEvent subclass
                 break;
             case "AUTH":
                 if ((64 & ord($bitfield)) > 0) {
                     $this->fail("AT: Attested Credential Data Included.");
                 } else {
                     $this->pass("AT: not present, like it should be during an authentication.");
+                }
+                // AUTH events can also have extensions. Extensions, if any,
+                // would follow after the counter. We allow them to be present
+                // but don't currently do anything with them, so let's
+                // just make a useless extraction here as a reminder.
+                $extensionBytes = substr($authData, 37);
+                if (strlen($extensionBytes) > 0) {
+                    // assign into variable and process if needed
+                    $this->cborDecode($extensionBytes);
                 }
                 break;
             default:

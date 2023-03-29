@@ -24,11 +24,28 @@ class StaticProcessHelper
         $state['FIDO2Tokens'] = $stateData->store->getTokenData($state['Attributes'][$stateData->usernameAttrib][0]);
         $state['FIDO2Scope'] = $stateData->scope;
         $state['FIDO2DerivedScope'] = $stateData->derivedScope;
+        $state['FIDO2AttributeStoringUsername'] = $stateData->usernameAttrib;
         $state['FIDO2Username'] = $state['Attributes'][$stateData->usernameAttrib][0];
         $state['FIDO2Displayname'] = $state['Attributes'][$stateData->displaynameAttrib][0];
         $state['FIDO2SignupChallenge'] = hash('sha512', random_bytes(64));
         $state['FIDO2WantsRegister'] = false;
         $state['FIDO2AuthSuccessful'] = false;
-        $state['UseInflowRegistration'] = $stateData->useInflowRegistration;
+        $state['FIDO2PasswordlessAuthMode'] = false;
+    }
+
+    public static function prepareStatePasswordlessAuth(StateData $stateData, array &$state): void
+    {
+        $state['requestTokenModel'] = $stateData->requestTokenModel;
+        $state['webauthn:store'] = $stateData->store;
+        $state['FIDO2Scope'] = $stateData->scope;
+        $state['FIDO2DerivedScope'] = $stateData->derivedScope;
+        $state['FIDO2AttributeStoringUsername'] = $stateData->usernameAttrib;
+        $state['FIDO2SignupChallenge'] = hash('sha512', random_bytes(64));
+        $state['FIDO2PasswordlessAuthMode'] = true;
+        $state['FIDO2AuthSuccessful'] = false;     
+        $state['FIDO2Tokens'] = []; // we don't know which token comes in.
+        $state['FIDO2Username'] = 'notauthenticated';
+        $state['FIDO2Displayname'] = 'User Not Authenticated Yet';        
+        $state['FIDO2WantsRegister'] = false;
     }
 }

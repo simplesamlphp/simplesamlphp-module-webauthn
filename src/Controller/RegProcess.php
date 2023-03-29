@@ -122,7 +122,6 @@ class RegProcess
             $request->request->get('type'),
             $fido2Scope,
             $state['FIDO2SignupChallenge'],
-            $state['IdPMetadata']['entityid'],
             base64_decode($request->request->get('attestation_object')),
             $request->request->get('response_id'),
             $request->request->get('attestation_client_data_json'),
@@ -176,14 +175,31 @@ class RegProcess
             $currentCounterValue = $regObject->getCounter();
         }
 
+        // did we get any client extensions?
+        $isResidentKey = 0;
+        if (strlen($request->request->get('clientext')) > 0 && count(json_decode($request->request->get('clientext'), true)) > 0 ) {
+            $extensions = json_decode($request->request->get('clientext'), true);
+            if ($extensions['credProps']['rk'] === true) {
+                $isResidentKey = 1;
+            }
+        }
+
+        // we also need to store the hased user_id in case we need to retrieve
+        // tokens in passwordless mode
+        // use identical hashing as in JS generation step
+        $configUtils = new Utils\Config();
+        $username = hash('sha512', $state['FIDO2Username'] . '|' . $configUtils->getSecretSalt());
+       
         $store->storeTokenData(
             $state['FIDO2Username'],
             $regObject->getCredentialId(),
             $regObject->getCredential(),
             $regObject->getAlgo(),
             $regObject->getPresenceLevel(),
+            $isResidentKey,
             $currentCounterValue,
-            $friendlyName
+            $friendlyName,
+            $username,
         );
 
         // make sure $state gets the news, the token is to be displayed to the user on the next page
@@ -191,7 +207,10 @@ class RegProcess
             0 => $regObject->getCredentialId(),
             1 => $regObject->getCredential(),
             2 => $currentCounterValue,
-            3 => $friendlyName
+            3 => $friendlyName,
+            4 => $regObject->getAlgo(),
+            5 => $regObject->getPresenceLevel(),
+            6 => $isResidentKey
         ];
 
         $id = $this->authState::saveState($state, 'webauthn:request');
