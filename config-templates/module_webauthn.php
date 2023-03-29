@@ -66,6 +66,7 @@ $config = [
          * "1plus" => FIDO Certified Level 1+
          * "2" =>     FIDO Certified Level 2
          * "3" =>     FIDO Certified Level 3
+         * "3plus" => FIDO Certified Level 3+
          */
         'minimum_certification_level' => "2",
 
