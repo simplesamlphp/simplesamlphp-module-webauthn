@@ -97,13 +97,16 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
     }
 
     private function verifyAcceptability($acceptabilityPolicy) {
+        if ($acceptabilityPolicy['minCertLevel'] == "0") { // all is accepted
+            return;
+        }
         if (in_array($this->AAGUID, $acceptabilityPolicy['aaguidWhitelist'])) {
             return;
         }
 
-        // if we care about the attestation at all, make sure we have a confidence
-        // level beyond "None".
-        if ($acceptabilityPolicy['minCertLevel'] != "0" && $this->AAGUIDAssurance == self::AAGUID_ASSURANCE_LEVEL_NONE) {
+        // if we care about the content of the attestation at all, make sure we
+        // have a confidence level beyond "None".
+        if ($this->AAGUIDAssurance == self::AAGUID_ASSURANCE_LEVEL_NONE) {
             throw new Exception("Authenticator did not provide a useful attestation level.");
         }
 
