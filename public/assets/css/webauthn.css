@@ -12,6 +12,11 @@ li.currenttoken {
     font-weight: bold;
     color: blue;
 }
+
+li.othertoken {
+    display: flex;
+}
+
 span#tokencaption {
     font-weight: bold;
 }
