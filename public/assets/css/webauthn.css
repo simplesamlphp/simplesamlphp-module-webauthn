@@ -17,6 +17,10 @@ li.othertoken {
     display: flex;
 }
 
+img.factorlogo {
+    height: 2em;
+}
+
 span#tokencaption {
     font-weight: bold;
 }
