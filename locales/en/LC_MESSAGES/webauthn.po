@@ -53,3 +53,9 @@ msgstr "Remove"
 
 msgid "{webauthn:webauthn:currentToken}"
 msgstr "(you authenticated with this token)"
+
+msgid "title_FIDO_CERTIFICATION_TOO_LOW"
+msgstr "FIDO Token not Acceptable"
+
+msgid "descr_FIDO_CERTIFICATION_TOO_LOW"
+msgstr "You attempted to register a FIDO token that does not match company policy. You may need to use a different token."
