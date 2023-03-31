@@ -19,6 +19,7 @@ li.othertoken {
 
 img.factorlogo {
     height: 2em;
+    padding: 2px;
 }
 
 span#tokencaption {
