@@ -1,5 +1,7 @@
 <?php
 
+use SimpleSAML\Module\webauthn\WebAuthn\WebAuthnRegistrationEvent;
+
 $config = [
     /* Enable/disable Debug made */
     'debug' => false,
@@ -56,20 +58,21 @@ $config = [
          * make and model are sent during the registration process, so that the
          * characteristics of the authenticator can be verified.
          * 
-         * "0" is probably acceptable for second-factor use, but most certainly
-         * not for Passwordless.
+         * WebAuthnRegistrationEvent::CERTIFICATION_NOT_REQUIRED is probably 
+         * acceptable for second-factor use, but most certainly not for Passwordless.
          * 
          * Possible values:
-         * "0" =>     no restriction (even authenticators which are NOT FIDO 
-         *            Certified are acceptable!)
-         * "1" =>     FIDO Certified Level 1
-         * "1plus" => FIDO Certified Level 1+
-         * "2" =>     FIDO Certified Level 2
-         * "3" =>     FIDO Certified Level 3
-         * "3plus" => FIDO Certified Level 3+
+         * WebAuthnRegistrationEvent::CERTIFICATION_NOT_REQUIRED => no 
+         *     restriction (even authenticators which are NOT FIDO Certified 
+         *     or not known to FIDO Alliance at all are acceptable!)
+         * WebAuthnRegistrationEvent::FIDO_CERTIFIED_L1 =>     FIDO Certified Level 1
+         * WebAuthnRegistrationEvent::FIDO_CERTIFIED_L1plus => FIDO Certified Level 1+
+         * WebAuthnRegistrationEvent::FIDO_CERTIFIED_L2 =>     FIDO Certified Level 2
+         * WebAuthnRegistrationEvent::FIDO_CERTIFIED_L3 =>     FIDO Certified Level 3
+         * WebAuthnRegistrationEvent::FIDO_CERTIFIED_L3plus => FIDO Certified Level 3+
          */
-        'minimum_certification_level' => "2",
-
+        'policy_2fa' => [
+            'minimum_certification_level' => WebAuthnRegistrationEvent::CERTIFICATION_NOT_REQUIRED,
         /*
          * If you specify a level above, you may want to make exceptions for
          * specific authenticators that are not on that level. This array
@@ -77,8 +80,7 @@ $config = [
          * exception.
          * 
          */
-        'aaguid_whitelist' => [ ],
-        
+            'aaguid_whitelist' => [ ],
         /*
          * Some authenticators are more equal than others. Apple TouchID and
          * FaceID set their AAGUID to all-zeroes so can't be whitelisted. But
@@ -91,7 +93,13 @@ $config = [
          * 
          * https://webkit.org/blog/11312/meet-face-id-and-touch-id-for-the-web/
          */
-        'attestation_format_whitelist' => ['apple'],
+            'attestation_format_whitelist' => [ ],
+        ],
+        'policy_passwordless' => [
+            'minimum_certification_level' => WebAuthnRegistrationEvent::FIDO_CERTIFIED_L1,
+            'aaguid_whitelist' => [ ],
+            'attestation_format_whitelist' => ['apple'],
+        ],
         
         /* optional parameter which determines whether you will be able to 
          * register and manage tokens while authenticating or you want to use 

@@ -47,9 +47,13 @@ class StateData
      */
     public bool $requestTokenModel;
     
-    public string $minCertLevel;
-    public array $aaguidWhitelist;
-    public array $attFmtWhitelist;
+    public string $minCertLevel2FA;
+    public array $aaguidWhitelist2FA;
+    public array $attFmtWhitelist2FA;
+
+    public string $minCertLevelPasswordless;
+    public array $aaguidWhitelistPasswordless;
+    public array $attFmtWhitelistPasswordless;
 
     /**
      * @var bool an attribute which determines whether you will be able to register and manage tokens

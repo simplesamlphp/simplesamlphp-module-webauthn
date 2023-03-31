@@ -20,10 +20,15 @@ class StaticProcessHelper
     public static function prepareState(StateData $stateData, array &$state): void
     {
         $state['requestTokenModel'] = $stateData->requestTokenModel;
-        $state['authenticatorAcceptability'] = [ 
-            'minCertLevel' => $stateData->minCertLevel,
-            'aaguidWhitelist' => $stateData->aaguidWhitelist,
-            'attFmtWhitelist' => $stateData->attFmtWhitelist,
+        $state['authenticatorAcceptability2FA'] = [ 
+            'minCertLevel' => $stateData->minCertLevel2FA,
+            'aaguidWhitelist' => $stateData->aaguidWhitelist2FA,
+            'attFmtWhitelist' => $stateData->attFmtWhitelist2FA,
+            ];
+        $state['authenticatorAcceptabilityPasswordless'] = [ 
+            'minCertLevel' => $stateData->minCertLevelPasswordless,
+            'aaguidWhitelist' => $stateData->aaguidWhitelistPasswordless,
+            'attFmtWhitelist' => $stateData->attFmtWhitelistPasswordless,
             ];
         $state['webauthn:store'] = $stateData->store;
         $state['FIDO2Tokens'] = $stateData->store->getTokenData($state['Attributes'][$stateData->usernameAttrib][0]);

@@ -181,6 +181,11 @@ class AuthProcess {
         if ($state['FIDO2PasswordlessAuthMode'] === true && $oneToken[5] != WebAuthnAbstractEvent::PRESENCE_LEVEL_VERIFIED) {
             throw new Exception("Attempt to authenticate without User Verification in passwordless mode!");
         }
+        // if we didn't register the key as resident, do not allow its use in
+        // passwordless mode
+        if ($state['FIDO2PasswordlessAuthMode'] === true && $oneToken[6] != 1) {
+            throw new Exception("Attempt to authenticate with a token that is not registered for passwordless mode!");
+        }
         /**
          * §7.2 STEP 18 : detect physical object cloning on the token
          */

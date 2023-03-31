@@ -32,6 +32,15 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
     public const AAGUID_ASSURANCE_LEVEL_BASIC = 'Basic';
     public const AAGUID_ASSURANCE_LEVEL_ATTCA = 'AttCA';
 
+    // nomenclature from the MDS3 spec
+    
+    public const FIDO_REVOKED = "REVOKED";
+    public const CERTIFICATION_NOT_REQUIRED = false;
+    public const FIDO_CERTIFIED_L1 = "FIDO_CERTIFIED_L1";
+    public const FIDO_CERTIFIED_L1plus = "FIDO_CERTIFIED_L1plus";
+    public const FIDO_CERTIFIED_L2 = "FIDO_CERTIFIED_L2";
+    public const FIDO_CERTIFIED_L3 = "FIDO_CERTIFIED_L3";
+    public const FIDO_CERTIFIED_L3plus = "FIDO_CERTIFIED_L3plus";
     /**
      * the AAGUID of the newly registered authenticator
      * @var string
@@ -97,7 +106,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
     }
 
     private function verifyAcceptability($acceptabilityPolicy) {
-        if ($acceptabilityPolicy['minCertLevel'] == "0") { // all is accepted
+        if ($acceptabilityPolicy['minCertLevel'] == self::CERTIFICATION_NOT_REQUIRED) { // all is accepted
             return;
         }
 
@@ -120,36 +129,34 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
         $authenticatorData = $aaguidDb->get($this->AAGUID);
         $certification = $authenticatorData['statusReports'][0]['status'];
 
-        if ($certification == "REVOKED") {
+        if ($certification == self::FIDO_REVOKED) {
             throw new Exception("FIDO Alliance has REVOKED certification of this device. It cannot be registered.");
         }
 
         switch ($acceptabilityPolicy['minCertLevel']) {
-            case "0":
-                return;
-            case "1":
+            case self::FIDO_CERTIFIED_L1:
                 // note: always full string match - there is also a level NOT_FIDO_CERTIFIED !
-                if ($certification == "FIDO_CERTIFIED" || $certification == "FIDO_CERTIFIED_L1") {
+                if ($certification == "FIDO_CERTIFIED" || $certification == self::FIDO_CERTIFIED_L1) {
                     return;
                 }
             // intentional fall-thorugh, higher levels are also okay
-            case "1plus":
-                if ($certification == "FIDO_CERTIFIED_L1plus") {
+            case self::FIDO_CERTIFIED_L1plus:
+                if ($certification == self::FIDO_CERTIFIED_L1plus) {
                     return;
                 }
             // intentional fall-thorugh, higher levels are also okay
-            case "2":
-                if ($certification == "FIDO_CERTIFIED_L2") {
+            case self::FIDO_CERTIFIED_L2:
+                if ($certification == self::FIDO_CERTIFIED_L2) {
                     return;
                 }
             // intentional fall-thorugh, higher levels are also okay
-            case "3":
-                if ($certification == "FIDO_CERTIFIED_L3") {
+            case self::FIDO_CERTIFIED_L3:
+                if ($certification == self::FIDO_CERTIFIED_L3) {
                     return;
                 }
             // intentional fall-thorugh, higher levels are also okay
-            case "3plus":
-                if ($certification == "FIDO_CERTIFIED_L3plus") {
+            case self::FIDO_CERTIFIED_L3plus:
+                if ($certification == self::FIDO_CERTIFIED_L3plus) {
                     return;
                 }
                 throw new Exception("Authenticator must have Certification Level " . $acceptabilityPolicy['minCertLevel'] . " but has $certification");

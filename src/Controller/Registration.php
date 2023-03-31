@@ -123,10 +123,13 @@ class Registration
         $state['Attributes'] = $attrs;
 
         $stateData = new StateData();
-        $stateData->requestTokenModel = ($registrationConfig['minimum_certification_level'] == "0" ? false : true);
-        $stateData->minCertLevel = $registrationConfig['minimum_certification_level'];
-        $stateData->aaguidWhitelist = $registrationConfig['aaguid_whitelist'];
-        $stateData->attFmtWhitelist = $registrationConfig['attestation_format_whitelist'];
+        $stateData->requestTokenModel = ($registrationConfig['policy_2fa']['minimum_certification_level'] == "0" ? false : true);
+        $stateData->minCertLevel2FA = $registrationConfig['policy_2fa']['minimum_certification_level'];
+        $stateData->aaguidWhitelist2FA = $registrationConfig['policy_2fa']['aaguid_whitelist'];
+        $stateData->attFmtWhitelist2FA = $registrationConfig['policy_2fa']['attestation_format_whitelist'];
+        $stateData->minCertLevelPasswordless = $registrationConfig['policy_passwordless']['minimum_certification_level'];
+        $stateData->aaguidWhitelistPasswordless = $registrationConfig['policy_passwordless']['aaguid_whitelist'];
+        $stateData->attFmtWhitelistPasswordless = $registrationConfig['policy_passwordless']['attestation_format_whitelist'];
         
         try {
             $stateData->store = Store::parseStoreConfig($moduleConfig->getArray('store'));

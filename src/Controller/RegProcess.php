@@ -125,7 +125,7 @@ class RegProcess
             base64_decode($request->request->get('attestation_object')),
             $request->request->get('response_id'),
             $request->request->get('attestation_client_data_json'),
-            $state['authenticatorAcceptability'],
+            ($request->request->get('passwordless') == "on" ? $state['authenticatorAcceptabilityPasswordless'] : $state['authenticatorAcceptability2FA']),
             $debugEnabled
         );
         // at this point, we need to talk to the DB
@@ -191,7 +191,9 @@ class RegProcess
             $regObject->getCredential(),
             $regObject->getAlgo(),
             $regObject->getPresenceLevel(),
-            $isResidentKey,
+                // we deny saving resident key properties if Passwordless mode
+                // was not requested
+            ($request->request->get('passwordless') == "on" ? $isResidentKey : 0),
             $currentCounterValue,
             $friendlyName,
             $username,
