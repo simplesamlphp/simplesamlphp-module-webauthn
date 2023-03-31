@@ -8,6 +8,7 @@ use SimpleSAML\Logger;
 use SimpleSAML\Module\webauthn\WebAuthn\AAGUID;
 use SimpleSAML\Utils;
 use SimpleSAML\Utils\Config as SSPConfig;
+use SimpleSAML\Error\InvalidCredential;
 use \Exception;
 
 /**
@@ -130,7 +131,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
         $certification = $authenticatorData['statusReports'][0]['status'];
 
         if ($certification == self::FIDO_REVOKED) {
-            throw new Exception("FIDO Alliance has REVOKED certification of this device. It cannot be registered.");
+            throw new InvalidCredential("FIDO Alliance has REVOKED certification of this device. It cannot be registered.");
         }
 
         switch ($acceptabilityPolicy['minCertLevel']) {
@@ -159,7 +160,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
                 if ($certification == self::FIDO_CERTIFIED_L3plus) {
                     return;
                 }
-                throw new Exception("Authenticator must have Certification Level " . $acceptabilityPolicy['minCertLevel'] . " but has $certification");
+                throw new InvalidCredential("Authenticator must have Certification Level " . $acceptabilityPolicy['minCertLevel'] . " but has $certification");
             default:
                 throw new Exception("Configuration error: unknown minimum certification level " . $acceptabilityPolicy['minCertLevel']);
         }
