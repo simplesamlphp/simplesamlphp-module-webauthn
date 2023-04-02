@@ -2,7 +2,7 @@
 
 namespace SimpleSAML\Module\webauthn\Controller;
 
-use Datetime;
+use DateTime;
 use Exception;
 use SimpleSAML\Auth;
 use SimpleSAML\Auth\Source;

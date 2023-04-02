@@ -1,15 +1,31 @@
+---
+
 webauthn-registration:
-    path:       /registration
-    defaults:   { _controller: 'SimpleSAML\Module\webauthn\Controller\Registration::main' }
+  path: /registration
+  defaults: {
+    _controller: 'SimpleSAML\Module\webauthn\Controller\Registration::main'
+  }
+
 webauthn-authprocess:
-    path:       /authprocess
-    defaults:   { _controller: 'SimpleSAML\Module\webauthn\Controller\AuthProcess::main' }
+  path: /authprocess
+  defaults: {
+    _controller: 'SimpleSAML\Module\webauthn\Controller\AuthProcess::main'
+  }
+
 webauthn-webauthn:
-    path:       /webauthn
-    defaults:   { _controller: 'SimpleSAML\Module\webauthn\Controller\WebAuthn::main' }
+  path: /webauthn
+  defaults: {
+    _controller: 'SimpleSAML\Module\webauthn\Controller\WebAuthn::main'
+  }
+
 webauthn-regprocess:
-    path:       /regprocess
-    defaults:   { _controller: 'SimpleSAML\Module\webauthn\Controller\RegProcess::main' }
+  path: /regprocess
+  defaults: {
+    _controller: 'SimpleSAML\Module\webauthn\Controller\RegProcess::main'
+  }
+
 webauthn-managetoken:
-    path:       /managetoken
-    defaults:   { _controller: 'SimpleSAML\Module\webauthn\Controller\ManageToken::main' }
+  path: /managetoken
+  defaults: {
+    _controller: 'SimpleSAML\Module\webauthn\Controller\ManageToken::main'
+  }
