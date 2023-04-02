@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SimpleSAML\Module\webauthn\WebAuthn;
 
 use CBOR\Decoder;
 use CBOR\OtherObject;
 use CBOR\Tag;
 use CBOR\StringStream;
-
 use SimpleSAML\Utils\HTTP as HTTPHelper;
+
 /**
  * FIDO2/WebAuthn Authentication Processing filter
  *
@@ -54,9 +56,10 @@ abstract class WebAuthnAbstractEvent
      */
     protected int $algo;
 
-    const PRESENCE_LEVEL_PRESENT = 1;
-    const PRESENCE_LEVEL_VERIFIED = 4;
-    const PRESENCE_LEVEL_NONE = 0;
+    public const PRESENCE_LEVEL_PRESENT = 1;
+    public const PRESENCE_LEVEL_VERIFIED = 4;
+    public const PRESENCE_LEVEL_NONE = 0;
+
     /**
      * UV or UP bit?
      */
@@ -357,7 +360,7 @@ abstract class WebAuthnAbstractEvent
          */
 
         if ((128 & ord($bitfield)) > 0) {
-            // so we get Extensions. We typically ignore all, but the 
+            // so we get Extensions. We typically ignore all, but the
             // "credProtect" one may be interesting in the future.
             $this->pass("ED: Extension Data included. Interesting bits may be extracted later.");
         } else {

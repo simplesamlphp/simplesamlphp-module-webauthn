@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SimpleSAML\Module\webauthn\Controller;
 
 use DateTime;
@@ -177,7 +179,7 @@ class RegProcess
 
         // did we get any client extensions?
         $isResidentKey = 0;
-        if (strlen($request->request->get('clientext')) > 0 && count(json_decode($request->request->get('clientext'), true)) > 0 ) {
+        if (strlen($request->request->get('clientext')) > 0 && count(json_decode($request->request->get('clientext'), true)) > 0) {
             $extensions = json_decode($request->request->get('clientext'), true);
             if ($extensions['credProps']['rk'] === true) {
                 $isResidentKey = 1;
@@ -189,7 +191,7 @@ class RegProcess
         // use identical hashing as in JS generation step
         $configUtils = new Utils\Config();
         $username = hash('sha512', $state['FIDO2Username'] . '|' . $configUtils->getSecretSalt());
-       
+
         $store->storeTokenData(
             $state['FIDO2Username'],
             $regObject->getCredentialId(),

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SimpleSAML\Module\webauthn\Controller;
 
 use SimpleSAML\Auth;
@@ -86,7 +88,8 @@ class WebAuthn
     public const STATE_MGMT = 4; // show token management page
 
 
-    public static function workflowStateMachine($state) {
+    public static function workflowStateMachine($state)
+    {
         // if we don't have any credentials yet, allow user to register
         // regardless if in inflow or standalone (redirect to standalone if need
         // be)
@@ -115,7 +118,8 @@ class WebAuthn
         }
     }
 
-    public static function loadModuleConfig($moduleConfig, &$stateData): void {
+    public static function loadModuleConfig($moduleConfig, &$stateData): void
+    {
         $stateData->store = Store::parseStoreConfig($moduleConfig['store']);
 
         // Set the optional scope if set by configuration
@@ -166,7 +170,7 @@ class WebAuthn
 
         $state = $this->authState::loadState($stateId, 'webauthn:request');
 
-        if ( $this->workflowStateMachine($state) != self::STATE_AUTH_NOMGMT ) {
+        if ($this->workflowStateMachine($state) != self::STATE_AUTH_NOMGMT) {
             $templateFile = 'webauthn:webauthn.twig';
         } else {
             $templateFile = 'webauthn:authentication.twig';
@@ -213,15 +217,14 @@ class WebAuthn
         $t->data['showExitButton'] = !array_key_exists('Registration', $state);
         $frontendData['usernameEncoded'] = $usernameEncoded;
         $frontendData['attestation'] = $state['requestTokenModel'] ? "indirect" : "none";
-	$frontendData['credentialIdEncoded'] = $credentialIdEncoded;
-	$frontendData['FIDO2PasswordlessAuthMode'] = $state['FIDO2PasswordlessAuthMode'];
+        $frontendData['credentialIdEncoded'] = $credentialIdEncoded;
+        $frontendData['FIDO2PasswordlessAuthMode'] = $state['FIDO2PasswordlessAuthMode'];
         $t->data['frontendData'] = json_encode($frontendData);
 
         $t->data['FIDO2AuthSuccessful'] = $state['FIDO2AuthSuccessful'];
-        if ( $this->workflowStateMachine($state) == self::STATE_MGMT ) {
+        if ($this->workflowStateMachine($state) == self::STATE_MGMT) {
             $t->data['regURL'] = Module::getModuleURL('webauthn/regprocess?StateId=' . urlencode($stateId));
             $t->data['delURL'] = Module::getModuleURL('webauthn/managetoken?StateId=' . urlencode($stateId));
-
         }
 
         $t->data['authForm'] = "";

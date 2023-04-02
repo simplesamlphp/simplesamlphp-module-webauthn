@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SimpleSAML\Module\webauthn\WebAuthn\Store;
 
 use PDO;
@@ -215,8 +217,8 @@ class Database extends Store
     ): bool {
         $this->db->write(
             'INSERT INTO credentials ' .
-            '(user_id, credentialId, credential, algo, presenceLevel, isResidentKey, signCounter, friendlyName, hashedId) VALUES '
-          . '(:userId,:credentialId,:credential,:algo,:presenceLevel,:isResidentKey,:signCounter,:friendlyName,:hashedId)',
+            '(user_id, credentialId, credential, algo, presenceLevel, isResidentKey, signCounter, friendlyName, hashedId) VALUES ' .
+            '(:userId,:credentialId,:credential,:algo,:presenceLevel,:isResidentKey,:signCounter,:friendlyName,:hashedId)',
             [
                 'userId' => $userId,
                 'credentialId' => $credentialId,
@@ -294,7 +296,7 @@ class Database extends Store
 
         return $ret;
     }
-    
+
     /**
      * Retrieve username, given a credential ID
      *
@@ -315,5 +317,4 @@ class Database extends Store
 
         return "";
     }
-
 }

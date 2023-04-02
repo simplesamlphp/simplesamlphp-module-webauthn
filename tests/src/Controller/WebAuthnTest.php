@@ -53,20 +53,20 @@ class WebAuthnTest extends TestCase
             'simplesaml'
         );
 
-	$this->module_config = [];
-	$this->module_config = Configuration::loadFromArray(
-		[
-			'registration' => ['use_inflow_registration' => true],
-		]);
+        $this->module_config = Configuration::loadFromArray(
+            [
+                'registration' => ['use_inflow_registration' => true],
+            ]
+        );
 
         $this->session = Session::getSessionFromRequest();
 
         $this->logger = new class () extends Logger {
-            public static function info(string $str): void
+            public static function info(string $string): void
             {
                 // do nothing
             }
-	};
+        };
         Configuration::setPreLoadedConfig($this->config, 'config.php');
         Configuration::setPreLoadedConfig($this->module_config, 'module_webauthn.php');
     }
@@ -96,11 +96,11 @@ class WebAuthnTest extends TestCase
                     'FIDO2Scope' => 'Ducktown',
                     'FIDO2Tokens' => [0 => 'A1B2C3', 1 => 'D4E5F6'],
                     'FIDO2SignupChallenge' => 'A1B2C3',
-		    'FIDO2WantsRegister' => false,
-		    'FIDO2PasswordlessAuthMode' => false,
+                    'FIDO2WantsRegister' => false,
+                    'FIDO2PasswordlessAuthMode' => false,
                     'FIDO2AuthSuccessful' => false,
-		    'requestTokenModel' => 'something',
-		    'Source' => 'There is no real auth source in this test.',
+                    'requestTokenModel' => 'something',
+                    'Source' => 'There is no real auth source in this test.',
                 ];
             }
         });

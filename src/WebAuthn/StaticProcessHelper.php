@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SimpleSAML\Module\webauthn\WebAuthn;
 
 use SimpleSAML\Auth;
@@ -42,10 +44,10 @@ class StaticProcessHelper
         $state['FIDO2AttributeStoringUsername'] = $stateData->usernameAttrib;
         $state['FIDO2SignupChallenge'] = hash('sha512', random_bytes(64));
         $state['FIDO2PasswordlessAuthMode'] = true;
-        $state['FIDO2AuthSuccessful'] = false;     
+        $state['FIDO2AuthSuccessful'] = false;
         $state['FIDO2Tokens'] = []; // we don't know which token comes in.
         $state['FIDO2Username'] = 'notauthenticated';
-        $state['FIDO2Displayname'] = 'User Not Authenticated Yet';        
+        $state['FIDO2Displayname'] = 'User Not Authenticated Yet';
         $state['FIDO2WantsRegister'] = false;
     }
 }

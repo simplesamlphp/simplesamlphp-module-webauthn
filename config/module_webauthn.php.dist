@@ -31,17 +31,17 @@ $config = [
      * contrived attack scenarios with other servers in that same second-level
      * domain.
      */
-    'scope' => 'example.com',    
-    
+    'scope' => 'example.com',
+
     /**
      * The following options control how new FIDO2 keys are registered for a
      * given user.
      */
     'registration' => [
         /* the following will interactively ask the user if he is willing to
-         * share manufacturer and model information during credential 
-         * registration. The user can decline, in which case registration will 
-         * still succeed but vendor and model will be logged as 
+         * share manufacturer and model information during credential
+         * registration. The user can decline, in which case registration will
+         * still succeed but vendor and model will be logged as
          * "unknown model [unknown vendor]"
          *
          * When not requesting this, there is one less user interaction during
@@ -51,10 +51,10 @@ $config = [
          */
         'request_tokenmodel' => true,
 
-        /* optional parameter which determines whether you will be able to 
-         * register and manage tokens while authenticating or you want to use 
-         * the standalone registration page for these purposes. 
-         * If false => standalone registration page (user needs to visit 
+        /* optional parameter which determines whether you will be able to
+         * register and manage tokens while authenticating or you want to use
+         * the standalone registration page for these purposes.
+         * If false => standalone registration page (user needs to visit
          *             dedicated token management page and authenticate to that)
          * if true => inflow registration (automatically ask for registration
          *            if no key registered; enable key management with a

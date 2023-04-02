@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SimpleSAML\Module\webauthn\WebAuthn;
 
 use Cose\Key\Ec2Key;
@@ -575,10 +577,8 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         }
         $extensions = substr($attData, 18 + $credIdLen + $credentialLength);
         if (strlen($extensions) !== 0) {
-            $this->pass("Found the following extensions (". strlen($extensions) ." bytes) during registration ceremony: " );
+            $this->pass("Found the following extensions (" . strlen($extensions) . " bytes) during registration ceremony: ");
         }
-
-
     }
 
     /**
