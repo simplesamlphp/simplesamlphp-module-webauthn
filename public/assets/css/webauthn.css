@@ -1,26 +1,26 @@
-div#currentTokens {
-    border: 1px;
-    border-style: dotted;
-    margin-bottom: 20px;
+div#current-tokens {
+  border: 1px;
+  border-style: dotted;
+  margin-bottom: 20px;
 }
 
 div.space {
-    margin: 10px;
+  margin: 10px;
 }
 
 li.currenttoken {
-    font-weight: bold;
-    color: blue;
+  font-weight: bold;
+  color: blue;
 }
 
 li.othertoken {
-    display: flex;
+  display: flex;
 }
 
 img.factorlogo {
-    height: 2em;
+  height: 2em;
 }
 
 span#tokencaption {
-    font-weight: bold;
+  font-weight: bold;
 }

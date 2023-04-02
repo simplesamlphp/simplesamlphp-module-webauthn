@@ -10,7 +10,7 @@
     <h1>{{ '{webauthn:webauthn:heading1}'|trans }}</h1>
     <h2>{{ '{webauthn:webauthn:accountEnabled}'|trans }}</h2>
     {% if FIDO2Tokens|length > 0 %}
-        <div id="currentTokens">
+        <div id="current-tokens">
             <span id='tokencaption'>{{ '{webauthn:webauthn:tokenList}'|trans }}</span>
             <ul>
                 {% for token in FIDO2Tokens %}
