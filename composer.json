@@ -12,20 +12,24 @@
     ],
     "autoload": {
         "psr-4": {
-            "SimpleSAML\\Module\\webauthn\\": "lib/"
+            "SimpleSAML\\Module\\webauthn\\": "src/"
         }
     },
     "require": {
         "php": ">=7.4 || ^8.0",
+        "ext-date": "*",
+        "ext-hash": "*",
+        "ext-openssl": "*",
         "ext-pdo": "*",
 
-        "simplesamlphp/composer-module-installer": "^1.3.2",
-        "simplesamlphp/simplesamlphp": "^2.0.0",
-        "spomky-labs/cbor-php": "^2.1 || ^3.0",
+        "simplesamlphp/assert": "^0.8.0",
+        "spomky-labs/cbor-php": "^2.1",
+        "symfony/http-foundation": "^5.4 || ^6.0",
         "web-auth/cose-lib": "^3.3 || ^4.0"
     },
     "require-dev": {
-        "simplesamlphp/simplesamlphp-test-framework": "^1.2.1"
+        "simplesamlphp/simplesamlphp": "^2.0.0",
+        "simplesamlphp/simplesamlphp-test-framework": "^1.5.4"
     },
     "config": {
         "allow-plugins": {

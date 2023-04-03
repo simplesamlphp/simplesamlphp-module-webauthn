@@ -1,0 +1,24 @@
+{
+  "symbol-whitelist": [
+    "SimpleSAML\\Auth\\ProcessingChain",
+    "SimpleSAML\\Auth\\ProcessingFilter",
+    "SimpleSAML\\Auth\\Simple",
+    "SimpleSAML\\Auth\\Source",
+    "SimpleSAML\\Auth\\State",
+    "SimpleSAML\\Configuration",
+    "SimpleSAML\\Database",
+    "SimpleSAML\\Error\\BadRequest",
+    "SimpleSAML\\Error\\CriticalConfigurationError",
+    "SimpleSAML\\HTTP\\RunnableResponse",
+    "SimpleSAML\\Locale\\Translate",
+    "SimpleSAML\\Logger",
+    "SimpleSAML\\Metadata\\MetaDataStorageHandler",
+    "SimpleSAML\\Module",
+    "SimpleSAML\\Session",
+    "SimpleSAML\\Utils\\Arrays",
+    "SimpleSAML\\Utils\\Config",
+    "SimpleSAML\\Utils\\Crypto",
+    "SimpleSAML\\Utils\\HTTP",
+    "SimpleSAML\\XHTML\\Template"
+  ]
+}
