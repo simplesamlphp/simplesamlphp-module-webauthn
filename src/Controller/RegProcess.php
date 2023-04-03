@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SimpleSAML\Module\webauthn\Controller;
 
 use DateTime;
@@ -143,14 +145,14 @@ class RegProcess
         $friendlyName = $request->request->get('tokenname');
 
         // if we know the token model, add it to the name
-            $model = Translate::noop('unknown model');
-            $aaguiddict = AAGUID::getInstance();
-            if ($aaguiddict->hasToken($regObject->getAAGUID())) {
-                $token = $aaguiddict->get($regObject->getAAGUID());
-                $model = $token['metadataStatement']['description'];
-            }
-            $friendlyName .= " ($model)";
-        
+        $model = Translate::noop('unknown model');
+        $aaguiddict = AAGUID::getInstance();
+        if ($aaguiddict->hasToken($regObject->getAAGUID())) {
+            $token = $aaguiddict->get($regObject->getAAGUID());
+            $model = $token['metadataStatement']['description'];
+        }
+        $friendlyName .= " ($model)";
+
         /**
          * STEP 20 of the validation procedure in § 7.1 of the spec: store credentialId, credential,
          * signCount and associate with user
@@ -173,7 +175,7 @@ class RegProcess
 
         // did we get any client extensions?
         $isResidentKey = 0;
-        if (strlen($request->request->get('clientext')) > 0 && count(json_decode($request->request->get('clientext'), true)) > 0 ) {
+        if (strlen($request->request->get('clientext')) > 0 && count(json_decode($request->request->get('clientext'), true)) > 0) {
             $extensions = json_decode($request->request->get('clientext'), true);
             if ($extensions['credProps']['rk'] === true) {
                 $isResidentKey = 1;
@@ -191,8 +193,8 @@ class RegProcess
             $regObject->getCredential(),
             $regObject->getAlgo(),
             $regObject->getPresenceLevel(),
-                // we deny saving resident key properties if Passwordless mode
-                // was not requested
+            // we deny saving resident key properties if Passwordless mode
+            // was not requested
             ($request->request->get('passwordless') == "on" ? $isResidentKey : 0),
             $currentCounterValue,
             $friendlyName,

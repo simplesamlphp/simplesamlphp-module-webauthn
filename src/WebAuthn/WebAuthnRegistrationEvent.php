@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SimpleSAML\Module\webauthn\WebAuthn;
 
 use Cose\Key\Ec2Key;
 use Cose\Key\RsaKey;
+use Exception;
+use SimpleSAML\Error\Error;
+use SimpleSAML\Error\InvalidCredential;
 use SimpleSAML\Logger;
 use SimpleSAML\Module\webauthn\WebAuthn\AAGUID;
 use SimpleSAML\Utils;
 use SimpleSAML\Utils\Config as SSPConfig;
-use SimpleSAML\Error\InvalidCredential;
-use SimpleSAML\Error\Error;
-use \Exception;
 
 /**
  * FIDO2/WebAuthn Authentication Processing filter
@@ -21,8 +23,8 @@ use \Exception;
  * @author Stefan Winter <stefan.winter@restena.lu>
  * @package SimpleSAMLphp
  */
-class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
-
+class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
+{
     /**
      * Public key algorithm supported. This is -7 - ECDSA with curve P-256, or -275 (RS256)
      */
@@ -35,14 +37,13 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
     public const AAGUID_ASSURANCE_LEVEL_ATTCA = 'AttCA';
 
     // nomenclature from the MDS3 spec
-    
     public const FIDO_REVOKED = "REVOKED";
     public const CERTIFICATION_NOT_REQUIRED = false;
     public const FIDO_CERTIFIED_L1 = "FIDO_CERTIFIED_L1";
-    public const FIDO_CERTIFIED_L1plus = "FIDO_CERTIFIED_L1plus";
+    public const FIDO_CERTIFIED_L1PLUS = "FIDO_CERTIFIED_L1plus";
     public const FIDO_CERTIFIED_L2 = "FIDO_CERTIFIED_L2";
     public const FIDO_CERTIFIED_L3 = "FIDO_CERTIFIED_L3";
-    public const FIDO_CERTIFIED_L3plus = "FIDO_CERTIFIED_L3plus";
+    public const FIDO_CERTIFIED_L3PLUS = "FIDO_CERTIFIED_L3plus";
     /**
      * the AAGUID of the newly registered authenticator
      * @var string
@@ -77,14 +78,14 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
      * @param bool $debugMode         print debugging statements?
      */
     public function __construct(
-            string $pubkeyCredType,
-            string $scope,
-            string $challenge,
-            string $attestationData,
-            string $responseId,
-            string $clientDataJSON,
-            array $acceptabilityPolicy,
-            bool $debugMode = false
+        string $pubkeyCredType,
+        string $scope,
+        string $challenge,
+        string $attestationData,
+        string $responseId,
+        string $clientDataJSON,
+        array $acceptabilityPolicy,
+        bool $debugMode = false
     ) {
         $this->debugBuffer .= "attestationData raw: " . $attestationData . "<br/>";
         /**
@@ -107,7 +108,8 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
         $this->verifyAcceptability($acceptabilityPolicy);
     }
 
-    private function verifyAcceptability($acceptabilityPolicy) {
+    private function verifyAcceptability($acceptabilityPolicy)
+    {
         if ($acceptabilityPolicy['minCertLevel'] == self::CERTIFICATION_NOT_REQUIRED) { // all is accepted
             return;
         }
@@ -141,24 +143,24 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
                 if ($certification == "FIDO_CERTIFIED" || $certification == self::FIDO_CERTIFIED_L1) {
                     return;
                 }
-            // intentional fall-thorugh, higher levels are also okay
-            case self::FIDO_CERTIFIED_L1plus:
-                if ($certification == self::FIDO_CERTIFIED_L1plus) {
+            // intentional fall-through, higher levels are also okay
+            case self::FIDO_CERTIFIED_L1PLUS:
+                if ($certification == self::FIDO_CERTIFIED_L1PLUS) {
                     return;
                 }
-            // intentional fall-thorugh, higher levels are also okay
+            // intentional fall-through, higher levels are also okay
             case self::FIDO_CERTIFIED_L2:
                 if ($certification == self::FIDO_CERTIFIED_L2) {
                     return;
                 }
-            // intentional fall-thorugh, higher levels are also okay
+            // intentional fall-through, higher levels are also okay
             case self::FIDO_CERTIFIED_L3:
                 if ($certification == self::FIDO_CERTIFIED_L3) {
                     return;
                 }
-            // intentional fall-thorugh, higher levels are also okay
-            case self::FIDO_CERTIFIED_L3plus:
-                if ($certification == self::FIDO_CERTIFIED_L3plus) {
+            // intentional fall-through, higher levels are also okay
+            case self::FIDO_CERTIFIED_L3PLUS:
+                if ($certification == self::FIDO_CERTIFIED_L3PLUS) {
                     return;
                 }
                 throw new Error("FIDO_CERTIFICATION_TOO_LOW");
@@ -172,7 +174,8 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
      * @param string $attestationData
      * @return void
      */
-    private function validateAttestationData(string $attestationData): void {
+    private function validateAttestationData(string $attestationData): void
+    {
         /**
          * STEP 9 of the validation procedure in § 7.1 of the spec: CBOR-decode the attestationObject
          */
@@ -216,7 +219,8 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
      * @param array $attestationArray
      * @return void
      */
-    private function validateAttestationFormatNone(array $attestationArray): void {
+    private function validateAttestationFormatNone(array $attestationArray): void
+    {
         // § 8.7 of the spec
         /**
          * § 7.1 Step 16 && §8.7 Verification Procedure: stmt must be an empty array
@@ -234,7 +238,8 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent {
     /**
      * @param array $attestationArray
      */
-    private function validateAttestationFormatApple(array $attestationArray): void {
+    private function validateAttestationFormatApple(array $attestationArray): void
+    {
         // found at: https://www.apple.com/certificateauthority/private/
 
         $APPLE_WEBAUTHN_ROOT_CA = "-----BEGIN CERTIFICATE-----
@@ -296,8 +301,8 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
                 $signerPubKey = openssl_pkey_get_public($APPLE_WEBAUTHN_ROOT_CA);
                 if (openssl_x509_verify($certResource, $signerPubKey) != 1) {
                     $this->fail(sprintf(
-                                    "Error during root CA validation of the attestation chain certificate, which is %s",
-                                    $cryptoUtils->der2pem($runCert)
+                        "Error during root CA validation of the attestation chain certificate, which is %s",
+                        $cryptoUtils->der2pem($runCert)
                     ));
                 }
             }
@@ -306,12 +311,12 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         $keyResource = openssl_pkey_get_public($cryptoUtils->der2pem($stmtDecoded['x5c'][0]));
         if ($keyResource === false) {
             $this->fail(
-                    "Did not get a parseable X.509 structure out of the Apple attestation statement - x5c nr. 0 statement was: XXX "
-                    . $stmtDecoded['x5c'][0]
-                    . " XXX; PEM equivalent is "
-                    . $cryptoUtils->der2pem($stmtDecoded['x5c'][0])
-                    . ". OpenSSL error: "
-                    . openssl_error_string()
+                "Did not get a parseable X.509 structure out of the Apple attestation statement - x5c nr. 0 statement was: XXX "
+                . $stmtDecoded['x5c'][0]
+                . " XXX; PEM equivalent is "
+                . $cryptoUtils->der2pem($stmtDecoded['x5c'][0])
+                . ". OpenSSL error: "
+                . openssl_error_string()
             );
         }
 
@@ -322,12 +327,12 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
 
         if ($credentialResource === false) {
             $this->fail(
-                    "Could not create a public key from CBOR credential. XXX "
-                    . $this->credential
-                    . " XXX; PEM equivalent is "
-                    . $keyObject->asPEM()
-                    . ". OpenSSL error: "
-                    . openssl_error_string()
+                "Could not create a public key from CBOR credential. XXX "
+                . $this->credential
+                . " XXX; PEM equivalent is "
+                . $keyObject->asPEM()
+                . ". OpenSSL error: "
+                . openssl_error_string()
             );
         }
 
@@ -335,16 +340,16 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         $credentialDetails = openssl_pkey_get_details($credentialResource);
         $keyDetails = openssl_pkey_get_details($keyResource);
         if (
-                $credentialDetails['bits'] != $keyDetails['bits'] ||
-                $credentialDetails['key'] != $keyDetails['key'] ||
-                $credentialDetails['type'] != $keyDetails['type']
+            $credentialDetails['bits'] != $keyDetails['bits'] ||
+            $credentialDetails['key'] != $keyDetails['key'] ||
+            $credentialDetails['type'] != $keyDetails['type']
         ) {
             $this->fail(
-                    "The credential public key does not match the certificate public key in attestationData. ("
-                    . $credentialDetails['key']
-                    . " - "
-                    . $keyDetails['key']
-                    . ")"
+                "The credential public key does not match the certificate public key in attestationData. ("
+                . $credentialDetails['key']
+                . " - "
+                . $keyDetails['key']
+                . ")"
             );
         }
         $this->pass("Apple attestation format verification passed.");
@@ -354,7 +359,8 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
     /**
      * @param array $attestationArray
      */
-    private function validateAttestationFormatPacked(array $attestationArray): void {
+    private function validateAttestationFormatPacked(array $attestationArray): void
+    {
         $stmtDecoded = $attestationArray['attStmt'];
         $this->debugBuffer .= "AttStmt: " . print_r($stmtDecoded, true) . "<br/>";
         /**
@@ -374,7 +380,8 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
      * @param array $attestationArray
      * @return void
      */
-    private function validateAttestationFormatPackedX5C(array $attestationArray): void {
+    private function validateAttestationFormatPackedX5C(array $attestationArray): void
+    {
         $stmtDecoded = $attestationArray['attStmt'];
         /**
          * §8.2 Step 2: check x5c attestation
@@ -413,7 +420,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
              * Checking the OID is not programmatically possible. Text per spec:
              * "If the related attetation root certificate is used for multiple
              * authenticator models, the Extension OID ... MUST be present."
-             * 
+             *
              * FIDO MDS3 metadata does not disclose whether the root CAs are
              * used for multiple models.
              */
@@ -441,7 +448,6 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
              */
             foreach ($token['metadataStatement']['attestationRootCertificates'] as $oneRoot) {
                 $caData = openssl_x509_parse("-----BEGIN CERTIFICATE-----\n$oneRoot\n-----END CERTIFICATE-----", true);
-                
             }
             /*
              * §7.1 Step 18 is skipped, and we unconditionally return "only" Basic.
@@ -461,7 +467,8 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
      * @param array $attestationArray
      * @return void
      */
-    private function validateAttestationFormatPackedSelf(array $attestationArray): void {
+    private function validateAttestationFormatPackedSelf(array $attestationArray): void
+    {
         $stmtDecoded = $attestationArray['attStmt'];
         /**
          * §8.2 Step 4 Bullet 1: check algorithm
@@ -509,7 +516,8 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
      * @param array $attestationData the incoming attestation data
      * @return void
      */
-    private function validateAttestationFormatFidoU2F(array $attestationData): void {
+    private function validateAttestationFormatFidoU2F(array $attestationData): void
+    {
         /**
          * §8.6 Verification Step 1 is a NOOP: if we're here, the attStmt was
          * already successfully CBOR decoded
@@ -581,8 +589,8 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
      * @param array $attestationData the incoming attestation data
      * @return void
      */
-    private function validateAttestationFormatAndroidSafetyNet(array $attestationData): void {
-        
+    private function validateAttestationFormatAndroidSafetyNet(array $attestationData): void
+    {
     }
 
     /**
@@ -591,7 +599,8 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
      * @param string $responseId the response ID
      * @return void
      */
-    private function validateAttestedCredentialData(string $attData, string $responseId): void {
+    private function validateAttestedCredentialData(string $attData, string $responseId): void
+    {
         $aaguid = substr($attData, 0, 16);
         $credIdLenBytes = substr($attData, 16, 2);
         $credIdLen = intval(bin2hex($credIdLenBytes), 16);
@@ -605,8 +614,8 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
             $this->pass("Credential IDs in authenticator response and in attestation data match.");
         } else {
             $this->fail(
-                    "Mismatch of credentialId (" . bin2hex($credId) . ") vs. response ID (" .
-                    bin2hex(WebAuthnAbstractEvent::base64urlDecode($responseId)) . ")."
+                "Mismatch of credentialId (" . bin2hex($credId) . ") vs. response ID (" .
+                bin2hex(WebAuthnAbstractEvent::base64urlDecode($responseId)) . ")."
             );
         }
         // so far so good. Now extract the actual public key from its COSE
@@ -656,7 +665,8 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
      * @param string $derData blob of DER data
      * @return string the PEM representation of the certificate
      */
-    private function der2pem(string $derData): string {
+    private function der2pem(string $derData): string
+    {
         $pem = chunk_split(base64_encode($derData), 64, "\n");
         $pem = "-----BEGIN CERTIFICATE-----\n" . $pem . "-----END CERTIFICATE-----\n";
         return $pem;
@@ -665,15 +675,16 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
     /**
      * @return string
      */
-    public function getAAGUID() {
+    public function getAAGUID()
+    {
         return $this->AAGUID;
     }
 
-        /**
+    /**
      * @return string
      */
-    public function getAttestationLevel() {
+    public function getAttestationLevel()
+    {
         return $this->AAGUIDAssurance;
     }
-
 }

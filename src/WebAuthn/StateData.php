@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SimpleSAML\Module\webauthn\WebAuthn;
 
 use SimpleSAML\Module\webauthn\Store;
@@ -46,7 +48,7 @@ class StateData
      * @var boolean
      */
     public bool $requestTokenModel;
-    
+
     public string $minCertLevel2FA;
     public array $aaguidWhitelist2FA;
     public array $attFmtWhitelist2FA;

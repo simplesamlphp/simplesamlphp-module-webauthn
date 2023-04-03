@@ -7,7 +7,7 @@
     </description>
 
     <file>bin</file>
-    <file>config-templates</file>
+    <file>config</file>
     <file>src</file>
     <file>tests</file>
 

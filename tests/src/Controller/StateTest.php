@@ -53,7 +53,7 @@ class StateTest extends TestCase
         $this->session = Session::getSessionFromRequest();
 
         $this->logger = new class () extends Logger {
-            public static function info(string $str): void
+            public static function info(string $string): void
             {
                 // do nothing
             }

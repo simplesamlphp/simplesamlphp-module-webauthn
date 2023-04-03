@@ -10,6 +10,8 @@
  * @package SimpleSAMLphp
  */
 
+declare(strict_types=1);
+
 namespace SimpleSAML\Module\webauthn\Auth\Process;
 
 use SimpleSAML\Assert\Assert;
@@ -80,26 +82,23 @@ class WebAuthn extends Auth\ProcessingFilter
         parent::__construct($config, $reserved);
 
         $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php')->toArray();
-       
+
         $initialStateData = new Module\webauthn\WebAuthn\StateData();
         Module\webauthn\Controller\WebAuthn::loadModuleConfig($moduleConfig, $initialStateData);
         $this->stateData = $initialStateData;
-        
+
         // switched to authsource config for 2.0
         $this->force = $config['force'] ?? true;
         $this->toggleAttrib = $config['attrib_toggle'] ?? 'toggle';
         $this->useDatabase = $config['use_database'] ?? true;
         $this->defaultEnabled = $config['default_enable'] ?? false;
         $this->authnContextClassRef = $config['authncontextclassref'] ?? null;
-        
+
         if (array_key_exists('use_inflow_registration', $moduleConfig['registration'])) {
             $this->stateData->useInflowRegistration = $moduleConfig['registration']['use_inflow_registration'];
         } else {
             $this->stateData->useInflowRegistration = true;
         }
-        
-
-
     }
 
     /**

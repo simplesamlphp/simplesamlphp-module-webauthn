@@ -6,8 +6,8 @@
     reportMixedIssues="false"
 >
     <projectFiles>
+        <directory name="public" />
         <directory name="src" />
-        <directory name="www" />
     </projectFiles>
 
     <issueHandlers>

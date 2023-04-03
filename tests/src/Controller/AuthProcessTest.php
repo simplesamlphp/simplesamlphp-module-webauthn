@@ -54,7 +54,7 @@ class AuthProcessTest extends TestCase
         $this->session = Session::getSessionFromRequest();
 
         $this->logger = new class () extends Logger {
-            public static function info(string $str): void
+            public static function info(string $string): void
             {
                 // do nothing
             }
@@ -85,8 +85,8 @@ class AuthProcessTest extends TestCase
                     'FIDO2Scope' => 'Ducktown',
                     'FIDO2Tokens' => [],
                     'FIDO2SignupChallenge' => 'abc123',
-		    'FIDO2AuthSuccessful' => true,
-		    'FIDO2PasswordlessAuthMode' => false,
+                    'FIDO2AuthSuccessful' => true,
+                    'FIDO2PasswordlessAuthMode' => false,
                     'requestTokenModel' => 'something',
                 ];
             }

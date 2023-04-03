@@ -54,11 +54,11 @@ class ManageTokenTest extends TestCase
             'simplesaml'
         );
 
-        $this->module_config = [];
         $this->module_config = Configuration::loadFromArray(
-                [
-                        'registration' => ['use_inflow_registration' => true],
-                ]);
+            [
+                'registration' => ['use_inflow_registration' => true],
+            ]
+        );
 
         Configuration::setPreLoadedConfig($this->config, 'config.php');
         Configuration::setPreLoadedConfig($this->module_config, 'module_webauthn.php');
@@ -67,7 +67,7 @@ class ManageTokenTest extends TestCase
         $this->session = Session::getSessionFromRequest();
 
         $this->logger = new class () extends Logger {
-            public static function info(string $str): void
+            public static function info(string $string): void
             {
                 // do nothing
             }
@@ -93,8 +93,8 @@ class ManageTokenTest extends TestCase
             public static function loadState(string $id, string $stage, bool $allowMissing = false): ?array
             {
                 return [
-			'FIDO2AuthSuccessful' => true,
-			'FIDO2PasswordlessAuthMode' => false,
+                    'FIDO2AuthSuccessful' => true,
+                    'FIDO2PasswordlessAuthMode' => false,
                 ];
             }
         });
@@ -154,8 +154,8 @@ class ManageTokenTest extends TestCase
             public static function loadState(string $id, string $stage, bool $allowMissing = false): ?array
             {
                 return [
-			'FIDO2AuthSuccessful' => true,
-			'FIDO2PasswordlessAuthMode' => false,
+                    'FIDO2AuthSuccessful' => true,
+                    'FIDO2PasswordlessAuthMode' => false,
                 ];
             }
         });
@@ -189,8 +189,8 @@ class ManageTokenTest extends TestCase
                     'FIDO2AuthSuccessful' => false,
                     'FIDO2Tokens' => [0 => "foo"],
                     'FIDO2WantsRegister' => false,
-		    'UseInflowRegistration' => false,
-		    'FIDO2PasswordlessAuthMode' => false,
+                    'UseInflowRegistration' => false,
+                    'FIDO2PasswordlessAuthMode' => false,
                 ];
             }
         });

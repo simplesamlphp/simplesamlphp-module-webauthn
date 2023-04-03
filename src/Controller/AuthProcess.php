@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SimpleSAML\Module\webauthn\Controller;
 
 use DateTime;
@@ -27,8 +29,8 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @package SimpleSAML\Module\webauthn
  */
-class AuthProcess {
-
+class AuthProcess
+{
     /** @var \SimpleSAML\Configuration */
     protected Configuration $config;
 
@@ -58,8 +60,8 @@ class AuthProcess {
      * @throws \Exception
      */
     public function __construct(
-            Configuration $config,
-            Session $session
+        Configuration $config,
+        Session $session
     ) {
         $this->config = $config;
         $this->session = $session;
@@ -70,7 +72,8 @@ class AuthProcess {
      *
      * @param \SimpleSAML\Auth\State $authState
      */
-    public function setAuthState(Auth\State $authState): void {
+    public function setAuthState(Auth\State $authState): void
+    {
         $this->authState = $authState;
     }
 
@@ -79,7 +82,8 @@ class AuthProcess {
      *
      * @param \SimpleSAML\Logger $logger
      */
-    public function setLogger(Logger $logger): void {
+    public function setLogger(Logger $logger): void
+    {
         $this->logger = $logger;
     }
 
@@ -90,7 +94,8 @@ class AuthProcess {
      *   \SimpleSAML\HTTP\RunnableResponse
      * ) A Symfony Response-object.
      */
-    public function main(Request $request): Response {
+    public function main(Request $request): Response
+    {
         $this->logger::info('FIDO2 - Accessing WebAuthn enrollment validation');
 
         $stateId = $request->query->get('StateId');
@@ -109,7 +114,7 @@ class AuthProcess {
          * For passwordless auth, extract the userid from the response of the
          * discoverable credential, look up whether the credential used is one
          * that belongs to the claimed username
-         * 
+         *
          * Fail auth if not found, otherwise treat this auth like any other
          * (but check later whether UV was set during auth for the token at hand)
          */
@@ -147,22 +152,22 @@ class AuthProcess {
 
         if ($publicKey === false) {
             throw new Exception(
-                            "User attempted to authenticate with an unknown credential ID. This should already have been prevented by the browser!"
+                "User attempted to authenticate with an unknown credential ID. This should already have been prevented by the browser!"
             );
         }
 
         /** @psalm-var array $oneToken */
         $authObject = new WebAuthnAuthenticationEvent(
-                $request->request->get('type'),
-                ($state['FIDO2Scope'] === null ? $state['FIDO2DerivedScope'] : $state['FIDO2Scope']),
-                $state['FIDO2SignupChallenge'],
-                base64_decode($request->request->get('authenticator_data')),
-                base64_decode($request->request->get('client_data_raw')),
-                $oneToken[0],
-                $oneToken[1],
-                $oneToken[4], // algo
-                base64_decode($request->request->get('signature')),
-                $debugEnabled
+            $request->request->get('type'),
+            ($state['FIDO2Scope'] === null ? $state['FIDO2DerivedScope'] : $state['FIDO2Scope']),
+            $state['FIDO2SignupChallenge'],
+            base64_decode($request->request->get('authenticator_data')),
+            base64_decode($request->request->get('client_data_raw')),
+            $oneToken[0],
+            $oneToken[1],
+            $oneToken[4], // algo
+            base64_decode($request->request->get('signature')),
+            $debugEnabled
         );
 
         /** Custom check: if the token was initially registered with UV, but now
@@ -181,11 +186,13 @@ class AuthProcess {
         if ($state['FIDO2PasswordlessAuthMode'] === true && $oneToken[5] != WebAuthnAbstractEvent::PRESENCE_LEVEL_VERIFIED) {
             throw new Exception("Attempt to authenticate without User Verification in passwordless mode!");
         }
+
         // if we didn't register the key as resident, do not allow its use in
         // passwordless mode
         if ($state['FIDO2PasswordlessAuthMode'] === true && $oneToken[6] != 1) {
             throw new Exception("Attempt to authenticate with a token that is not registered for passwordless mode!");
         }
+
         /**
          * §7.2 STEP 18 : detect physical object cloning on the token
          */
@@ -198,7 +205,7 @@ class AuthProcess {
             $store->updateSignCount($oneToken[0], $counter);
         } else {
             throw new Exception(
-                            "Signature counter less or equal to a previous authentication! Token cloning likely (old: $previousCounter, new: $counter)."
+                "Signature counter less or equal to a previous authentication! Token cloning likely (old: $previousCounter, new: $counter)."
             );
         }
 
@@ -216,17 +223,17 @@ class AuthProcess {
 
         if ($debugEnabled) {
             $response = new RunnableResponse(
-                    function (WebAuthnAuthenticationEvent $authObject, array $state) {
-                        echo $authObject->getDebugBuffer();
-                        echo $authObject->getValidateBuffer();
-                        echo "Debug mode, not continuing to " . ($state['FIDO2WantsRegister'] ? "credential registration page." : "destination.");
-                    },
-                    [$authObject, $state]
+                function (WebAuthnAuthenticationEvent $authObject, array $state) {
+                    echo $authObject->getDebugBuffer();
+                    echo $authObject->getValidateBuffer();
+                    echo "Debug mode, not continuing to " . ($state['FIDO2WantsRegister'] ? "credential registration page." : "destination.");
+                },
+                [$authObject, $state]
             );
         } else {
             if ($state['FIDO2WantsRegister']) {
                 $response = new RedirectResponse(
-                        Module::getModuleURL('webauthn/webauthn?StateId=' . urlencode($stateId))
+                    Module::getModuleURL('webauthn/webauthn?StateId=' . urlencode($stateId))
                 );
             } else {
                 $response = new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
@@ -264,5 +271,4 @@ class AuthProcess {
 //        throw new Exception("state is: ".print_r($state, true));
         return $response;
     }
-
 }
