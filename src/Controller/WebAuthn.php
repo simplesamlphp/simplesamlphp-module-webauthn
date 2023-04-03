@@ -143,12 +143,14 @@ class WebAuthn
             throw new Error\CriticalConfigurationError('webauthn: it is required to set attrib_displayname in config.');
         }
 
-        if (array_key_exists('minimum_certification_level', $moduleConfig['registration'])) {
-            $stateData->requestTokenModel = ($moduleConfig['registration']['minimum_certification_level'] == "0" ? false : true);
-            $stateData->minCertLevel = $moduleConfig['registration']['minimum_certification_level'];
-            $stateData->aaguidWhitelist = $moduleConfig['registration']['aaguid_whitelist'];
-            $stateData->attFmtWhitelist = $moduleConfig['registration']['attestation_format_whitelist'];
-
+        if (array_key_exists('minimum_certification_level', $moduleConfig['registration']['policy_2fa'])) {
+            $stateData->requestTokenModel = ($moduleConfig['registration']['policy_2fa']['minimum_certification_level'] == Module\webauthn\WebAuthn\WebAuthnRegistrationEvent::CERTIFICATION_NOT_REQUIRED ? false : true);
+            $stateData->minCertLevel2FA = $moduleConfig['registration']['policy_2fa']['minimum_certification_level'];
+            $stateData->aaguidWhitelist2FA = $moduleConfig['registration']['policy_2fa']['aaguid_whitelist'];
+            $stateData->attFmtWhitelist2FA = $moduleConfig['registration']['policy_2fa']['attestation_format_whitelist'];
+            $stateData->minCertLevelPasswordless = $moduleConfig['registration']['policy_passwordless']['minimum_certification_level'];
+            $stateData->aaguidWhitelistPasswordless = $moduleConfig['registration']['policy_passwordless']['aaguid_whitelist'];
+            $stateData->attFmtWhitelistPasswordless = $moduleConfig['registration']['policy_passwordless']['attestation_format_whitelist'];
         } else {
             $stateData->requestTokenModel = false;
         }
