@@ -432,10 +432,10 @@ abstract class WebAuthnAbstractEvent
         $otherObjectManager->add(OtherObject\SinglePrecisionFloatObject::class);
         $otherObjectManager->add(OtherObject\DoublePrecisionFloatObject::class);
 
-        $tagManager = new Tag\TagObjectManager();
-        $tagManager->add(Tag\EpochTag::class);
+        $tagManager = new Tag\TagManager();
+        $tagManager->add(Tag\DatetimeTag::class);
         $tagManager->add(Tag\TimestampTag::class);
-        $tagManager->add(Tag\PositiveBigIntegerTag::class);
+        $tagManager->add(Tag\UnsignedBigIntegerTag::class);
         $tagManager->add(Tag\NegativeBigIntegerTag::class);
         $tagManager->add(Tag\DecimalFractionTag::class);
         $tagManager->add(Tag\BigFloatTag::class);
@@ -446,7 +446,7 @@ abstract class WebAuthnAbstractEvent
         $decoder = new Decoder($tagManager, $otherObjectManager);
         $stream = new StringStream($rawData);
         $object = $decoder->decode($stream);
-        $finalData = $object->getNormalizedData(true);
+        $finalData = $object->normalize();
         if ($finalData === null) {
             $this->fail("CBOR data decoding failed.");
         }
