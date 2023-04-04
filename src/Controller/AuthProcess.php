@@ -153,16 +153,16 @@ class AuthProcess {
 
         /** @psalm-var array $oneToken */
         $authObject = new WebAuthnAuthenticationEvent(
-                $request->request->get('type'),
-                ($state['FIDO2Scope'] === null ? $state['FIDO2DerivedScope'] : $state['FIDO2Scope']),
-                $state['FIDO2SignupChallenge'],
-                base64_decode($request->request->get('authenticator_data')),
-                base64_decode($request->request->get('client_data_raw')),
-                $oneToken[0],
-                $oneToken[1],
-                $oneToken[4], // algo
-                base64_decode($request->request->get('signature')),
-                $debugEnabled
+            $request->request->get('type'),
+            ($state['FIDO2Scope'] === null ? $state['FIDO2DerivedScope'] : $state['FIDO2Scope']),
+            $state['FIDO2SignupChallenge'],
+            base64_decode($request->request->get('authenticator_data')),
+            base64_decode($request->request->get('client_data_raw')),
+            $oneToken[0],
+            $oneToken[1],
+            (int)$oneToken[4], // algo
+            base64_decode($request->request->get('signature')),
+            $debugEnabled
         );
 
         /** Custom check: if the token was initially registered with UV, but now
