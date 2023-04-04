@@ -105,6 +105,7 @@ class Supercharged extends WebAuthn
 
         $t->data['authForm'] = "";
         $t->data['authURL'] = Module::getModuleURL('webauthn/authprocess?StateId=' . urlencode($stateId));
+        $t->data['pushbackURL'] = Module::getModuleURL('webauthn/pushbackuserpass?StateId=' . urlencode($stateId));
         
         // dynamically generate the JS code needed for token registration
         return $t;

@@ -29,7 +29,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @package SimpleSAML\Module\webauthn
  */
-class PushbackUserPass extends UserPassBase {
+class PushbackUserPass extends \SimpleSAML\Module\core\Auth\UserPassBase {
 
     /** @var \SimpleSAML\Configuration */
     protected Configuration $config;
@@ -102,20 +102,20 @@ class PushbackUserPass extends UserPassBase {
 
         $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php');
 
-        $authsource = $moduleConfig['password_authsource'];
+        $authsource = $moduleConfig->getString('password_authsource');
         
         
         $state = $this->authState::loadState($stateId, 'webauthn:request');
 
-        $response = new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
+/*        $response = new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
 
         $response->headers->set('Expires', 'Thu, 19 Nov 1981 08:52:00 GMT');
         $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
         $response->headers->set('Pragma', 'no-cache');
-        return $response;
+        return $response; */
     }
 
-    public function login(string $username, string $password) {
+    public function login(string $username, string $password): array {
         throw new Exception("Ugh ($username, $password).");
     }
 }
