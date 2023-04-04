@@ -38,7 +38,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
 
     // nomenclature from the MDS3 spec
     public const FIDO_REVOKED = "REVOKED";
-    public const CERTIFICATION_NOT_REQUIRED = false;
+    public const CERTIFICATION_NOT_REQUIRED = "CERTIFICATION_NOT_REQUIRED";
     public const FIDO_CERTIFIED_L1 = "FIDO_CERTIFIED_L1";
     public const FIDO_CERTIFIED_L1PLUS = "FIDO_CERTIFIED_L1plus";
     public const FIDO_CERTIFIED_L2 = "FIDO_CERTIFIED_L2";
