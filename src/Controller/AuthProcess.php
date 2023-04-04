@@ -165,7 +165,7 @@ class AuthProcess
             base64_decode($request->request->get('client_data_raw')),
             $oneToken[0],
             $oneToken[1],
-            $oneToken[4], // algo
+            (int)$oneToken[4], // algo
             base64_decode($request->request->get('signature')),
             $debugEnabled
         );
