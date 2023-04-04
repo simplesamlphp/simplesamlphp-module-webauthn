@@ -26,17 +26,17 @@ class Passwordless extends Source
      *
      * @var \SimpleSAML\Module\webauthn\WebAuthn\StateData
      */
-    private StateData $stateData;
+    protected StateData $stateData;
 
     /**
      * @var string|null AuthnContextClassRef
      */
-    private ?string $authnContextClassRef = null;
+    protected ?string $authnContextClassRef = null;
 
     /**
      * @var Configuration $authSourceConfig
      */
-    private Configuration $authSourceConfig;
+    protected Configuration $authSourceConfig;
 
     public function __construct(array $info, array $config)
     {

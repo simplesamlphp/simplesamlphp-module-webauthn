@@ -19,6 +19,14 @@ class StaticProcessHelper
         $httpUtils->redirectTrustedURL($url, ['StateId' => $id]);
     }
 
+    public static function saveStateAndRedirectSupercharged(array &$state): void
+    {
+        $id = Auth\State::saveState($state, 'webauthn:request');
+        $url = Module::getModuleURL('webauthn/supercharged');
+        $httpUtils = new Utils\HTTP();
+        $httpUtils->redirectTrustedURL($url, ['StateId' => $id]);
+    }
+
     public static function prepareState(StateData $stateData, array &$state): void
     {
         $state['requestTokenModel'] = $stateData->requestTokenModel;
