@@ -248,6 +248,19 @@ class AuthProcess
              * username.
              */
             $state['Attributes'][$state['FIDO2AttributeStoringUsername']] = [ $state['FIDO2Username'] ];
+            // in case this authentication happened in the Supercharged context
+            // it may be that there is an authprocfilter for WebAuthN, too.
+            
+            // If so, remove it from $state as it is stupid to touch the token
+            // twice; once in the Passwordless auth source and once as an
+            // authprocfilter
+            
+            foreach ($state['IdPMetadata']['authproc'] as $index => $content) {
+                if ($content['class'] == "webauthn:WebAuthn") {
+                    unset( $state['IdPMetadata']['authproc'][$index] );
+                }
+            }
+            
             // now properly return our final state to the framework
             Source::completeAuth($state);
         }

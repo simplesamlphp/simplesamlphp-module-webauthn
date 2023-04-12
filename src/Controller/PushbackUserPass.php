@@ -29,7 +29,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @package SimpleSAML\Module\webauthn
  */
-class PushbackUserPass extends \SimpleSAML\Module\core\Auth\UserPassBase {
+class PushbackUserPass {
 
     /** @var \SimpleSAML\Configuration */
     protected Configuration $config;
@@ -101,21 +101,49 @@ class PushbackUserPass extends \SimpleSAML\Module\core\Auth\UserPassBase {
         }
 
         $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php');
+        $authsources = Configuration::getConfig('authsources.php')->toArray();
+        $authsourceString = $moduleConfig->getString('password_authsource');
+        $classname = get_class(Source::getById($authsourceString));
+        switch ($classname) {
+            case 'SimpleSAML\Module\radius\Auth\Source\Radius':
+                $overrideSource = new class(['AuthId' => $authsourceString], $authsources[$authsourceString]) extends \SimpleSAML\Module\radius\Auth\Source\Radius {
+                    public function loginOverload(string $username, string $password): array {
+                        return $this->login($username, $password);
+                    }
+                };
+                break;
+            case 'SimpleSAML\Module\radius\Auth\Source\Ldap':
+                $overrideSource = new class(['AuthId' => $authsourceString], $authsources[$authsourceString]) extends \SimpleSAML\Module\ldap\Auth\Source\Ldap {
+                    public function loginOverload(string $username, string $password): array {
+                        return $this->login($username, $password);
+                    }
+                };
+                break;
+            default:
+                throw new Exception("Unable to pushback authentication to source :$classname:");
+        }
 
-        $authsource = $moduleConfig->getString('password_authsource');
-        
+
+        $attribs = $overrideSource->loginOverload($request->request->get("username"), $request->request->get("password"));
         
         $state = $this->authState::loadState($stateId, 'webauthn:request');
+        
+        // this is the confirmed username, we store it just like the Passwordless
+        // one would have been
+        
+        $state['Attributes'][$state['FIDO2AttributeStoringUsername']] = [ $request->request->get("username") ];
 
-/*        $response = new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
+        // we deliberately do not store any additional attributes - these have
+        // to be retrieved from the same authproc that would retrieve them
+        // in Passwordless mode
 
-        $response->headers->set('Expires', 'Thu, 19 Nov 1981 08:52:00 GMT');
-        $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
-        $response->headers->set('Pragma', 'no-cache');
-        return $response; */
+        // now properly return our final state to the framework
+        Source::completeAuth($state);
+        
     }
 
     public function login(string $username, string $password): array {
         throw new Exception("Ugh ($username, $password).");
     }
+
 }
