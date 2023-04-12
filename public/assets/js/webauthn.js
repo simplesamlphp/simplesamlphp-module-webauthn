@@ -219,4 +219,8 @@ window.addEventListener('DOMContentLoaded', () => {
         }
         authform.addEventListener('submit', () => false);
     }
+    const collection = document.getElementsByClassName('form-discoverable-credential');
+    for (let i = 0; i < collection.length; i++) {
+       collection[i].onsubmit = function() { return confirm('Information about this website is also stored on the device itself. Remember to delete it from the device.'); };
+    }
 });
