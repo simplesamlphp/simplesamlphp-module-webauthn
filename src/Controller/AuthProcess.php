@@ -269,6 +269,11 @@ class AuthProcess
             
             $this->authState::saveState($state, 'webauthn:request');
             
+            // set a cookie to remember that the user has successfully used
+            // Passwordless - on the Supercharged AuthSource, this can be used
+            // to auto-trigger the FIDO2 authentication step next time
+            setcookie("SuccessfullyUsedPasswordlessBefore", "YES", time()+60*60*24*90, '/', "", true, true );
+            
             // now properly return our final state to the framework
             Source::completeAuth($state);
         }

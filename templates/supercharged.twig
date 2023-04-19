@@ -10,7 +10,7 @@
 {% block postload %}
     <script src="{{ asset('js/loginuserpass.js', 'core') }}"></script>
     <script src="{{ asset('js/webauthn.js', 'webauthn') }}"></script>
-    <script src="{{ asset('js/authentication.js', 'webauthn') }}"></script>
+    {%  if hasPreviouslyDonePasswordless == "YES" %}<script src="{{ asset('js/authentication.js', 'webauthn') }}"></script>{% endif %}
 {% endblock %}
 
 {% block content %}

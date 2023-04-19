@@ -101,6 +101,7 @@ class Supercharged extends WebAuthn
         $frontendData['attestation'] = $state['requestTokenModel'] ? "indirect" : "none";
         $frontendData['credentialIdEncoded'] = $credentialIdEncoded;
         $frontendData['FIDO2PasswordlessAuthMode'] = $state['FIDO2PasswordlessAuthMode'];
+        $t->data['hasPreviouslyDonePasswordless'] = $_COOKIE['SuccessfullyUsedPasswordlessBefore'] ?? "NO";
         $t->data['frontendData'] = json_encode($frontendData);
 
         $t->data['authForm'] = "";
