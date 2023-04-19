@@ -20,7 +20,10 @@
       {% trans %}You are now accessing a pre-production system. This authentication setup is for testing and pre-production verification only. If someone sent you a link that pointed you here, and you are not <i>a tester</i> you probably got the wrong link, and should <b>not be here</b>.{% endtrans %}
     </div>
     {% endif -%}
-    <h1>{{ '{webauthn:webauthn:heading1}'|trans }}</h1>
+    <div class='choicecontainer' style='display: grid; grid-template-columns: 1fr 0.2fr 1fr; grid-gap: 20 px;'>
+    <div class='choice'>
+    <h1>{{ 'Passwordless Authentication'|trans }}</h1>
+    <p>{{ 'Did you register a biometric or PIN-protected WebAuthN token already? Log in now without username or password!'|trans }}</p>
     {% if authURL is defined and authURL|length > 0 %}
         <form id='authform' method='POST' action='{{ authURL|raw }}'>
             <input type='hidden' id='resp' name='response_id' value='0'/>
@@ -35,7 +38,11 @@
             <button type='button' id='authformSubmit'>{{ '{webauthn:webauthn:authTokenButton}'|trans }}</button>
         </form>
     {%- endif %}
-
+    </div>
+    <div style='align-self: center;'>
+        {{ '- or -'|trans }}
+    </div>
+    <div class='choice'>
     <h1>{{ 'Enter your username and password'|trans }}</h1>
 
     <p>{{ 'A service has requested you to authenticate yourself. Please enter your username and password in the form below.'|trans }}</p>
@@ -52,8 +59,6 @@
                     <input id="password" type="password" tabindex="2" name="password" class="edge" autocomplete="current-password" >
                 </div>
 
-                </div> <!--pure-control-group-->
-
             <div class="pure-control-group center login-form-submit">
                 <button class="pure-button pure-button-red pure-input-1-2 pure-input-sm-1-1 right" id="submit_button"
                         type="submit" tabindex="6" data-default="{% trans %}Login{% endtrans %}"
@@ -62,6 +67,8 @@
                 </button>
             </div>
         </form>
+    </div>
+    </div>
     </div>
     {% if loginpage_links is defined -%}
     <ul>
