@@ -15,6 +15,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
 
+msgid "{webauthn.webauthn:passwordlessCaption}"
+msgstr "Passwordless Authentication"
+
+msgid "{webauthn.webauthn:passwordlessProse}"
+msgstr "Did you register a biometric or PIN-protected WebAuthN token already? Log in now without username or password!"
+
 msgid "{webauthn:webauthn:heading1}"
 msgstr "Two Factor Authentication"
 
