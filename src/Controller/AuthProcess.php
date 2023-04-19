@@ -255,11 +255,16 @@ class AuthProcess
             // twice; once in the Passwordless auth source and once as an
             // authprocfilter
             
+            // this didn't actually work; authprocfilter self-removes instead
+            // if it found Passwordless to be successful in the same session
+            
             foreach ($state['IdPMetadata']['authproc'] as $index => $content) {
                 if ($content['class'] == "webauthn:WebAuthn") {
                     unset( $state['IdPMetadata']['authproc'][$index] );
                 }
             }
+            
+            $this->authState::saveState($state, 'webauthn:request');
             
             // now properly return our final state to the framework
             Source::completeAuth($state);

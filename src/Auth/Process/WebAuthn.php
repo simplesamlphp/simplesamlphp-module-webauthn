@@ -135,10 +135,17 @@ class WebAuthn extends Auth\ProcessingFilter
                 $localToggle,
                 $this->force
             ) === false
+                || // did we do Passwordless mode successfully before? Then no
+                   // need to trigger a second 2-Factor via authproc
+                (
+                    $state['FIDOPasswordlessAuthMode'] == 1 &&
+                    $state['FIDO2AuthSuccessful'] != false
+                )
         ) {
             // nothing to be done here, end authprocfilter processing
             return;
         }
+        throw new \Exception(print_r($state, true));
         StaticProcessHelper::prepareState($this->stateData, $state);
         StaticProcessHelper::saveStateAndRedirect($state);
     }
