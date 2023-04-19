@@ -22,8 +22,8 @@
     {% endif -%}
     <div class='choicecontainer' style='display: grid; grid-template-columns: 1fr 0.2fr 1fr; grid-gap: 20 px;'>
     <div class='choice'>
-    <h1>{{ 'Passwordless Authentication'|trans }}</h1>
-    <p>{{ 'Did you register a biometric or PIN-protected WebAuthN token already? Log in now without username or password!'|trans }}</p>
+    <h1>{{ '{webauthn.webauthn:passwordlessCaption}'|trans }}</h1>
+    <p>{{ '{webauthn.webauthn:passwordlessProse}'|trans }}</p>
     {% if authURL is defined and authURL|length > 0 %}
         <form id='authform' method='POST' action='{{ authURL|raw }}'>
             <input type='hidden' id='resp' name='response_id' value='0'/>
