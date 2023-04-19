@@ -21,6 +21,12 @@ msgstr "Passwordless Authentication"
 msgid "{webauthn.webauthn:passwordlessProse}"
 msgstr "Did you register a biometric or PIN-protected WebAuthN token already? Log in now without username or password!"
 
+msgid "{webauthn.webauthn:dedicatedManagementPageHint}"
+msgstr "If you need to add or delete tokens, please visit"
+
+msgid "{webauthn.webauthn:dedicatedManagementPageText}"
+msgstr "Token Management"
+
 msgid "{webauthn.webauthn:superchargeChoice}"
 msgstr "- or -"
 
