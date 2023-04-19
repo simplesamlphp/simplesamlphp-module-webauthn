@@ -263,6 +263,9 @@ class AuthProcess
                     unset( $state['IdPMetadata']['authproc'][$index] );
                 }
             }
+            // set an internal "authenticated passwordless" hint somewhere else
+            // in $state, which the authproc can react upon
+            $state['Attributes']['internal:FIDO2PasswordlessAuthentication'] = [ $state['FIDO2Username'] ];
             
             $this->authState::saveState($state, 'webauthn:request');
             
