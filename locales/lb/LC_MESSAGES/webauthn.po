@@ -21,6 +21,9 @@ msgstr "Authentificatioun ouni Passwuert"
 msgid "{webauthn.webauthn:passwordlessProse}"
 msgstr "Huet dir schons eng biometresch oder PIN-protegéiert WebAuthN token enregistréiert? Loggt iech elo domat an, ouni Benotzernumm oder Passwuert!"
 
+msgid "{webauthn.webauthn:superchargeChoice}"
+msgstr "- oder -"
+
 msgid "{webauthn:webauthn:heading1}"
 msgstr "Authentificatioun mat zwee Fakteuren"
 

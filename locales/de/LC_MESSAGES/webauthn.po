@@ -21,6 +21,9 @@ msgstr "Passwortlose Authentifikation"
 msgid "{webauthn.webauthn:passwordlessProse}"
 msgstr "Haben Sie bereits ein biometrisches oder PIN-geschütztes FIDO2 Token registriert? Loggen Sie sich hier ohne Benutzernamen oder Passwort ein!"
 
+msgid "{webauthn.webauthn:superchargeChoice}"
+msgstr "- oder -"
+
 msgid "{webauthn:webauthn:heading1}"
 msgstr "Zwei-Faktor-Authentifizierung"
 
