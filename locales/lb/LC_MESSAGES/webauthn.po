@@ -68,3 +68,6 @@ msgstr "FIDO Token ass net akzeptabel"
 
 msgid "descr_FIDO_CERTIFICATION_TOO_LOW"
 msgstr "Dir huet versicht en Token ze benotzen den d'Firmenpolitik net erlaabt. Dir musst vläit en aaneren benotzen."
+
+msgid "webauthn:webauthn:registerPasswordless"
+msgstr "Registréieren für Login ouni Passwuert?"

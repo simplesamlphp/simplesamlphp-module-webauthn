@@ -62,3 +62,6 @@ msgstr "Löschen von"
 
 msgid "{webauthn:webauthn:currentToken}"
 msgstr "(mit diesem Schlüssel sind Sie angemeldet)"
+
+msgid "webauthn:webauthn:registerPasswordless"
+msgstr "Für passwortlose Anmeldung registrieren?"

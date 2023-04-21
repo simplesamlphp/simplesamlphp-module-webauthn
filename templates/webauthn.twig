@@ -44,7 +44,7 @@
                 value='{{ '{webauthn:webauthn:newTokenDefaultName}'|trans }} {{ "now"|date('Y-m-d') }}' />
             <input type='checkbox' id='passwordless' name='passwordless'/>
             
-            <label for='passwordless'>Register for Passwordless?</label>
+            <label for='passwordless'>{{ '{webauthn:webauthn:registerPasswordless}'|trans }}</label>
         </form>
         <div class='space'></div>
         {% if FIDO2Tokens|length > 0 %}
