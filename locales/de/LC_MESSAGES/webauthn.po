@@ -24,6 +24,15 @@ msgstr "Haben Sie bereits ein biometrisches oder PIN-geschütztes FIDO2 Token re
 msgid "{webauthn.webauthn:superchargeChoice}"
 msgstr "- oder -"
 
+msgid "{webauthn.webauthn:dedicatedManagementPageHeading}"
+msgstr "Schlüsselverwaltung"
+
+msgid "{webauthn.webauthn:dedicatedManagementPageHint}"
+msgstr "Wenn Sie Schlüssel hinzufügen oder löschen möchten, gehen Sie bitte zur"
+
+msgid "{webauthn.webauthn:dedicatedManagementPageText}"
+msgstr "Verwaltungsseite"
+
 msgid "{webauthn:webauthn:heading1}"
 msgstr "Zwei-Faktor-Authentifizierung"
 
@@ -74,5 +83,8 @@ msgstr "Für passwortlose Anmeldung registrieren?"
 
 msgid "{webauthn:webauthn:registerPasswordlessExplanations}"
 msgstr "Im passwortlosen Modus wird der Schlüssel mit einem biometrischen "
-"Merkmal order einer PIN geschützt. Die Login-Informationen werden außerdem auf "
-"dem Schlüssel selbst gespeichert."
+"Merkmal order einer PIN geschützt. Dieser Schutz kann dann nicht mehr "
+"entfernt werden ohne alle Login-Daten für alle Webseiten zu löschen."
+
+msgid "{webauthn:webauthn:tokenRegisterBox}"
+msgstr "Registrierung eines neuen Schlüssels"

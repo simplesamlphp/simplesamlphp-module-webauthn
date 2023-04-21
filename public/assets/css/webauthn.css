@@ -1,7 +1,8 @@
-div#current-tokens {
+div.bounding-tokens {
   border: 1px;
   border-style: dotted;
   margin-bottom: 20px;
+  padding: 10px;
 }
 
 div.space {
@@ -22,6 +23,6 @@ img.factorlogo {
   padding: 2px;
 }
 
-span#tokencaption {
+span.tokencaption {
   font-weight: bold;
 }

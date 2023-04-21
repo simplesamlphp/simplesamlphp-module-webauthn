@@ -24,6 +24,15 @@ msgstr "Huet dir schons eng biometresch oder PIN-protegéiert WebAuthN token enr
 msgid "{webauthn.webauthn:superchargeChoice}"
 msgstr "- oder -"
 
+msgid "{webauthn.webauthn:dedicatedManagementPageHeading}"
+msgstr "Administratioun vun Schlesselen"
+
+msgid "{webauthn.webauthn:dedicatedManagementPageHint}"
+msgstr "Fir Schlesselen bäizepraffen oder ze läschen, besicht w.e.g. de"
+
+msgid "{webauthn.webauthn:dedicatedManagementPageText}"
+msgstr "Schlessel Administratioun"
+
 msgid "{webauthn:webauthn:heading1}"
 msgstr "Authentificatioun mat zwee Fakteuren"
 
@@ -74,5 +83,9 @@ msgstr "Registréieren für Login ouni Passwuert?"
 
 msgid "{webauthn:webauthn:registerPasswordlessExplanations}"
 msgstr "Am Modus ouni Passwuert gett de Schlessel mat engem biometrischen "
-"trait oder enger PIN protégéiert. Außerdem gin d'Login-Informatiounen direkt "
-"op dem Schlessel selwer gespäichert."
+"trait oder enger PIN protégéiert. Des Protectioun kann hanno net mei "
+"reckgängeg gemaach gin ouni dass all Login Informatiounen fir all Websäit "
+"geläscht gin."
+
+msgid "{webauthn:webauthn:tokenRegisterBox}"
+msgstr "Enregistrement vun engem neien Schlessel"
