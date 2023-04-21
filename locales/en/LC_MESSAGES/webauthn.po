@@ -75,5 +75,10 @@ msgstr "FIDO Token not Acceptable"
 msgid "descr_FIDO_CERTIFICATION_TOO_LOW"
 msgstr "You attempted to register a FIDO token that does not match company policy. You may need to use a different token."
 
-msgid "webauthn:webauthn:registerPasswordless"
+msgid "{webauthn:webauthn:registerPasswordless}"
 msgstr "Register for Passwordless?"
+
+msgid "{webauthn:webauthn:registerPasswordlessExplanations}"
+msgstr "In Passwordless mode, the token will be protected with a biometric or "
+"PIN. The login information for this website will also be stored on the token "
+"itself."

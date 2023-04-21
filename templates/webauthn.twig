@@ -41,10 +41,11 @@
             <button type='button' id='regformSubmit'>{{ '{webauthn:webauthn:newTokenButton}'|trans }}</button>
             <label for='tokenname'>{{ '{webauthn:webauthn:newTokenName}'|trans }}</label>
             <input type='text' id='tokenname' name='tokenname' size='40'
-                value='{{ '{webauthn:webauthn:newTokenDefaultName}'|trans }} {{ "now"|date('Y-m-d') }}' />
+                value='{{ '{webauthn:webauthn:newTokenDefaultName}'|trans }} {{ "now"|date('Y-m-d') }}' /><br/>
             <input type='checkbox' id='passwordless' name='passwordless'/>
             
-            <label for='passwordless'>{{ '{webauthn:webauthn:registerPasswordless}'|trans }}</label>
+            <label for='passwordless'>{{ '{webauthn:webauthn:registerPasswordless}'|trans }}</label><br/>
+            <p>{{  '{webauthn:webauthn:registerPasswordlessExplanations}'|trans }}
         </form>
         <div class='space'></div>
         {% if FIDO2Tokens|length > 0 %}

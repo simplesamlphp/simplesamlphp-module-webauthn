@@ -69,5 +69,10 @@ msgstr "FIDO Token ass net akzeptabel"
 msgid "descr_FIDO_CERTIFICATION_TOO_LOW"
 msgstr "Dir huet versicht en Token ze benotzen den d'Firmenpolitik net erlaabt. Dir musst vläit en aaneren benotzen."
 
-msgid "webauthn:webauthn:registerPasswordless"
+msgid "{webauthn:webauthn:registerPasswordless}"
 msgstr "Registréieren für Login ouni Passwuert?"
+
+msgid "{webauthn:webauthn:registerPasswordlessExplanations}"
+msgstr "Am Modus ouni Passwuert gett de Schlessel mat engem biometrischen "
+"trait oder enger PIN protégéiert. Außerdem gin d'Login-Informatiounen direkt "
+"op dem Schlessel selwer gespäichert."
