@@ -23,7 +23,7 @@ webauthn-supercharged:
   defaults: {
     _controller: 'SimpleSAML\Module\webauthn\Controller\Supercharged::main'
   }
- 
+
 webauthn-pushbackuserpass:
   path: /pushbackuserpass
   defaults: {
