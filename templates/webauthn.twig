@@ -16,7 +16,7 @@
                 {% for token in FIDO2Tokens %}
                     {% if FIDO2AuthSuccessful == false or FIDO2AuthSuccessful != token.0 %}
                         <li class='othertoken'><img class='factorlogo' src='{{ asset('base/icons/2nd.png', 'webauthn') }}' alt='2nd'/>{% if token.5 == 4 and token.6 == true %}<img class='factorlogo' src='{{ asset('base/icons/pwless.png', 'webauthn') }}' alt='Passwordless'/>{% else %}<img class='factorlogo' src='{{ asset('base/icons/nothing.png', 'webauthn') }}' alt='Password-based only'/>{%  endif  %}{{ token.3|e }}&nbsp;
-                        <form class='deleteform' id='delete-{{ loop.index }}' method='POST' action='{{ delURL|raw }}'>
+                        <form class='{% if token.6 == true %}form-discoverable-credential{% else %}deleteform{% endif %}' id='delete-{{ loop.index }}' method='POST' action='{{ delURL|raw }}'>
                         <input type='hidden' id='credId-{{ loop.index }}' name='credId' value='{{ token.0 }}'/>
                         <button type='submit' id='submit-{{ loop.index }}' name='submit' value='DELETE'>
                             {{ '{webauthn:webauthn:removePrefix}'|trans }}
