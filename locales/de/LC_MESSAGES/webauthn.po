@@ -15,6 +15,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
 
+msgid "{webauthn.webauthn:passwordlessCaption}"
+msgstr "Passwortlose Authentifikation"
+
+msgid "{webauthn.webauthn:passwordlessProse}"
+msgstr "Haben Sie bereits ein biometrisches oder PIN-geschütztes FIDO2 Token registriert? Loggen Sie sich hier ohne Benutzernamen oder Passwort ein!"
+
+msgid "{webauthn.webauthn:superchargeChoice}"
+msgstr "- oder -"
+
+msgid "{webauthn.webauthn:dedicatedManagementPageHeading}"
+msgstr "Schlüsselverwaltung"
+
+msgid "{webauthn.webauthn:dedicatedManagementPageHint}"
+msgstr "Wenn Sie Schlüssel hinzufügen oder löschen möchten, gehen Sie bitte zur"
+
+msgid "{webauthn.webauthn:dedicatedManagementPageText}"
+msgstr "Verwaltungsseite"
+
 msgid "{webauthn:webauthn:heading1}"
 msgstr "Zwei-Faktor-Authentifizierung"
 
@@ -53,3 +71,20 @@ msgstr "Löschen von"
 
 msgid "{webauthn:webauthn:currentToken}"
 msgstr "(mit diesem Schlüssel sind Sie angemeldet)"
+
+msgid "title_FIDO_CERTIFICATION_TOO_LOW"
+msgstr "FIDO Schlüssel inakzeptabel"
+
+msgid "descr_FIDO_CERTIFICATION_TOO_LOW"
+msgstr "Sie haben versucht, einen FIDO Schlüssel zu registrieren der für die Firma nicht akzeptabel ist. Sie brauchen vielleicht einen anderen Schlüssel."
+
+msgid "{webauthn:webauthn:registerPasswordless}"
+msgstr "Für passwortlose Anmeldung registrieren?"
+
+msgid "{webauthn:webauthn:registerPasswordlessExplanations}"
+msgstr "Im passwortlosen Modus wird der Schlüssel mit einem biometrischen "
+"Merkmal order einer PIN geschützt. Dieser Schutz kann dann nicht mehr "
+"entfernt werden ohne alle Login-Daten für alle Webseiten zu löschen."
+
+msgid "{webauthn:webauthn:tokenRegisterBox}"
+msgstr "Registrierung eines neuen Schlüssels"

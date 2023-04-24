@@ -15,6 +15,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
 
+msgid "{webauthn.webauthn:passwordlessCaption}"
+msgstr "Passwordless Authentication"
+
+msgid "{webauthn.webauthn:passwordlessProse}"
+msgstr "Did you register a biometric or PIN-protected WebAuthN token already? Log in now without username or password!"
+
+msgid "{webauthn.webauthn:dedicatedManagementPageHeading}"
+msgstr "Managing your tokens"
+
+msgid "{webauthn.webauthn:dedicatedManagementPageHint}"
+msgstr "If you need to add or delete tokens, please visit"
+
+msgid "{webauthn.webauthn:dedicatedManagementPageText}"
+msgstr "Token Management"
+
+msgid "{webauthn.webauthn:superchargeChoice}"
+msgstr "- or -"
+
 msgid "{webauthn:webauthn:heading1}"
 msgstr "Two Factor Authentication"
 
@@ -59,3 +77,14 @@ msgstr "FIDO Token not Acceptable"
 
 msgid "descr_FIDO_CERTIFICATION_TOO_LOW"
 msgstr "You attempted to register a FIDO token that does not match company policy. You may need to use a different token."
+
+msgid "{webauthn:webauthn:registerPasswordless}"
+msgstr "Register for Passwordless?"
+
+msgid "{webauthn:webauthn:registerPasswordlessExplanations}"
+msgstr "In Passwordless mode, the token will be protected with a biometric or "
+"PIN. From then on, this protection cannot be removed without deleting all "
+"login information for all websites."
+
+msgid "{webauthn:webauthn:tokenRegisterBox}"
+msgstr "New Token Registration"

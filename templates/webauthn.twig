@@ -10,8 +10,8 @@
     <h1>{{ '{webauthn:webauthn:heading1}'|trans }}</h1>
     <h2>{{ '{webauthn:webauthn:accountEnabled}'|trans }}</h2>
     {% if FIDO2Tokens|length > 0 %}
-        <div id="current-tokens">
-            <span id='tokencaption'>{{ '{webauthn:webauthn:tokenList}'|trans }}</span>
+        <div class="bounding-tokens">
+            <span class='tokencaption'>{{ '{webauthn:webauthn:tokenList}'|trans }}</span>
             <ul>
                 {% for token in FIDO2Tokens %}
                     {% if FIDO2AuthSuccessful == false or FIDO2AuthSuccessful != token.0 %}
@@ -31,6 +31,8 @@
         </div>
     {% endif %}
     {% if regURL is defined and regURL|length > 0 %}
+        <div class="bounding-tokens">
+        <span class='tokencaption'>{{ '{webauthn:webauthn:tokenRegisterBox}'|trans }}</span>
         <form id='regform' method='POST' action='{{ regURL|raw }}'>
             <input type='hidden' id='resp' name='response_id' value='0'/>
             <input type='hidden' id='data' name='attestation_client_data_json' value='nix'/>
@@ -38,14 +40,16 @@
             <input type='hidden' id='type' name='type' value='something'/>
             <input type='hidden' id='clientext' name='clientext' value=''/>
             <input type='hidden' id='operation' name='operation' value='REG'/>
-            <button type='button' id='regformSubmit'>{{ '{webauthn:webauthn:newTokenButton}'|trans }}</button>
             <label for='tokenname'>{{ '{webauthn:webauthn:newTokenName}'|trans }}</label>
             <input type='text' id='tokenname' name='tokenname' size='40'
-                value='{{ '{webauthn:webauthn:newTokenDefaultName}'|trans }} {{ "now"|date('Y-m-d') }}' />
+                value='{{ '{webauthn:webauthn:newTokenDefaultName}'|trans }} {{ "now"|date('Y-m-d') }}' /><br/>
             <input type='checkbox' id='passwordless' name='passwordless'/>
             
-            <label for='passwordless'>Register for Passwordless?</label>
+            <label for='passwordless' style='display: flex;'>{{ '{webauthn:webauthn:registerPasswordless}'|trans }}<br/>
+                <span style='font-size: small; display: contents;'>{{  '{webauthn:webauthn:registerPasswordlessExplanations}'|trans }}</span></label>
+            <button type='button' id='regformSubmit'>{{ '{webauthn:webauthn:newTokenButton}'|trans }}</button>
         </form>
+        </div>
         <div class='space'></div>
         {% if FIDO2Tokens|length > 0 %}
             {% if showExitButton %}

@@ -1,0 +1,98 @@
+{% set pagetitle = 'Passwordless future or username and password?'|trans %}
+
+{% extends "@core/base.twig" %}
+
+{% block preload %}
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/webauthn.css', 'webauthn') }}" />
+    <meta name="frontendData" id="frontendData" content="{{ frontendData }}" />
+{% endblock %}
+
+{% block postload %}
+    <script src="{{ asset('js/loginuserpass.js', 'core') }}"></script>
+    <script src="{{ asset('js/webauthn.js', 'webauthn') }}"></script>
+    {%  if hasPreviouslyDonePasswordless == "YES" %}<script src="{{ asset('js/authentication.js', 'webauthn') }}"></script>{% endif %}
+{% endblock %}
+
+{% block content %}
+    {%- if not isProduction %}
+
+        <div class="message-box warning">
+            {% trans %}You are now accessing a pre-production system. This authentication setup is for testing and pre-production verification only. If someone sent you a link that pointed you here, and you are not <i>a tester</i> you probably got the wrong link, and should <b>not be here</b>.{% endtrans %}
+        </div>
+    {% endif -%}
+    <div class='choicecontainer' style='display: grid; grid-template-columns: repeat(3, 1 0.2 1); gap: 20px;'>
+        <div class='choice' style='grid-column: 1; grid-row: 1;'>
+            <h1>{{ '{webauthn.webauthn:passwordlessCaption}'|trans }}</h1>
+        </div>
+        <div style='grid-column: 1; grid-row: 2;'>
+            <p>{{ '{webauthn.webauthn:passwordlessProse}'|trans }}</p>
+        </div>
+        <div style='grid-column: 1; grid-row: 3; align-self: end;'>
+            {% if authURL is defined and authURL|length > 0 %}
+                <form id='authform' method='POST' action='{{ authURL|raw }}'>
+                    <input type='hidden' id='resp' name='response_id' value='0'/>
+                    <input type='hidden' id='data' name='attestation_client_data_json' value='nix'/>
+                    <input type='hidden' id='authdata' name='authenticator_data' value='mehrnix'/>
+                    <input type='hidden' id='sigdata' name='signature' value='evenmorenix'/>
+                    <input type='hidden' id='userHandle' name='userHandle' value='unknownuserid' />
+                    <input type='hidden' id='data_raw_b64' name='client_data_raw' value='garnix'/>
+                    <input type='hidden' id='type' name='type' value='something'/>
+                    <input type='hidden' id='clientext' name='clientext' value=''/>
+                    <input type='hidden' id='operation' name='operation' value='AUTH'/>
+                    <button type='button' id='authformSubmit'>{{ '{webauthn:webauthn:authTokenButton}'|trans }}</button>
+                </form>
+            {%- endif %}
+        </div>
+        <div class="pure-form-message" style='grid-column: 1; grid-row: 4; align-self: end;'>
+            <strong>{{ '{webauthn.webauthn:dedicatedManagementPageHeading}'|trans }}</strong>
+            <p>{{ '{webauthn.webauthn:dedicatedManagementPageHint}'|trans }} <a href='registration'>{{ '{webauthn.webauthn:dedicatedManagementPageText}'|trans }}</a></p>
+        </div>
+        <div style='align-self: center; grid-column: 2; grid-row: 1 / 4; min-width: 20px; min-height: 100px;'>
+            {{ '{webauthn.webauthn:superchargeChoice}'|trans }}
+        </div>
+        <div class='choice' style='grid-column: 3; grid-row: 1;'>
+            <h1>{{ 'Enter your username and password'|trans }}</h1>
+        </div>
+        <div style='grid-column: 3; grid-row: 2;'>
+            <p>{{ 'A service has requested you to authenticate yourself. Please enter your username and password in the form below.'|trans }}</p>
+        </div>
+        <div style='grid-column: 3; grid-row: 3;'>
+            <div class="center-form login-form-start" >
+                <form id="f" class="pure-form pure-form-aligned" action="{{ pushbackURL|raw }}" method="post" name="f" spellcheck="false" >
+                    <div class="pure-control-group">
+                        <label for="username">{{ 'Username'|trans }}</label>
+                        <input id="username" type="text" name="username" class="edge" tabindex="1" autocomplete="username" autofocus  >
+                    </div>
+
+                    <div class="pure-control-group">
+                        <label for="password">{{ 'Password'|trans}}</label>
+                        <input id="password" type="password" tabindex="2" name="password" class="edge" autocomplete="current-password" >
+                    </div>
+            </div>
+            <div class="pure-control-group center login-form-submit" >
+                <button class="pure-button pure-button-red pure-input-1-2 pure-input-sm-1-1 left" id="submit_button"
+                        type="submit" tabindex="6" data-default="{% trans %}Login{% endtrans %}"
+                        data-processing="{% trans %}Processing...{% endtrans %}">
+                    {% trans %}Login{% endtrans %}
+                </button>
+                </form>            
+            </div>
+        </div>
+        <div style='grid-column: 3; grid-row: 4;'>
+            {% if loginpage_links is defined -%}
+                <ul>
+                    {% for link in loginpage_links -%}
+                        <li><a href="{{ link.href }}">{{ link['text']|trans }}</a></li>
+                        {% endfor %}
+                </ul>
+            {%- endif %}
+
+            <br><br>
+            <div class="pure-form-message">
+                <strong>{{ 'Help! I don\'t remember my password.'|trans }}</strong>
+                <p>{{ 'Without your username and password you cannot authenticate yourself for access to the service. There may be someone that can help you. Consult the help desk at your organization!'|trans }}</p>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

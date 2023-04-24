@@ -18,6 +18,18 @@ webauthn-webauthn:
     _controller: 'SimpleSAML\Module\webauthn\Controller\WebAuthn::main'
   }
 
+webauthn-supercharged:
+  path: /supercharged
+  defaults: {
+    _controller: 'SimpleSAML\Module\webauthn\Controller\Supercharged::main'
+  }
+  
+webauthn-pushbackuserpass:
+  path: /pushbackuserpass
+  defaults: {
+    _controller: 'SimpleSAML\Module\webauthn\Controller\PushbackUserPass::main'
+  }
+
 webauthn-regprocess:
   path: /regprocess
   defaults: {
