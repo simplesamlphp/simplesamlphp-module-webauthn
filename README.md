@@ -22,6 +22,8 @@ You can install this module with composer:
 % composer require simplesamlphp/simplesamlphp-module-webauthn
 ```
 
+If you are using PHP 7, you also need to install either the GMP extension (recommended) or the BCMath extension.
+
 How to setup the webauthn module as an authprocfilter
 -----------------------------------------------------
 You need to enable the module's authprocfilter at a priority level
