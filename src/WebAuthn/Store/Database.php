@@ -58,6 +58,7 @@ class Database extends Store
         parent::__construct($config);
         $this->config = $config;
         $this->db = SSP_Database::getInstance(Configuration::loadFromArray($config));
+        $driver = $this->db->getDriver();
         try {
             $this->db->read("SELECT COUNT(*) FROM credentials");
         } catch (\Exception $e) {
@@ -66,16 +67,20 @@ class Database extends Store
                     creation_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     user_id VARCHAR(80) NOT NULL,
                     credentialId VARCHAR(500) NOT NULL,
-                    credential MEDIUMBLOB NOT NULL,
+                    credential " . ($driver === 'pgsql' ? 'BYTEA' : 'MEDIUMBLOB') . " NOT NULL,
                     algo INT DEFAULT NULL,
                     presenceLevel INT DEFAULT NULL,
-                    isResidentKey BOOL DEFAULT NULL,
+                    isResidentKey BOOLEAN DEFAULT NULL,
                     signCounter INT NOT NULL,
                     friendlyName VARCHAR(100) DEFAULT 'Unnamed Token',
                     hashedId VARCHAR(100) DEFAULT '---',
                     aaguid VARCHAR(64) DEFAULT NULL,
-                    attLevel ENUM('None','Basic','Self', 'AttCA') NOT NULL DEFAULT 'None',
-                    UNIQUE (user_id,credentialId)
+                    " . (
+                        $driver === 'pgsql'
+                        ? "attLevel VARCHAR(6) NOT NULL DEFAULT 'None' CHECK (attLevel IN ('None','Basic','Self','AttCA')),"
+                        : "attLevel ENUM('None','Basic','Self','AttCA') NOT NULL DEFAULT 'None',"
+                    ) . "
+                    CONSTRAINT credentials_user_id_credentialId_key UNIQUE (user_id, credentialId)
                 )
             ");
         }
@@ -84,8 +89,12 @@ class Database extends Store
         } catch (\Exception $e) {
             $this->db->write("CREATE TABLE IF NOT EXISTS userstatus (
             user_id VARCHAR(80) NOT NULL,
-            fido2Status ENUM('FIDO2Disabled','FIDO2Enabled') NOT NULL DEFAULT 'FIDO2Disabled',
-            UNIQUE (user_id)
+            " . (
+                $driver === 'pgsql'
+                ? "fido2Status VARCHAR(14) NOT NULL DEFAULT 'FIDO2Disabled' CHECK (fido2Status IN ('FIDO2Disabled', 'FIDO2Enabled')),"
+                : "fido2Status ENUM('FIDO2Disabled','FIDO2Enabled') NOT NULL DEFAULT 'FIDO2Disabled',"
+            ) . "
+            CONSTRAINT userstatus_user_id_key UNIQUE (user_id)
             )");
         }
     }
@@ -152,7 +161,7 @@ class Database extends Store
             return $defaultIfNx;
         } else {
             $st2 = $this->db->read(
-                'SELECT COUNT(*) FROM userstatus WHERE user_id = :userId AND fido2Status = "FIDO2Disabled"',
+                "SELECT COUNT(*) FROM userstatus WHERE user_id = :userId AND fido2Status = 'FIDO2Disabled'",
                 ['userId' => $userId]
             );
             $rowCount2 = $st2->fetchColumn();
