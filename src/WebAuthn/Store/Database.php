@@ -74,7 +74,7 @@ class Database extends Store
                     friendlyName VARCHAR(100) DEFAULT 'Unnamed Token',
                     hashedId VARCHAR(100) DEFAULT '---',
                     aaguid VARCHAR(64) DEFAULT NULL,
-                    attLevel ENUM('None','Basic','Self', AttCA') NOT NULL DEFAULT 'None',
+                    attLevel ENUM('None','Basic','Self', 'AttCA') NOT NULL DEFAULT 'None',
                     UNIQUE (user_id,credentialId)
                 )
             ");
