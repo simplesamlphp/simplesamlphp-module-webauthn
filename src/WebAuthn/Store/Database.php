@@ -73,7 +73,7 @@ class Database extends Store
                     isResidentKey BOOLEAN DEFAULT NULL,
                     signCounter INT NOT NULL,
                     friendlyName VARCHAR(100) DEFAULT 'Unnamed Token',
-                    hashedId VARCHAR(100) DEFAULT '---',
+                    hashedId VARCHAR(128) DEFAULT '---',
                     aaguid VARCHAR(64) DEFAULT NULL,
                     " . (
                         $driver === 'pgsql'
