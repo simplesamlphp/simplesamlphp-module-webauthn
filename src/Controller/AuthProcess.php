@@ -155,6 +155,10 @@ class AuthProcess
                 "User attempted to authenticate with an unknown credential ID. This should already have been prevented by the browser!"
             );
         }
+        
+        if (!is_string($oneToken[1])) {
+            $oneToken[1] = stream_get_contents($oneToken[1]);
+        }
 
         /** @psalm-var array $oneToken */
         $authObject = new WebAuthnAuthenticationEvent(
