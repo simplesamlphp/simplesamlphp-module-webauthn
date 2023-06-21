@@ -194,8 +194,7 @@ Example config using MySQL database:
 
 ## Options
 
-`scope`
-: FIDO2 is phishing-resistent by binding generated credentials to a scope. Browsers will only invoke the registration/authentication if the scope matches the principal domain name the user is currently visiting. If not specified, the scope will be the hostname of the IdP as per its metadata. It is permissible to widen the scope up to the prinicpal domain though (e.g. authentication service is "saml.example.com" => scope can be extended to "example.com"; but not "examp1e.com". A registered FIDO2 token can then also be used on other servers in the same domain. If configuring this item, be sure that the authentication server name and the desired scope are a suffix match.
+### Options of auth proc filter
 
 `default_enable`
 : Should WebAuthn be enabled by default for all users? If not, users need to be white-listed in the database - other users simply pass through the filter without being subjected to 2FA. Defaults to "disabled by default" === false
@@ -209,16 +208,41 @@ Example config using MySQL database:
 `use_database`
 : This parameter determines if the database will be used to check whether to trigger second factor authentication or use the "attrib_toggle" instead. Default value of this attribute is true.
 
+### Options in `module_webauthn.php`
+
+`scope`
+: FIDO2 is phishing-resistent by binding generated credentials to a scope. Browsers will only invoke the registration/authentication if the scope matches the principal domain name the user is currently visiting. If not specified, the scope will be the hostname of the IdP as per its metadata. It is permissible to widen the scope up to the prinicpal domain though (e.g. authentication service is "saml.example.com" => scope can be extended to "example.com"; but not "examp1e.com". A registered FIDO2 token can then also be used on other servers in the same domain. If configuring this item, be sure that the authentication server name and the desired scope are a suffix match.
+
 `registration / use_inflow_registration`
 : Optional parameter which determines whether you will be able to register and manage tokens while authenticating or you want to use the standalone registration page for these purposes. If set to false => standalone registration page, if true => inflow registration. If this parameter is not explicitly set, the value is considered to be true.
 
 `registration / auth_source`
 : Optional parameter to define how the user authenticates to the dedicated registration page. Defaults to "default-sp"; ignored if inflow registration was configured.
 
-`registration / minimum_certification_level`
-`registration / aaguid_whitelist`
-`registration / attestation_format_whitelist`
-: These options steer which authenticators are considered acceptable for registration at the deployment.
+`registration / policy_2fa / minimum_certification_level`
+: Required parameter which specifies the required FIDO certification level for registration, allowed values:
+
+- `CERTIFICATION_NOT_REQUIRED` - attestation is not checked
+- `FIDO_CERTIFIED_L1` - FIDO L1 certified
+- `FIDO_CERTIFIED_L1plus` - FIDO L1+ certified
+- `FIDO_CERTIFIED_L2` - FIDO L2 certified
+- `FIDO_CERTIFIED_L3` - FIDO L3 certified
+- `FIDO_CERTIFIED_L3plus` - FIDO L3+ certified
+
+`registration / policy_2fa / aaguid_whitelist`
+: Optional list of AAGUIDs which are excluded from the minimum certification level check. Defaults to an empty list. Ignored when `minimum_certification_level` is set to `CERTIFICATION_NOT_REQUIRED`.
+
+`registration / policy_2fa / attestation_format_whitelist`
+: Optional list of attestation formats which are excluded from the minimum certification level check. Defaults to an empty list. Ignored when `minimum_certification_level` is set to `CERTIFICATION_NOT_REQUIRED`.
+
+`registration / policy_passwordless / minimum_certification_level`
+: Required parameter, same meaning as `registration / policy_2fa / minimum_certification_level` but for passwordless authentication
+
+`registration / policy_passwordless / aaguid_whitelist`
+: Optional parameter, same meaning as `registration / policy_2fa / aaguid_whitelist` but for passwordless authentication
+
+`registration / policy_passwordless / attestation_format_whitelist`
+: Optional parameter, same meaning as `registration / policy_2fa / attestation_format_whitelist` but for passwordless authentication
 
 ## User Experience / Workflow
 
