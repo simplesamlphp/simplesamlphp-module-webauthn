@@ -1,5 +1,7 @@
-Upgrade from 0.11.x to 2.0.x
-----------------------------
+# Upgrade instructions
+
+## Upgrade from 0.11.x to 2.0.x
+
 Note that the database schema has additional columns as of 2.0.0:
 
     algo INT DEFAULT NULL,
@@ -20,8 +22,8 @@ older version is still possible without removing the column.
 Also note that the parameter attribute_username was changed to
 identifyingAttribute to achieve better consistency with other authproc filters.
 
-Upgrade from 2.0.x to 2.1.x
----------------------------
+## Upgrade from 2.0.x to 2.1.x
+
 Two more columns were added to record the AAGUID of the authenticator and its
 attestation level:
 

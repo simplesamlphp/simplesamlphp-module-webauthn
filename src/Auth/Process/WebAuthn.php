@@ -85,7 +85,6 @@ class WebAuthn extends Auth\ProcessingFilter {
         Module\webauthn\Controller\WebAuthn::loadModuleConfig($moduleConfig, $initialStateData);
         $this->stateData = $initialStateData;
 
-        // switched to authsource config for 2.0
         $this->force = $config['force'] ?? true;
         $this->toggleAttrib = $config['attrib_toggle'] ?? 'toggle';
         $this->useDatabase = $config['use_database'] ?? true;
