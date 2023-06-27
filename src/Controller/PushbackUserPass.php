@@ -104,25 +104,12 @@ class PushbackUserPass {
         $authsources = Configuration::getConfig('authsources.php')->toArray();
         $authsourceString = $moduleConfig->getString('password_authsource');
         $classname = get_class(Source::getById($authsourceString));
-        switch ($classname) {
-            case 'SimpleSAML\Module\radius\Auth\Source\Radius':
-                $overrideSource = new class(['AuthId' => $authsourceString], $authsources[$authsourceString]) extends \SimpleSAML\Module\radius\Auth\Source\Radius {
-                    public function loginOverload(string $username, string $password): array {
+        class_alias($classname, 'AuthSourceOverloader');
+        $overrideSource = new class(['AuthId' => $authsourceString], $authsources[$authsourceString]) extends AuthSourceOverloader {
+                public function loginOverload(string $username, string $password): array {
                         return $this->login($username, $password);
                     }
-                };
-                break;
-            case 'SimpleSAML\Module\radius\Auth\Source\Ldap':
-                $overrideSource = new class(['AuthId' => $authsourceString], $authsources[$authsourceString]) extends \SimpleSAML\Module\ldap\Auth\Source\Ldap {
-                    public function loginOverload(string $username, string $password): array {
-                        return $this->login($username, $password);
-                    }
-                };
-                break;
-            default:
-                throw new Exception("Unable to pushback authentication to source :$classname:");
-        }
-
+        };
 
         $attribs = $overrideSource->loginOverload($request->request->get("username"), $request->request->get("password"));
         
