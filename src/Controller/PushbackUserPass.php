@@ -105,7 +105,7 @@ class PushbackUserPass {
         $authsourceString = $moduleConfig->getString('password_authsource');
         $classname = get_class(Source::getById($authsourceString));
         class_alias($classname, 'AuthSourceOverloader');
-        $overrideSource = new class(['AuthId' => $authsourceString], $authsources[$authsourceString]) extends AuthSourceOverloader {
+        $overrideSource = new class(['AuthId' => $authsourceString], $authsources[$authsourceString]) extends \AuthSourceOverloader {
                 public function loginOverload(string $username, string $password): array {
                         return $this->login($username, $password);
                     }
