@@ -100,9 +100,10 @@ class PushbackUserPass {
             throw new Error\BadRequest('Missing required StateId query parameter.');
         }
 
-        $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php');
+        $state = $this->authState::loadState($stateId, 'webauthn:request');
+                
         $authsources = Configuration::getConfig('authsources.php')->toArray();
-        $authsourceString = $moduleConfig->getString('password_authsource');
+        $authsourceString = $state['pushbackAuthsource'];
         $classname = get_class(Source::getById($authsourceString));
         class_alias($classname, 'AuthSourceOverloader');
         $overrideSource = new class(['AuthId' => $authsourceString], $authsources[$authsourceString]) extends \AuthSourceOverloader {
@@ -112,9 +113,7 @@ class PushbackUserPass {
         };
 
         $attribs = $overrideSource->loginOverload($request->request->get("username"), $request->request->get("password"));
-        
-        $state = $this->authState::loadState($stateId, 'webauthn:request');
-        
+       
         // this is the confirmed username, we store it just like the Passwordless
         // one would have been
         
@@ -123,6 +122,7 @@ class PushbackUserPass {
         // we deliberately do not store any additional attributes - these have
         // to be retrieved from the same authproc that would retrieve them
         // in Passwordless mode
+        unset($attribs);
 
         // now properly return our final state to the framework
         Source::completeAuth($state);

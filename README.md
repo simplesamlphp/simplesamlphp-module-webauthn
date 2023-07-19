@@ -22,7 +22,7 @@ You can install this module with composer:
 
 If you are using PHP 7, you also need to install either the GMP extension (recommended) or the BCMath extension.
 
-## How to setup the webauthn module as an authprocfilter
+## How to setup the webauthn module as a second-factor (an authprocfilter)
 
 You need to enable the module's authprocfilter at a priority level
 so that it takes place AFTER the first-factor authentication. E.g. at 100 and
@@ -100,7 +100,7 @@ will be forced into 2FA.
 Then you need to copy config-templates/module_webauthn.php to your config directory
 and adjust settings accordingly. See the file for parameters description.
 
-## How to set up Passwordless authentication
+## How to set up (pure) Passwordless authentication
 
 In passwordless mode, the module provides an AuthSource, to be configured as
 usual in simpleSAMLphp's config/authsources.php
@@ -128,6 +128,27 @@ The authsource takes the following parameters in authsources.php:
      */
 
     // 'authncontextclassref' => 'https://refeds.org/profile/mfa',
+],
+```
+
+## How to set up simultaneous Passwordless and traditional two-factor
+
+In this mode, the authentication prompt simultaneously allows for either 
+triggering a Passwordless auth, or to enter a username/password as traditional
+first-factor.
+
+The configuration is almost identical to Passwordless above, but requires one
+extra required configuration parameter: the authsource that should be used to 
+validate the username/password, if supplied by the user.
+
+The authsource takes the following parameters in authsources.php:
+
+```php
+'name-your-source' => [
+    'webauthn:Supercharged',
+    'password_authsource' => 'whatever-authsource',
+    // 'authncontextclassref' => 'https://refeds.org/profile/mfa',
+
 ],
 ```
 
