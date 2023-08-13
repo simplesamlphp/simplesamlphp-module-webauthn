@@ -9,6 +9,7 @@
  * @author Stefan Winter <stefan.winter@restena.lu>
  * @package SimpleSAMLphp
  */
+
 declare(strict_types=1);
 
 namespace SimpleSAML\Module\webauthn\Auth\Process;
@@ -24,8 +25,8 @@ use SimpleSAML\Module\webauthn\WebAuthn\StateData;
 use SimpleSAML\Module\webauthn\WebAuthn\StaticProcessHelper;
 use SimpleSAML\Utils;
 
-class WebAuthn extends Auth\ProcessingFilter {
-
+class WebAuthn extends Auth\ProcessingFilter
+{
     /**
      * @var boolean should new users be considered as enabled by default?
      */

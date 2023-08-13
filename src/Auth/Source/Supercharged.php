@@ -21,7 +21,6 @@ use SimpleSAML\Module\webauthn\Controller\WebAuthn;
 
 class Supercharged extends Passwordless
 {
-
     /**
      * The AuthSource to use when someone enters a username/password
      *

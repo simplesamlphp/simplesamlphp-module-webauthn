@@ -75,11 +75,10 @@ class Database extends Store
                     friendlyName VARCHAR(100) DEFAULT 'Unnamed Token',
                     hashedId VARCHAR(128) DEFAULT '---',
                     aaguid VARCHAR(64) DEFAULT NULL,
-                    " . (
-                        $driver === 'pgsql'
+                    " . ($driver === 'pgsql'
                         ? "attLevel VARCHAR(6) NOT NULL DEFAULT 'None' CHECK (attLevel IN ('None','Basic','Self','AttCA')),"
-                        : "attLevel ENUM('None','Basic','Self','AttCA') NOT NULL DEFAULT 'None',"
-                    ) . "
+                        : "attLevel ENUM('None','Basic','Self','AttCA') NOT NULL DEFAULT 'None',")
+                    . "
                     CONSTRAINT credentials_user_id_credentialId_key UNIQUE (user_id, credentialId)
                 )
             ");
@@ -89,11 +88,10 @@ class Database extends Store
         } catch (\Exception $e) {
             $this->db->write("CREATE TABLE IF NOT EXISTS userstatus (
             user_id VARCHAR(80) NOT NULL,
-            " . (
-                $driver === 'pgsql'
+            " . ($driver === 'pgsql'
                 ? "fido2Status VARCHAR(14) NOT NULL DEFAULT 'FIDO2Disabled' CHECK (fido2Status IN ('FIDO2Disabled', 'FIDO2Enabled')),"
-                : "fido2Status ENUM('FIDO2Disabled','FIDO2Enabled') NOT NULL DEFAULT 'FIDO2Disabled',"
-            ) . "
+                : "fido2Status ENUM('FIDO2Disabled','FIDO2Enabled') NOT NULL DEFAULT 'FIDO2Disabled',")
+            . "
             CONSTRAINT userstatus_user_id_key UNIQUE (user_id)
             )");
         }

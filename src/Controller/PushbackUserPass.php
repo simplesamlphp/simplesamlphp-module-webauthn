@@ -30,8 +30,8 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @package SimpleSAML\Module\webauthn
  */
-class PushbackUserPass {
-
+class PushbackUserPass
+{
     /** @var \SimpleSAML\Configuration */
     protected Configuration $config;
 
@@ -73,7 +73,8 @@ class PushbackUserPass {
      *
      * @param \SimpleSAML\Auth\State $authState
      */
-    public function setAuthState(Auth\State $authState): void {
+    public function setAuthState(Auth\State $authState): void
+    {
         $this->authState = $authState;
     }
 
@@ -82,7 +83,8 @@ class PushbackUserPass {
      *
      * @param \SimpleSAML\Logger $logger
      */
-    public function setLogger(Logger $logger): void {
+    public function setLogger(Logger $logger): void
+    {
         $this->logger = $logger;
     }
 
@@ -108,8 +110,13 @@ class PushbackUserPass {
         $authsourceString = $state['pushbackAuthsource'];
         $classname = get_class(Source::getById($authsourceString));
         class_alias($classname, '\SimpleSAML\Module\webauthn\Auth\Source\AuthSourceOverloader');
-        $overrideSource = new class(['AuthId' => $authsourceString], $authsources[$authsourceString]) extends AuthSourceOverloader {
-            public function loginOverload(string $username, string $password): array {
+        $overrideSource = new class (
+            ['AuthId' => $authsourceString],
+            $authsources[$authsourceString]
+        ) extends AuthSourceOverloader
+        {
+            public function loginOverload(string $username, string $password): array
+            {
                 return $this->login($username, $password);
             }
         };
@@ -133,5 +140,4 @@ class PushbackUserPass {
     {
         throw new Exception("Ugh ($username, $password).");
     }
-
 }
