@@ -286,6 +286,7 @@ abstract class WebAuthnAbstractEvent
                 $this->fail("Unexpected operation " . $this->eventType);
                 break;
         }
+
         /**
          * §7.1 STEP 5 : check if incoming challenge matches issued challenge
          * §7.2 STEP 9 : check if incoming challenge matches issued challenge
@@ -295,6 +296,7 @@ abstract class WebAuthnAbstractEvent
         } else {
             $this->fail("Challenge does not match");
         }
+
         /**
          * §7.1 STEP 6 : check if incoming origin matches our hostname (taken from IdP metadata prefix)
          * §7.2 STEP 10: check if incoming origin matches our hostname (taken from IdP metadata prefix)
@@ -307,6 +309,7 @@ abstract class WebAuthnAbstractEvent
         } else {
             $this->fail("Origin does not match: " . $expectedOrigin);
         }
+
         /**
          * §7.1 STEP 7 : optional tokenBinding check. The Yubikey does not make use of that option.
          * §7.2 STEP 11: optional tokenBinding check. The Yubikey does not make use of that option.
@@ -316,6 +319,7 @@ abstract class WebAuthnAbstractEvent
         } else {
             $this->warn("Validation of the present token binding data not implemented, continuing without!");
         }
+
         /**
          * §7.1 STEP 8 : SHA-256 hashing the clientData
          * §7.2 STEP 16: SHA-256 hashing the clientData
@@ -343,6 +347,7 @@ abstract class WebAuthnAbstractEvent
         $this->debugBuffer .= "AuthData: <pre>";
         $this->debugBuffer .= print_r($authData, true);
         $this->debugBuffer .= "</pre>";
+
         /**
          * §7.1 STEP 10: compare incoming RpId hash with expected value
          * §7.2 STEP 12: compare incoming RpId hash with expected value
@@ -354,11 +359,11 @@ abstract class WebAuthnAbstractEvent
             $this->fail("Mismatching Relying Party hash.");
         }
         $bitfield = substr($authData, 32, 1);
+
         /**
          * §7.1 STEP 14 (authData part): no extensions were requested, so none are allowed to be present
          * §7.2 STEP 15 (authData part): no extensions were requested, so none are allowed to be present
          */
-
         if ((128 & ord($bitfield)) > 0) {
             // so we get Extensions. We typically ignore all, but the
             // "credProtect" one may be interesting in the future.
@@ -397,6 +402,7 @@ abstract class WebAuthnAbstractEvent
                 $this->fail("unknown type of operation!");
                 break;
         }
+
         /**
          * §7.1 STEP 11 + 12 : check user presence (this implementation does not insist on verification currently)
          * §7.2 STEP 13 + 14 : check user presence (this implementation does not insist on verification currently)

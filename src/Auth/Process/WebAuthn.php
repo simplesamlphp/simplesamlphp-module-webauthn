@@ -72,7 +72,8 @@ class WebAuthn extends Auth\ProcessingFilter {
      *
      * @throws \SimpleSAML\Error\Exception if the configuration is not valid.
      */
-    public function __construct(array $config, $reserved) {
+    public function __construct(array $config, $reserved)
+    {
         /**
          * Remove annotation + assert as soon as this method can be typehinted (SSP 2.0)
          * @psalm-suppress RedundantConditionGivenDocblockType
@@ -108,7 +109,8 @@ class WebAuthn extends Auth\ProcessingFilter {
      *
      * @return void
      */
-    public function process(array &$state): void {
+    public function process(array &$state): void
+    {
         if (!array_key_exists($this->stateData->usernameAttrib, $state['Attributes'])) {
             Logger::warning('webauthn: cannot determine if user needs second factor, missing attribute "' .
                     $this->stateData->usernameAttrib . '".');
@@ -122,29 +124,28 @@ class WebAuthn extends Auth\ProcessingFilter {
         $localToggle = !empty($state['Attributes'][$this->toggleAttrib]) && !empty($state['Attributes'][$this->toggleAttrib][0]);
 
         if (
-                $this->stateData->store->is2FAEnabled(
-                        $state['Attributes'][$this->stateData->usernameAttrib][0],
-                        $this->defaultEnabled,
-                        $this->useDatabase,
-                        $localToggle,
-                        $this->force
-                ) === false
+            $this->stateData->store->is2FAEnabled(
+                $state['Attributes'][$this->stateData->usernameAttrib][0],
+                $this->defaultEnabled,
+                $this->useDatabase,
+                $localToggle,
+                $this->force
+            ) === false
         ) {
             // nothing to be done here, end authprocfilter processing
             return;
         }
-        if // did we do Passwordless mode successfully before? 
+        if // did we do Passwordless mode successfully before?
         (
-                $state['Attributes']['internal:FIDO2PasswordlessAuthentication'][0] == $state['Attributes'][$this->stateData->usernameAttrib][0]
+            $state['Attributes']['internal:FIDO2PasswordlessAuthentication'][0] == $state['Attributes'][$this->stateData->usernameAttrib][0]
         ) {
             // then no need to trigger a second 2-Factor via authproc
             // just delete the internal attribute then
             unset($state['Attributes']['internal:FIDO2PasswordlessAuthentication']);
             return;
         }
-        
+
         StaticProcessHelper::prepareState($this->stateData, $state);
         StaticProcessHelper::saveStateAndRedirect($state);
     }
-
 }

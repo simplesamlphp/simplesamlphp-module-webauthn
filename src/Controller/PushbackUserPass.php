@@ -60,8 +60,8 @@ class PushbackUserPass {
      * @throws \Exception
      */
     public function __construct(
-            Configuration $config,
-            Session $session
+        Configuration $config,
+        Session $session
     ) {
         $this->config = $config;
         $this->session = $session;
@@ -92,7 +92,8 @@ class PushbackUserPass {
      *   \SimpleSAML\HTTP\RunnableResponse
      * ) A Symfony Response-object.
      */
-    public function main(Request $request): Response {
+    public function main(Request $request): Response
+    {
         $this->logger::info('FIDO2 Supercharged - Redirecting to username/password validation');
 
         $stateId = $request->query->get('StateId');
@@ -101,22 +102,21 @@ class PushbackUserPass {
         }
 
         $state = $this->authState::loadState($stateId, 'webauthn:request');
-                
+
         $authsources = Configuration::getConfig('authsources.php')->toArray();
         $authsourceString = $state['pushbackAuthsource'];
         $classname = get_class(Source::getById($authsourceString));
         class_alias($classname, 'AuthSourceOverloader');
         $overrideSource = new class(['AuthId' => $authsourceString], $authsources[$authsourceString]) extends \AuthSourceOverloader {
-                public function loginOverload(string $username, string $password): array {
-                        return $this->login($username, $password);
-                    }
+            public function loginOverload(string $username, string $password): array {
+                return $this->login($username, $password);
+            }
         };
 
         $attribs = $overrideSource->loginOverload($request->request->get("username"), $request->request->get("password"));
-       
+
         // this is the confirmed username, we store it just like the Passwordless
         // one would have been
-        
         $state['Attributes'][$state['FIDO2AttributeStoringUsername']] = [ $request->request->get("username") ];
 
         // we deliberately do not store any additional attributes - these have
@@ -126,10 +126,10 @@ class PushbackUserPass {
 
         // now properly return our final state to the framework
         Source::completeAuth($state);
-        
     }
 
-    public function login(string $username, string $password): array {
+    public function login(string $username, string $password): array
+    {
         throw new Exception("Ugh ($username, $password).");
     }
 

@@ -155,7 +155,7 @@ class AuthProcess
                 "User attempted to authenticate with an unknown credential ID. This should already have been prevented by the browser!"
             );
         }
-        
+
         if (!is_string($oneToken[1])) {
             $oneToken[1] = stream_get_contents($oneToken[1]);
         }
@@ -254,30 +254,30 @@ class AuthProcess
             $state['Attributes'][$state['FIDO2AttributeStoringUsername']] = [ $state['FIDO2Username'] ];
             // in case this authentication happened in the Supercharged context
             // it may be that there is an authprocfilter for WebAuthN, too.
-            
+
             // If so, remove it from $state as it is stupid to touch the token
             // twice; once in the Passwordless auth source and once as an
             // authprocfilter
-            
+
             // this didn't actually work; authprocfilter self-removes instead
             // if it found Passwordless to be successful in the same session
-            
+
             foreach ($state['IdPMetadata']['authproc'] as $index => $content) {
                 if ($content['class'] == "webauthn:WebAuthn") {
-                    unset( $state['IdPMetadata']['authproc'][$index] );
+                    unset($state['IdPMetadata']['authproc'][$index]);
                 }
             }
             // set an internal "authenticated passwordless" hint somewhere else
             // in $state, which the authproc can react upon
             $state['Attributes']['internal:FIDO2PasswordlessAuthentication'] = [ $state['FIDO2Username'] ];
-            
+
             $this->authState::saveState($state, 'webauthn:request');
-            
+
             // set a cookie to remember that the user has successfully used
             // Passwordless - on the Supercharged AuthSource, this can be used
             // to auto-trigger the FIDO2 authentication step next time
-            setcookie("SuccessfullyUsedPasswordlessBefore", "YES", time()+60*60*24*90, '/', "", true, true );
-            
+            setcookie("SuccessfullyUsedPasswordlessBefore", "YES", time() + (3600 * 24 * 90), '/', "", true, true );
+
             // now properly return our final state to the framework
             Source::completeAuth($state);
         }
