@@ -5,28 +5,28 @@ webauthn-registration:
   defaults: {
     _controller: 'SimpleSAML\Module\webauthn\Controller\Registration::main'
   }
-  methods: [GET]
+  methods: [GET, POST]
 
 webauthn-authprocess:
   path: /authprocess
   defaults: {
     _controller: 'SimpleSAML\Module\webauthn\Controller\AuthProcess::main'
   }
-  methods: [GET]
+  methods: [GET, POST]
 
 webauthn-webauthn:
   path: /webauthn
   defaults: {
     _controller: 'SimpleSAML\Module\webauthn\Controller\WebAuthn::main'
   }
-  methods: [GET]
+  methods: [GET, POST]
 
 webauthn-supercharged:
   path: /supercharged
   defaults: {
     _controller: 'SimpleSAML\Module\webauthn\Controller\Supercharged::main'
   }
-  methods: [GET]
+  methods: [GET, POST]
 
 webauthn-pushbackuserpass:
   path: /pushbackuserpass
