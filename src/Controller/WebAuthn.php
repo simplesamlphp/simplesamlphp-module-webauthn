@@ -186,7 +186,7 @@ class WebAuthn
         $t->data['UserID'] = $state['FIDO2Username'];
         $t->data['FIDO2Tokens'] = $state['FIDO2Tokens'];
         // in case IdPs want to override UI and display SP-specific content
-        $t->data['entityid'] = $state['SPMetadata']['entityid'];
+        $t->data['entityid'] = $state['SPMetadata']['entityid'] ?? 'WEBAUTHN-SP-NONE';
 
         $challenge = str_split($state['FIDO2SignupChallenge'], 2);
         $configUtils = new Utils\Config();
