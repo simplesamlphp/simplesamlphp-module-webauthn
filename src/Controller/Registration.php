@@ -115,13 +115,14 @@ class Registration
         $registrationConfig = $moduleConfig->getArray('registration');
         $registrationAuthSource = $registrationConfig['auth_source'] ?? 'default-sp';
 
+        $state = [];
+        $state['SPMetadata']['entityid'] = "WEBAUTHN-SP-REGISTRATION";
         /** @psalm-var class-string $authSimple */
         $authSimple = $this->authSimple;
         $as = new $authSimple($registrationAuthSource);
         $as->requireAuth();
         $attrs = $as->getAttributes();
 
-        $state = [];
         $state['Attributes'] = $attrs;
 
         $stateData = new StateData();
