@@ -138,6 +138,7 @@ class WebAuthn extends Auth\ProcessingFilter
         }
         if // did we do Passwordless mode successfully before?
         (
+            isset($state['Attributes']['internal:FIDO2PasswordlessAuthentication']) &&
             $state['Attributes']['internal:FIDO2PasswordlessAuthentication'][0] == $state['Attributes'][$this->stateData->usernameAttrib][0]
         ) {
             // then no need to trigger a second 2-Factor via authproc
