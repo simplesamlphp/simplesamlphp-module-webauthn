@@ -19,12 +19,12 @@ jobs:
     runs-on: ['ubuntu-latest']
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Lint Code Base
-        uses: github/super-linter/slim@v4
+        uses: github/super-linter/slim@v5
         env:
           LOG_LEVEL: NOTICE
           VALIDATE_ALL_CODEBASE: true
@@ -56,7 +56,7 @@ jobs:
       - name: Setup problem matchers for PHP
         run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Get composer cache directory
         run: echo COMPOSER_CACHE="$(composer config cache-files-dir)" >> "$GITHUB_ENV"
@@ -122,7 +122,7 @@ jobs:
       - name: Setup problem matchers for PHP
         run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Get composer cache directory
         run: echo COMPOSER_CACHE="$(composer config cache-files-dir)" >> "$GITHUB_ENV"
@@ -178,7 +178,7 @@ jobs:
           git config --global core.autocrlf false
           git config --global core.eol lf
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Get composer cache directory
         run: echo COMPOSER_CACHE="$(composer config cache-files-dir)" >> "$GITHUB_ENV"
@@ -240,7 +240,7 @@ jobs:
           git config --global core.autocrlf false
           git config --global core.eol lf
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Get composer cache directory
         run: echo COMPOSER_CACHE="$(composer config cache-files-dir)" >> "$env:GITHUB_ENV"
@@ -263,7 +263,7 @@ jobs:
     runs-on: [ubuntu-latest]
     needs: [unit-tests-linux]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: actions/download-artifact@v3
         with:
