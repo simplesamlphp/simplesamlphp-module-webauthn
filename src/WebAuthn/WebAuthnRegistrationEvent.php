@@ -206,6 +206,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
                 break;
             case "tpm":
                 $this->fail("TPM attestation format not supported right now.");
+                break;
             case "android-key":
                 $this->validateAttestationFormatAndroidKey($attestationArray);
                 break;
@@ -415,7 +416,9 @@ private function commonX5cSignatureChecks(array $attestationArray): void
             $this->fail("ecdaa attestation not supported right now.");
         } else {
             // if we are still here, we are in the "self" type.
-            $this->validateAttestationFormatPackedSelf($attestationArray);
+            // signature checks already done, nothing more to do
+            $this->pass("Self-Attestation veried.");
+            $this->AAGUIDAssurance = self::AAGUID_ASSURANCE_LEVEL_SELF;
         }
     }
 
@@ -491,29 +494,7 @@ private function commonX5cSignatureChecks(array $attestationArray): void
         return;
     }
 
-    /**
-     * @param array $attestationArray
-     * @return void
-     */
-    private function validateAttestationFormatPackedSelf(array $attestationArray): void
-    {
-        $stmtDecoded = $attestationArray['attStmt'];
-        $sigdata = $attestationArray['authData'] . $this->clientDataHash;
-        /**
-         * §8.2 Step 4 Bullet 2: verify signature
-         */
-        if (openssl_verify($sigdata, $stmtDecoded['sig'], $keyResource, OPENSSL_ALGO_SHA256) === 1) {
-            $this->pass("Self-Attestation veried.");
-            /**
-             * §8.2 Step 4 Bullet 3: return Self level
-             */
-            $this->AAGUIDAssurance = self::AAGUID_ASSURANCE_LEVEL_SELF;
-        } else {
-            $this->fail("Self-Attestation failed.");
-        }
-    }
-
-private function validateAttestationFormatAndroidKey(array $attestationData): void
+private function validateAttestationFormatAndroidKey(array $attestationArray): void
     {
         $stmtDecoded = $attestationArray['attStmt'];
         $this->debugBuffer .= "AttStmt: " . print_r($stmtDecoded, true) . "<br/>";
