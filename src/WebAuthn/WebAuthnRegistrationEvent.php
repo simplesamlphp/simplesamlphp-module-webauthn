@@ -566,7 +566,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         ) {
             $this->fail("Incorrect value for ORIGIN!");
         }
-       
+
         if ($softwareEnforced->hasTagged(1)) {
             $purposesSoftware = $softwareEnforced->getTagged(1)->asExplicit()->asSet();
             foreach ($purposesSoftware->elements() as $onePurpose) {
