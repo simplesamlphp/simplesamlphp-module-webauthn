@@ -13,6 +13,7 @@ use SimpleSAML\Logger;
 use SimpleSAML\Module\webauthn\WebAuthn\AAGUID;
 use SimpleSAML\Utils;
 use SimpleSAML\Utils\Config as SSPConfig;
+use SpomkyLabs\Pki\ASN1\Type\UnspecifiedType;
 
 /**
  * FIDO2/WebAuthn Authentication Processing filter
@@ -494,6 +495,24 @@ private function commonX5cSignatureChecks(array $attestationArray): void
         return;
     }
 
+    // Keymaster 3 - KeyMint ???
+    private const ORIGINS_3 = [ // https://source.android.com/docs/security/features/keystore/tags#origin
+        0 => "GENERATED", 
+        1 => "DERIVED", 
+        2 => "IMPORTED", 
+        3 => "UNKNOWN",
+        ];
+    private const PURPOSE_3 = [
+        0 => "ENCRYPT",
+        1 => "DECRYPT",
+        2 => "SIGN",
+        3 => "VERIFY",
+        4 => "DERIVE_KEY",
+        5 => "WRAP_KEY",
+    ];
+            
+    private const MIN_SUPPORTED_KEYMASTER_VERSION = 3;
+    
 private function validateAttestationFormatAndroidKey(array $attestationArray): void
     {
         $stmtDecoded = $attestationArray['attStmt'];
@@ -501,27 +520,63 @@ private function validateAttestationFormatAndroidKey(array $attestationArray): v
         $this->commonX5cSignatureChecks($attestationArray);    
         // first certificate's properties
         $certProps = openssl_x509_parse($this->der2pem($stmtDecoded['x5c'][0]));
+        $keyResource = openssl_pkey_get_public($this->der2pem($stmtDecoded['x5c'][0]));
+        $keyDetails = openssl_pkey_get_details($keyResource);
+        switch ($keyDetails['type']) {
+            case OPENSSL_KEYTYPE_EC:
+                $certPubkey = $keyDetails['ec'];
+                break;
+            case OPENSSL_KEYTYPE_RSA:
+                $certPubkey = $keyDetails['rsa'];
+                break;
+            default:
+                throw new Exception("Public key was neither a RSA nor EC key.");            
+        }
+        $statementKeyData = $this->cborDecode(hex2bin($this->credential));
+        // this will only work for ECDSA keys, screw RSA
+        if (
+            $statementKeyData['x'] != $certPubkey[-2] || $statementKeyData['y'] != $certPubkey[-3]
+           )
+        {
+            $this->fail("Certificate public key does not match credentialPublicKey in authenticatorData (".print_r($certPubkey, true). "###".print_r($statementKeyData, true).").");
+        }
+        // throw new Exception(print_r($certProps, true));
+        $rawAsn1Oid = $certProps['extensions']['1.3.6.1.4.1.11129.2.1.17'];
+        $keyDescription = UnspecifiedType::fromDER($rawAsn1Oid)->asSequence();
+        $attestationVersion = $keyDescription->at(0)->asInteger()->intNumber();
+        $attestationChallenge = $keyDescription->at(4)->asOctetString()->string();
+        $softwareEnforced = $keyDescription->at(6)->asSequence();
+        $teeEnforced = $keyDescription->at(7)->asSequence();
         
-        if (
-            $attestationArray['authData']['attestedCredentialData']['credentialPublicKey']
-            !==
-            $certProps['publicKey']
-            )
+        if ( $this->clientDataHash !== $attestationChallenge ) 
         {
-            $this->fail("Certificate public key does not match credentialPublicKey in authenticatorData.");
+            $this->fail("ClientDataHash is not in certificate's extension data (attestationChallenge).");
         }
-        if (
-            $this->clientDataHash 
-            !==
-            $certProps['policyOID']['1.3.6.1.4.1.11129.2.1.17']['attestationChallenge']
-            ) 
+        
+        if ( // allApplications stopped existing at version 100, so we're good
+                $attestationVersion < self::MIN_SUPPORTED_KEYMASTER_VERSION
+        ) 
         {
-            $this->fail("ClientDataHash is not in certificate's extension data.");
+            $this->fail("Attestation versions below ". self::MIN_SUPPORTED_KEYMASTER_VERSION . " not supported, found $attestationVersion.");
         }
             
+        if ($softwareEnforced->hasTagged(600) || $teeEnforced->hasTagged(600)) 
+        {
+            $this->fail("Tag allApplications found!");
+        }
+        // need to go through both software and TEE and check origins and purpose
+        
+        if ($softwareEnforced->hasTagged(702) && $softwareEnforced->at(702)->asInteger()->intNumber() != array_search("GENERATED", self::ORIGINS_3)) 
+        {
+            $this->fail("Incorrect value for ORIGIN!");
+        }
+        if ($softwareEnforced->hasTagged(1) && $softwareEnforced->at(1)->asInteger()->intNumber() != array_search("SIGN", self::PURPOSE_3)) 
+        {
+            $this->fail("Incorrect value for PURPOSE!");
+        }
             
-            
-        $this->fail("Still need to do Android-Key specific further checks.");
+        $this->pass("Android Key attestation passed.");
+        $this->AAGUIDAssurance = self::AAGUID_ASSURANCE_LEVEL_BASIC;
     }
     
     /**
