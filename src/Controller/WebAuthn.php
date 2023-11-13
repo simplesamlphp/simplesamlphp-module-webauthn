@@ -239,6 +239,7 @@ class WebAuthn
             $this->workflowStateMachine($state) == self::STATE_AUTH_ALLOWMGMT || $this->workflowStateMachine($state) == self::STATE_AUTH_NOMGMT
         ) {
             $t->data['authURL'] = Module::getModuleURL('webauthn/authprocess?StateId=' . urlencode($stateId));
+            $t->data['delURL'] = Module::getModuleURL('webauthn/managetoken?StateId=' . urlencode($stateId));
         }
 
         // dynamically generate the JS code needed for token registration
