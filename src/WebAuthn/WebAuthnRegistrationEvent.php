@@ -359,7 +359,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         return;
     }
 
-private function commonX5cSignatureChecks(array $attestationArray): void
+    private function commonX5cSignatureChecks(array $attestationArray): void
     {
         $stmtDecoded = $attestationArray['attStmt'];
         /**
@@ -397,9 +397,9 @@ private function commonX5cSignatureChecks(array $attestationArray): void
         if (openssl_verify($sigdata, $stmtDecoded['sig'], $keyResource, OPENSSL_ALGO_SHA256) !== 1) {
             $this->fail("x5c attestation failed.");
         }
-        $this->pass("x5c sig check passed.");        
+        $this->pass("x5c sig check passed.");
     }
-    
+
     /**
      * @param array $attestationArray
      */
@@ -497,9 +497,9 @@ private function commonX5cSignatureChecks(array $attestationArray): void
 
     // Keymaster 3 - KeyMint ???
     private const ORIGINS_3 = [ // https://source.android.com/docs/security/features/keystore/tags#origin
-        0 => "GENERATED", 
-        1 => "DERIVED", 
-        2 => "IMPORTED", 
+        0 => "GENERATED",
+        1 => "DERIVED",
+        2 => "IMPORTED",
         3 => "UNKNOWN",
         ];
     private const PURPOSE_3 = [
@@ -510,14 +510,14 @@ private function commonX5cSignatureChecks(array $attestationArray): void
         4 => "DERIVE_KEY",
         5 => "WRAP_KEY",
     ];
-            
+
     private const MIN_SUPPORTED_KEYMASTER_VERSION = 3;
     
-private function validateAttestationFormatAndroidKey(array $attestationArray): void
+    private function validateAttestationFormatAndroidKey(array $attestationArray): void
     {
         $stmtDecoded = $attestationArray['attStmt'];
         $this->debugBuffer .= "AttStmt: " . print_r($stmtDecoded, true) . "<br/>";
-        $this->commonX5cSignatureChecks($attestationArray);    
+        $this->commonX5cSignatureChecks($attestationArray);
         // first certificate's properties
         $certProps = openssl_x509_parse($this->der2pem($stmtDecoded['x5c'][0]));
         $keyResource = openssl_pkey_get_public($this->der2pem($stmtDecoded['x5c'][0]));
@@ -530,15 +530,15 @@ private function validateAttestationFormatAndroidKey(array $attestationArray): v
                 $certPubkey = $keyDetails['rsa'];
                 break;
             default:
-                throw new Exception("Public key was neither a RSA nor EC key.");            
+                throw new Exception("Public key was neither a RSA nor EC key.");
         }
         $statementKeyData = $this->cborDecode(hex2bin($this->credential));
         // this will only work for ECDSA keys, screw RSA
         if (
             $statementKeyData['x'] != $certPubkey[-2] || $statementKeyData['y'] != $certPubkey[-3]
-           )
+        ) 
         {
-            $this->fail("Certificate public key does not match credentialPublicKey in authenticatorData (".print_r($certPubkey, true). "###".print_r($statementKeyData, true).").");
+            $this->fail("Certificate public key does not match credentialPublicKey in authenticatorData (" . print_r($certPubkey, true) . "###" . print_r($statementKeyData, true) . ").");
         }
         // throw new Exception(print_r($certProps, true));
         $rawAsn1Oid = $certProps['extensions']['1.3.6.1.4.1.11129.2.1.17'];
@@ -547,30 +547,28 @@ private function validateAttestationFormatAndroidKey(array $attestationArray): v
         $attestationChallenge = $keyDescription->at(4)->asOctetString()->string();
         $softwareEnforced = $keyDescription->at(6)->asSequence();
         $teeEnforced = $keyDescription->at(7)->asSequence();
-        
-        if ( $this->clientDataHash !== $attestationChallenge ) 
+
+        if ($this->clientDataHash !== $attestationChallenge)
         {
             $this->fail("ClientDataHash is not in certificate's extension data (attestationChallenge).");
         }
-        
-        if ( // allApplications stopped existing at version 100, so we're good
-                $attestationVersion < self::MIN_SUPPORTED_KEYMASTER_VERSION
-        ) 
+
+        if ($attestationVersion < self::MIN_SUPPORTED_KEYMASTER_VERSION) 
         {
-            $this->fail("Attestation versions below ". self::MIN_SUPPORTED_KEYMASTER_VERSION . " not supported, found $attestationVersion.");
+            $this->fail("Attestation versions below " . self::MIN_SUPPORTED_KEYMASTER_VERSION . " not supported, found $attestationVersion.");
         }
-            
-        if ($softwareEnforced->hasTagged(600) || $teeEnforced->hasTagged(600)) 
+
+        if ($softwareEnforced->hasTagged(600) || $teeEnforced->hasTagged(600))
         {
             $this->fail("Tag allApplications found!");
         }
         // need to go through both software and TEE and check origins and purpose
-        
-        if ($softwareEnforced->hasTagged(702) && $softwareEnforced->at(702)->asInteger()->intNumber() != array_search("GENERATED", self::ORIGINS_3)) 
+
+        if ($softwareEnforced->hasTagged(702) && $softwareEnforced->at(702)->asInteger()->intNumber() != array_search("GENERATED", self::ORIGINS_3))
         {
             $this->fail("Incorrect value for ORIGIN!");
         }
-        if ($softwareEnforced->hasTagged(1) && $softwareEnforced->at(1)->asInteger()->intNumber() != array_search("SIGN", self::PURPOSE_3)) 
+        if ($softwareEnforced->hasTagged(1) && $softwareEnforced->at(1)->asInteger()->intNumber() != array_search("SIGN", self::PURPOSE_3))
         {
             $this->fail("Incorrect value for PURPOSE!");
         }
@@ -578,7 +576,7 @@ private function validateAttestationFormatAndroidKey(array $attestationArray): v
         $this->pass("Android Key attestation passed.");
         $this->AAGUIDAssurance = self::AAGUID_ASSURANCE_LEVEL_BASIC;
     }
-    
+
     /**
      * support legacy U2F tokens
      *
