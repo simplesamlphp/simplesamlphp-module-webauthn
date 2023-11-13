@@ -377,6 +377,7 @@ The implementation supports the attestation formats
 - "packed / self" (Packed Attestation, Self-Attestation)
 - "fido-u2f" (FIDO U2F Attestation)
 - "apple" (Apple Anonymous Attestation)
+- "android-key" (Android key attestation with Keymaster 3, for Android 8 and up)
   Other attestation formats lead to a registration failure.
 
 For the attation type "packed / x5c",
