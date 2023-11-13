@@ -536,8 +536,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         // this will only work for ECDSA keys, screw RSA
         if (
             $statementKeyData['x'] != $certPubkey[-2] || $statementKeyData['y'] != $certPubkey[-3]
-        ) 
-        {
+        ) {
             $this->fail("Certificate public key does not match credentialPublicKey in authenticatorData (" . print_r($certPubkey, true) . "###" . print_r($statementKeyData, true) . ").");
         }
         // throw new Exception(print_r($certProps, true));
@@ -564,16 +563,14 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         if (
                 ($softwareEnforced->hasTagged(702) && ($softwareEnforced->getTagged(702)->asExplicit()->asInteger()->intNumber() != array_search("GENERATED", self::ORIGINS_3))) ||
                 ($teeEnforced->hasTagged(702) && ($teeEnforced->getTagged(702)->asExplicit()->asInteger()->intNumber() != array_search("GENERATED", self::ORIGINS_3)))
-                ) 
-        {
+        ) {
             $this->fail("Incorrect value for ORIGIN!");
         }
        
         if ($softwareEnforced->hasTagged(1)) {
             $purposesSoftware = $softwareEnforced->getTagged(1)->asExplicit()->asSet();
             foreach ($purposesSoftware->elements() as $onePurpose) {
-                if ($onePurpose->asInteger()->intNumber() != array_search("SIGN", self::PURPOSE_3))
-                    {
+                if ($onePurpose->asInteger()->intNumber() != array_search("SIGN", self::PURPOSE_3)) {
                         $this->fail("Incorrect value for PURPOSE (softwareEnforced)!");
                 }
             }
@@ -581,8 +578,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         if ($teeEnforced->hasTagged(1)) {
             $purposesTee = $teeEnforced->getTagged(1)->asExplicit()->asSet();
             foreach ($purposesTee->elements() as $onePurpose) {
-                if ($onePurpose->asInteger()->intNumber() != array_search("SIGN", self::PURPOSE_3))
-                    {
+                if ($onePurpose->asInteger()->intNumber() != array_search("SIGN", self::PURPOSE_3)) {
                         $this->fail("Incorrect value for PURPOSE (teeEnforced)!");
                 }
             }
