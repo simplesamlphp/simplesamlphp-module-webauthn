@@ -536,7 +536,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         // this will only work for ECDSA keys, screw RSA
         if (
             $statementKeyData['x'] != $certPubkey[-2] || $statementKeyData['y'] != $certPubkey[-3]
-        )
+        ) 
         {
             $this->fail("Certificate public key does not match credentialPublicKey in authenticatorData (" . print_r($certPubkey, true) . "###" . print_r($statementKeyData, true) . ").");
         }
@@ -548,18 +548,15 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         $softwareEnforced = $keyDescription->at(6)->asSequence();
         $teeEnforced = $keyDescription->at(7)->asSequence();
 
-        if ($this->clientDataHash !== $attestationChallenge) 
-        {
+        if ($this->clientDataHash !== $attestationChallenge) {
             $this->fail("ClientDataHash is not in certificate's extension data (attestationChallenge).");
         }
 
-        if ($attestationVersion < self::MIN_SUPPORTED_KEYMASTER_VERSION) 
-        {
+        if ($attestationVersion < self::MIN_SUPPORTED_KEYMASTER_VERSION) {
             $this->fail("Attestation versions below " . self::MIN_SUPPORTED_KEYMASTER_VERSION . " not supported, found $attestationVersion.");
         }
 
-        if ($softwareEnforced->hasTagged(600) || $teeEnforced->hasTagged(600)) 
-        {
+        if ($softwareEnforced->hasTagged(600) || $teeEnforced->hasTagged(600)) {
             $this->fail("Tag allApplications found!");
         }
         // need to go through both software and TEE and check origins and purpose
@@ -572,26 +569,25 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
             $this->fail("Incorrect value for ORIGIN!");
         }
        
-        if ($softwareEnforced->hasTagged(1)) { 
+        if ($softwareEnforced->hasTagged(1)) {
             $purposesSoftware = $softwareEnforced->getTagged(1)->asExplicit()->asSet();
             foreach ($purposesSoftware->elements() as $onePurpose) {
                 if ($onePurpose->asInteger()->intNumber() != array_search("SIGN", self::PURPOSE_3))
                     {
                         $this->fail("Incorrect value for PURPOSE (softwareEnforced)!");
-                    }
+                }
             }
         }
-        if ($teeEnforced->hasTagged(1)) { 
+        if ($teeEnforced->hasTagged(1)) {
             $purposesTee = $teeEnforced->getTagged(1)->asExplicit()->asSet();
             foreach ($purposesTee->elements() as $onePurpose) {
                 if ($onePurpose->asInteger()->intNumber() != array_search("SIGN", self::PURPOSE_3))
                     {
                         $this->fail("Incorrect value for PURPOSE (teeEnforced)!");
-                    }
+                }
             }
         }
-        
-            
+
         $this->pass("Android Key attestation passed.");
         $this->AAGUIDAssurance = self::AAGUID_ASSURANCE_LEVEL_BASIC;
     }
