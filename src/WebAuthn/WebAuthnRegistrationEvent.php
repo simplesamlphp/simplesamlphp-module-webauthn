@@ -565,19 +565,32 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         // need to go through both software and TEE and check origins and purpose
 
         if (
-                ($softwareEnforced->hasTagged(702) && $softwareEnforced->at(702)->asInteger()->intNumber() != array_search("GENERATED", self::ORIGINS_3)) ||
-                ($teeEnforced->hasTagged(702) && $teeEnforced->at(702)->asInteger()->intNumber() != array_search("GENERATED", self::ORIGINS_3))
+                ($softwareEnforced->hasTagged(702) && ($softwareEnforced->getTagged(702)->asExplicit()->asInteger()->intNumber() != array_search("GENERATED", self::ORIGINS_3))) ||
+                ($teeEnforced->hasTagged(702) && ($teeEnforced->getTagged(702)->asExplicit()->asInteger()->intNumber() != array_search("GENERATED", self::ORIGINS_3)))
                 ) 
         {
             $this->fail("Incorrect value for ORIGIN!");
         }
-        if (
-                ($softwareEnforced->hasTagged(1) && $softwareEnforced->at(1)->asInteger()->intNumber() != array_search("SIGN", self::PURPOSE_3)) ||
-                ($teeEnforced->hasTagged(1) && $teeEnforced->at(1)->asInteger()->intNumber() != array_search("SIGN", self::PURPOSE_3))
-                ) 
-        {
-            $this->fail("Incorrect value for PURPOSE!");
+       
+        if ($softwareEnforced->hasTagged(1)) { 
+            $purposesSoftware = $softwareEnforced->getTagged(1)->asExplicit()->asSet();
+            foreach ($purposesSoftware->elements() as $onePurpose) {
+                if ($onePurpose->asInteger()->intNumber() != array_search("SIGN", self::PURPOSE_3))
+                    {
+                        $this->fail("Incorrect value for PURPOSE (softwareEnforced)!");
+                    }
+            }
         }
+        if ($teeEnforced->hasTagged(1)) { 
+            $purposesTee = $teeEnforced->getTagged(1)->asExplicit()->asSet();
+            foreach ($purposesTee->elements() as $onePurpose) {
+                if ($onePurpose->asInteger()->intNumber() != array_search("SIGN", self::PURPOSE_3))
+                    {
+                        $this->fail("Incorrect value for PURPOSE (teeEnforced)!");
+                    }
+            }
+        }
+        
             
         $this->pass("Android Key attestation passed.");
         $this->AAGUIDAssurance = self::AAGUID_ASSURANCE_LEVEL_BASIC;
