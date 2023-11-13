@@ -114,7 +114,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           # Should be the lowest supported version
-          php-version: '8.0'
+          php-version: '8.1'
           extensions: ctype, date, dom, fileinfo, filter, hash, intl, mbstring, openssl, pcre, spl, xml
           tools: composer
           coverage: none
@@ -154,7 +154,7 @@ jobs:
       fail-fast: false
       matrix:
         operating-system: [ubuntu-latest]
-        php-versions: ['8.0', '8.1', '8.2']
+        php-versions: ['8.1', '8.2']
 
     steps:
       - name: Setup PHP, with composer and extensions
@@ -216,7 +216,7 @@ jobs:
       fail-fast: true
       matrix:
         operating-system: [windows-latest]
-        php-versions: ['8.0', '8.1', '8.2']
+        php-versions: ['8.1', '8.2']
 
     steps:
       - name: Setup PHP, with composer and extensions
