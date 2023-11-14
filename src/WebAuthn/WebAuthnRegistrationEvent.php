@@ -13,6 +13,7 @@ use SimpleSAML\Logger;
 use SimpleSAML\Module\webauthn\WebAuthn\AAGUID;
 use SimpleSAML\Utils;
 use SimpleSAML\Utils\Config as SSPConfig;
+use SpomkyLabs\Pki\ASN1\Type\UnspecifiedType;
 
 /**
  * FIDO2/WebAuthn Authentication Processing filter
@@ -205,8 +206,10 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
                 $this->validateAttestationFormatApple($attestationArray);
                 break;
             case "tpm":
+                $this->fail("TPM attestation format not supported right now.");
+                break;
             case "android-key":
-                $this->fail("Attestation format " . $attestationArray['fmt'] . " validation not supported right now.");
+                $this->validateAttestationFormatAndroidKey($attestationArray);
                 break;
             default:
                 $this->fail("Unknown attestation format.");
@@ -356,6 +359,47 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         return;
     }
 
+    private function commonX5cSignatureChecks(array $attestationArray): void
+    {
+        $stmtDecoded = $attestationArray['attStmt'];
+        /**
+         * §8.2 Step 4 Bullet 1: check algorithm
+         */
+        if (!in_array($stmtDecoded['alg'], self::PK_ALGORITHM)) {
+            $this->fail("Unexpected algorithm type in packed basic attestation: " . $stmtDecoded['alg'] . ".");
+        }
+        $keyObject = null;
+        switch ($stmtDecoded['alg']) {
+            case self::PK_ALGORITHM_ECDSA:
+                $keyObject = new Ec2Key($this->cborDecode(hex2bin($this->credential)));
+                $keyResource = openssl_pkey_get_public($keyObject->asPEM());
+                if ($keyResource === false) {
+                    $this->fail("Unable to construct ECDSA public key resource from PEM.");
+                };
+                break;
+            case self::PK_ALGORITHM_RSA:
+                $keyObject = new RsaKey($this->cborDecode(hex2bin($this->credential)));
+                $keyResource = openssl_pkey_get_public($keyObject->asPEM());
+                if ($keyResource === false) {
+                    $this->fail("Unable to construct RSA public key resource from PEM.");
+                }
+                break;
+            default:
+                $this->fail("Unable to construct public key resource from PEM.");
+        }
+        /**
+         * §8.2 Step 2: check x5c attestation
+         */
+        $sigdata = $attestationArray['authData'] . $this->clientDataHash;
+        /**
+         * §8.2 Step 2 Bullet 1: check signature
+         */
+        if (openssl_verify($sigdata, $stmtDecoded['sig'], $keyResource, OPENSSL_ALGO_SHA256) !== 1) {
+            $this->fail("x5c attestation failed.");
+        }
+        $this->pass("x5c sig check passed.");
+    }
+
     /**
      * @param array $attestationArray
      */
@@ -363,6 +407,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
     {
         $stmtDecoded = $attestationArray['attStmt'];
         $this->debugBuffer .= "AttStmt: " . print_r($stmtDecoded, true) . "<br/>";
+        $this->commonX5cSignatureChecks($attestationArray);
         /**
          * §7.1 Step 16: attestation is either done with x5c or ecdaa.
          */
@@ -372,7 +417,9 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
             $this->fail("ecdaa attestation not supported right now.");
         } else {
             // if we are still here, we are in the "self" type.
-            $this->validateAttestationFormatPackedSelf($attestationArray);
+            // signature checks already done, nothing more to do
+            $this->pass("Self-Attestation veried.");
+            $this->AAGUIDAssurance = self::AAGUID_ASSURANCE_LEVEL_SELF;
         }
     }
 
@@ -383,21 +430,6 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
     private function validateAttestationFormatPackedX5C(array $attestationArray): void
     {
         $stmtDecoded = $attestationArray['attStmt'];
-        /**
-         * §8.2 Step 2: check x5c attestation
-         */
-        $sigdata = $attestationArray['authData'] . $this->clientDataHash;
-        $keyResource = openssl_pkey_get_public($this->der2pem($stmtDecoded['x5c'][0]));
-        if ($keyResource === false) {
-            $this->fail("Unable to construct public key resource from PEM.");
-        }
-        /**
-         * §8.2 Step 2 Bullet 1: check signature
-         */
-        if (openssl_verify($sigdata, $stmtDecoded['sig'], $keyResource, OPENSSL_ALGO_SHA256) !== 1) {
-            $this->fail("x5c attestation failed.");
-        }
-        $this->pass("x5c sig check passed.");
         // still need to perform sanity checks on the attestation certificate
         /**
          * §8.2 Step 2 Bullet 2: check certificate properties listed in §8.2.1
@@ -463,51 +495,97 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         return;
     }
 
-    /**
-     * @param array $attestationArray
-     * @return void
-     */
-    private function validateAttestationFormatPackedSelf(array $attestationArray): void
+    // Keymaster 3 - KeyMint ???
+    private const ORIGINS_3 = [ // https://source.android.com/docs/security/features/keystore/tags#origin
+        0 => "GENERATED",
+        1 => "DERIVED",
+        2 => "IMPORTED",
+        3 => "UNKNOWN",
+        ];
+    private const PURPOSE_3 = [
+        0 => "ENCRYPT",
+        1 => "DECRYPT",
+        2 => "SIGN",
+        3 => "VERIFY",
+        4 => "DERIVE_KEY",
+        5 => "WRAP_KEY",
+    ];
+
+    private const MIN_SUPPORTED_KEYMASTER_VERSION = 3;
+
+    private function validateAttestationFormatAndroidKey(array $attestationArray): void
     {
         $stmtDecoded = $attestationArray['attStmt'];
-        /**
-         * §8.2 Step 4 Bullet 1: check algorithm
-         */
-        if (!in_array($stmtDecoded['alg'], self::PK_ALGORITHM)) {
-            $this->fail("Unexpected algorithm type in packed basic attestation: " . $stmtDecoded['alg'] . ".");
-        }
-        $keyObject = null;
-        switch ($stmtDecoded['alg']) {
-            case self::PK_ALGORITHM_ECDSA:
-                $keyObject = new Ec2Key($this->cborDecode(hex2bin($this->credential)));
-                $keyResource = openssl_pkey_get_public($keyObject->asPEM());
-                if ($keyResource === false) {
-                    $this->fail("Unable to construct ECDSA public key resource from PEM.");
-                };
+        $this->debugBuffer .= "AttStmt: " . print_r($stmtDecoded, true) . "<br/>";
+        $this->commonX5cSignatureChecks($attestationArray);
+        // first certificate's properties
+        $certProps = openssl_x509_parse($this->der2pem($stmtDecoded['x5c'][0]));
+        $keyResource = openssl_pkey_get_public($this->der2pem($stmtDecoded['x5c'][0]));
+        $keyDetails = openssl_pkey_get_details($keyResource);
+        switch ($keyDetails['type']) {
+            case OPENSSL_KEYTYPE_EC:
+                $certPubkey = $keyDetails['ec'];
                 break;
-            case self::PK_ALGORITHM_RSA:
-                $keyObject = new RsaKey($this->cborDecode(hex2bin($this->credential)));
-                $keyResource = openssl_pkey_get_public($keyObject->asPEM());
-                if ($keyResource === false) {
-                    $this->fail("Unable to construct RSA public key resource from PEM.");
-                }
+            case OPENSSL_KEYTYPE_RSA:
+                $certPubkey = $keyDetails['rsa'];
                 break;
             default:
-                $this->fail("Unable to construct public key resource from PEM.");
+                throw new Exception("Public key was neither a RSA nor EC key.");
         }
-        $sigdata = $attestationArray['authData'] . $this->clientDataHash;
-        /**
-         * §8.2 Step 4 Bullet 2: verify signature
-         */
-        if (openssl_verify($sigdata, $stmtDecoded['sig'], $keyResource, OPENSSL_ALGO_SHA256) === 1) {
-            $this->pass("Self-Attestation veried.");
-            /**
-             * §8.2 Step 4 Bullet 3: return Self level
-             */
-            $this->AAGUIDAssurance = self::AAGUID_ASSURANCE_LEVEL_SELF;
-        } else {
-            $this->fail("Self-Attestation failed.");
+        $statementKeyData = $this->cborDecode(hex2bin($this->credential));
+        // this will only work for ECDSA keys, screw RSA
+        if (
+            $statementKeyData['x'] != $certPubkey[-2] || $statementKeyData['y'] != $certPubkey[-3]
+        ) {
+            $this->fail("Certificate public key does not match credentialPublicKey in authenticatorData (" . print_r($certPubkey, true) . "###" . print_r($statementKeyData, true) . ").");
         }
+        // throw new Exception(print_r($certProps, true));
+        $rawAsn1Oid = $certProps['extensions']['1.3.6.1.4.1.11129.2.1.17'];
+        $keyDescription = UnspecifiedType::fromDER($rawAsn1Oid)->asSequence();
+        $attestationVersion = $keyDescription->at(0)->asInteger()->intNumber();
+        $attestationChallenge = $keyDescription->at(4)->asOctetString()->string();
+        $softwareEnforced = $keyDescription->at(6)->asSequence();
+        $teeEnforced = $keyDescription->at(7)->asSequence();
+
+        if ($this->clientDataHash !== $attestationChallenge) {
+            $this->fail("ClientDataHash is not in certificate's extension data (attestationChallenge).");
+        }
+
+        if ($attestationVersion < self::MIN_SUPPORTED_KEYMASTER_VERSION) {
+            $this->fail("Attestation versions below " . self::MIN_SUPPORTED_KEYMASTER_VERSION . " not supported, found $attestationVersion.");
+        }
+
+        if ($softwareEnforced->hasTagged(600) || $teeEnforced->hasTagged(600)) {
+            $this->fail("Tag allApplications found!");
+        }
+        // need to go through both software and TEE and check origins and purpose
+
+        if (
+                ($softwareEnforced->hasTagged(702) && ($softwareEnforced->getTagged(702)->asExplicit()->asInteger()->intNumber() != array_search("GENERATED", self::ORIGINS_3))) ||
+                ($teeEnforced->hasTagged(702) && ($teeEnforced->getTagged(702)->asExplicit()->asInteger()->intNumber() != array_search("GENERATED", self::ORIGINS_3)))
+        ) {
+            $this->fail("Incorrect value for ORIGIN!");
+        }
+
+        if ($softwareEnforced->hasTagged(1)) {
+            $purposesSoftware = $softwareEnforced->getTagged(1)->asExplicit()->asSet();
+            foreach ($purposesSoftware->elements() as $onePurpose) {
+                if ($onePurpose->asInteger()->intNumber() != array_search("SIGN", self::PURPOSE_3)) {
+                        $this->fail("Incorrect value for PURPOSE (softwareEnforced)!");
+                }
+            }
+        }
+        if ($teeEnforced->hasTagged(1)) {
+            $purposesTee = $teeEnforced->getTagged(1)->asExplicit()->asSet();
+            foreach ($purposesTee->elements() as $onePurpose) {
+                if ($onePurpose->asInteger()->intNumber() != array_search("SIGN", self::PURPOSE_3)) {
+                        $this->fail("Incorrect value for PURPOSE (teeEnforced)!");
+                }
+            }
+        }
+
+        $this->pass("Android Key attestation passed.");
+        $this->AAGUIDAssurance = self::AAGUID_ASSURANCE_LEVEL_BASIC;
     }
 
     /**

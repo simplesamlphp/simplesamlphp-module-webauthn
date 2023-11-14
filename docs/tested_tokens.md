@@ -11,6 +11,7 @@
 - [Solo Tap - FIDO2 security key (USB + NFC)](https://solokeys.com/collections/all/products/solo-tap)
 - TouchID (tested on Macbook Pro 2019, macOS 10.15.3, Google Chrome) - AAGUID 'adce000235bcc60a648b0b25f1f05503' not in database yet
 - FaceID (tested on an iPhone with iOS 14)
+- Android 13 (tested on a Murena Fairphone 5, "Samsung Internet" browser)
 
 ## Attestation mode None
 
