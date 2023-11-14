@@ -140,7 +140,7 @@ class AuthProcess
         $publicKey = false;
         $previousCounter = -1;
         $oneToken = [];
-        
+
         foreach ($state['FIDO2Tokens'] as $oneToken) {
             if ($oneToken[0] == $incomingID) {
                 // Credential ID is eligible for user $state['FIDO2Username'];
