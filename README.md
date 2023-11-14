@@ -133,12 +133,12 @@ The authsource takes the following parameters in authsources.php:
 
 ## How to set up simultaneous Passwordless and traditional two-factor
 
-In this mode, the authentication prompt simultaneously allows for either 
+In this mode, the authentication prompt simultaneously allows for either
 triggering a Passwordless auth, or to enter a username/password as traditional
 first-factor.
 
 The configuration is almost identical to Passwordless above, but requires one
-extra required configuration parameter: the authsource that should be used to 
+extra required configuration parameter: the authsource that should be used to
 validate the username/password, if supplied by the user.
 
 The authsource takes the following parameters in authsources.php:
