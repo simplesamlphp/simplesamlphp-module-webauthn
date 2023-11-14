@@ -139,7 +139,8 @@ class AuthProcess
          */
         $publicKey = false;
         $previousCounter = -1;
-
+        $oneToken = [];
+        
         foreach ($state['FIDO2Tokens'] as $oneToken) {
             if ($oneToken[0] == $incomingID) {
                 // Credential ID is eligible for user $state['FIDO2Username'];
@@ -150,7 +151,7 @@ class AuthProcess
             }
         }
 
-        if ($publicKey === false) {
+        if ($publicKey === false || sizeof($oneToken) == 0) {
             throw new Exception(
                 "User attempted to authenticate with an unknown credential ID. This should already have been prevented by the browser!"
             );

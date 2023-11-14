@@ -386,6 +386,8 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
                 break;
             default:
                 $this->fail("Unable to construct public key resource from PEM.");
+                // be sure to end execution even if the Exception is caught
+                exit(1);
         }
         /**
          * §8.2 Step 2: check x5c attestation
@@ -406,7 +408,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
     private function validateAttestationFormatPacked(array $attestationArray): void
     {
         $stmtDecoded = $attestationArray['attStmt'];
-        $this->debugBuffer .= "AttStmt: " . print_r($stmtDecoded, true) . "<br/>";
+        $this->debugBuffer .= "AttStmt: " . /** @scrutinizer ignore-type */ print_r($stmtDecoded, true) . "<br/>";
         $this->commonX5cSignatureChecks($attestationArray);
         /**
          * §7.1 Step 16: attestation is either done with x5c or ecdaa.
@@ -435,7 +437,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
          * §8.2 Step 2 Bullet 2: check certificate properties listed in §8.2.1
          */
         $certProps = openssl_x509_parse($this->der2pem($stmtDecoded['x5c'][0]));
-        $this->debugBuffer .= "Attestation Certificate:" . print_r($certProps, true) . "<br/>";
+        $this->debugBuffer .= "Attestation Certificate:" . /** @scrutinizer ignore-type */ print_r($certProps, true) . "<br/>";
         if (
                 $certProps['version'] !== 2 || /** §8.2.1 Bullet 1 */
                 $certProps['subject']['OU'] !== "Authenticator Attestation" || /** §8.2.1 Bullet 2 [Subject-OU] */
@@ -479,7 +481,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
              * §7.1 Step 17 is to look at $token['RootPEMs']
              */
             foreach ($token['metadataStatement']['attestationRootCertificates'] as $oneRoot) {
-                $caData = openssl_x509_parse("-----BEGIN CERTIFICATE-----\n$oneRoot\n-----END CERTIFICATE-----", true);
+                openssl_x509_parse("-----BEGIN CERTIFICATE-----\n$oneRoot\n-----END CERTIFICATE-----", true);
             }
             /*
              * §7.1 Step 18 is skipped, and we unconditionally return "only" Basic.
@@ -516,7 +518,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
     private function validateAttestationFormatAndroidKey(array $attestationArray): void
     {
         $stmtDecoded = $attestationArray['attStmt'];
-        $this->debugBuffer .= "AttStmt: " . print_r($stmtDecoded, true) . "<br/>";
+        $this->debugBuffer .= "AttStmt: " . /** @scrutinizer ignore-type */ print_r($stmtDecoded, true) . "<br/>";
         $this->commonX5cSignatureChecks($attestationArray);
         // first certificate's properties
         $certProps = openssl_x509_parse($this->der2pem($stmtDecoded['x5c'][0]));
@@ -537,7 +539,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         if (
             $statementKeyData['x'] != $certPubkey[-2] || $statementKeyData['y'] != $certPubkey[-3]
         ) {
-            $this->fail("Certificate public key does not match credentialPublicKey in authenticatorData (" . print_r($certPubkey, true) . "###" . print_r($statementKeyData, true) . ").");
+            $this->fail("Certificate public key does not match credentialPublicKey in authenticatorData (" . /** @scrutinizer ignore-type */ print_r($certPubkey, true) . "###" . /** @scrutinizer ignore-type */ print_r($statementKeyData, true) . ").");
         }
         // throw new Exception(print_r($certProps, true));
         $rawAsn1Oid = $certProps['extensions']['1.3.6.1.4.1.11129.2.1.17'];
@@ -669,6 +671,9 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
      */
     private function validateAttestationFormatAndroidSafetyNet(array $attestationData): void
     {
+        $this->fail("Android SafetyNet attestation is historic and not supported ($attestationData).");
+        // be sure to end execution even if the Exception is caught
+        exit(1);
     }
 
     /**
@@ -706,7 +711,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         // silently ignores trailing extensions (if any)
         $pubKeyCBOR = substr($attData, 18 + $credIdLen);
         $arrayPK = $this->cborDecode($pubKeyCBOR);
-        $this->debugBuffer .= "pubKey in canonical form: <pre>" . print_r($arrayPK, true) . "</pre>";
+        $this->debugBuffer .= "pubKey in canonical form: <pre>" . /** @scrutinizer ignore-type */ print_r($arrayPK, true) . "</pre>";
         /**
          * STEP 13 of the validation procedure in § 7.1 of the spec: is the algorithm the expected one?
          */
@@ -730,6 +735,8 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
                 break;
             default:
                 $this->fail("No credential length information for $this->algo");
+                // be sure to end execution even if the Exception is caught
+                exit(1);
         }
         $extensions = substr($attData, 18 + $credIdLen + $credentialLength);
         if (strlen($extensions) !== 0) {

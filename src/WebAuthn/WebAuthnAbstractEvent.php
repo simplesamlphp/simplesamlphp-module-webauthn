@@ -260,7 +260,7 @@ abstract class WebAuthnAbstractEvent
          */
         $this->debugBuffer .= "ClientDataJSON hash: " . hash("sha256", $clientDataJSON) . "<br/>";
         $clientData = json_decode($clientDataJSON, true);
-        $this->debugBuffer .= "<pre>" . print_r($clientData, true) . "</pre>";
+        $this->debugBuffer .= "<pre>" . /** @scrutinizer ignore-type */ print_r($clientData, true) . "</pre>";
         switch ($this->eventType) {
             case "REG":
                 if ($clientData['type'] == "webauthn.create") {
