@@ -409,18 +409,18 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
     {
         $stmtDecoded = $attestationArray['attStmt'];
         $this->debugBuffer .= "AttStmt: " . /** @scrutinizer ignore-type */ print_r($stmtDecoded, true) . "<br/>";
-        $this->commonX5cSignatureChecks($attestationArray);
         /**
          * §7.1 Step 16: attestation is either done with x5c or ecdaa.
          */
         if (isset($stmtDecoded['x5c'])) {
+            $this->commonX5cSignatureChecks($attestationArray);
             $this->validateAttestationFormatPackedX5C($attestationArray);
         } elseif (isset($stmtDecoded['ecdaa'])) {
             $this->fail("ecdaa attestation not supported right now.");
         } else {
             // if we are still here, we are in the "self" type.
             // signature checks already done, nothing more to do
-            $this->pass("Self-Attestation veried.");
+            $this->pass("Self-Attestation verified.");
             $this->AAGUIDAssurance = self::AAGUID_ASSURANCE_LEVEL_SELF;
         }
     }
