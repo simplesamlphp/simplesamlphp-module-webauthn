@@ -368,26 +368,9 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         if (!in_array($stmtDecoded['alg'], self::PK_ALGORITHM)) {
             $this->fail("Unexpected algorithm type in packed basic attestation: " . $stmtDecoded['alg'] . ".");
         }
-        $keyObject = null;
-        switch ($stmtDecoded['alg']) {
-            case self::PK_ALGORITHM_ECDSA:
-                $keyObject = new Ec2Key($this->cborDecode(hex2bin($this->credential)));
-                $keyResource = openssl_pkey_get_public($keyObject->asPEM());
-                if ($keyResource === false) {
-                    $this->fail("Unable to construct ECDSA public key resource from PEM.");
-                };
-                break;
-            case self::PK_ALGORITHM_RSA:
-                $keyObject = new RsaKey($this->cborDecode(hex2bin($this->credential)));
-                $keyResource = openssl_pkey_get_public($keyObject->asPEM());
-                if ($keyResource === false) {
-                    $this->fail("Unable to construct RSA public key resource from PEM.");
-                }
-                break;
-            default:
-                $this->fail("Unable to construct public key resource from PEM.");
-                // be sure to end execution even if the Exception is caught
-                exit(1);
+        $keyResource = openssl_pkey_get_public($this->der2pem($stmtDecoded['x5c'][0]));
+        if ($keyResource === false) {
+            $this->fail("Unable to construct public key resource from PEM.");
         }
         /**
          * §8.2 Step 2: check x5c attestation
@@ -396,8 +379,9 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         /**
          * §8.2 Step 2 Bullet 1: check signature
          */
-        if (openssl_verify($sigdata, $stmtDecoded['sig'], $keyResource, OPENSSL_ALGO_SHA256) !== 1) {
-            $this->fail("x5c attestation failed.");
+        $retCode = openssl_verify($sigdata, $stmtDecoded['sig'], $keyResource, "sha256");
+        if ( $retCode !== 1) {
+            $this->fail("Packed signature mismatch (return code $retCode, for :authdata:".$attestationArray['authData']." - :clientDataHash:".$this->clientDataHash." - :signature:".$stmtDecoded['sig']."), attestation failed.");
         }
         $this->pass("x5c sig check passed.");
     }
@@ -413,7 +397,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
          * §7.1 Step 16: attestation is either done with x5c or ecdaa.
          */
         if (isset($stmtDecoded['x5c'])) {
-            $this->commonX5cSignatureChecks($attestationArray);
+        $this->commonX5cSignatureChecks($attestationArray);
             $this->validateAttestationFormatPackedX5C($attestationArray);
         } elseif (isset($stmtDecoded['ecdaa'])) {
             $this->fail("ecdaa attestation not supported right now.");
