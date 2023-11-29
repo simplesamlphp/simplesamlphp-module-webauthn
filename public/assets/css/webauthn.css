@@ -104,3 +104,7 @@ span.tokencaption {
 #submit_button {
     margin-top: 80px;
 }
+
+#passwordblock {
+    display: block;
+}
