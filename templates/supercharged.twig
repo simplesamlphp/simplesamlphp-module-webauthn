@@ -28,7 +28,7 @@
             <p>{{ '{webauthn.webauthn:passwordlessProse}'|trans }}</p>
         </div>
         <div id='container-1-3'>
-            <img src='{{ asset('base/icons/fingerprint.png', 'webauthn') }}' alt='fingerprint' width=150 height=180 style='padding-bottom: 30px; padding-right: 50px;'/><img src='{{ asset('base/icons/face.png', 'webauthn') }}' alt='face recognition' width=140 height=180 style='padding-bottom: 30px;'/>
+            <img src='{{ asset('base/icons/fingerprint.png', 'webauthn') }}' id='fingerprint' alt='fingerprint' width=150 height=180><img src='{{ asset('base/icons/face.png', 'webauthn') }}' id='face' alt='face recognition' width=140 height=180>
             {% if authURL is defined and authURL|length > 0 %}
                 <form id='authform' method='POST' action='{{ authURL|raw }}'>
                     <input type='hidden' id='resp' name='response_id' value='0'/>
@@ -73,7 +73,7 @@
                 <div class="pure-control-group center login-form-submit" >
                     <button class="pure-button pure-button-red pure-input-1-2 pure-input-sm-1-1 left" id="submit_button"
                             type="submit" tabindex="6" data-default="{% trans %}Login{% endtrans %}"
-                            data-processing="{% trans %}Processing...{% endtrans %}" style='margin-top: 80px'>
+                            data-processing="{% trans %}Processing...{% endtrans %}">
                         {% trans %}Login{% endtrans %}
                     </button>
                 </div>

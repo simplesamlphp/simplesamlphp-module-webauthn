@@ -27,35 +27,35 @@ span.tokencaption {
   font-weight: bold;
 }
 
-div.containerbase {
+#containerbase {
     display: grid; 
     grid-template-columns: repeat(3, 45% 10% 45%); 
     gap: 20px;
 }
 
-div.container-1-1 {
+#container-1-1 {
      grid-column: 1; 
      grid-row: 1;
 }
 
-div.container-1-2 {
+#container-1-2 {
      grid-column: 1; 
      grid-row: 2;
 }
 
-div.container-1-3 {
+#container-1-3 {
      grid-column: 1; 
      grid-row: 3;
      align-self: end;
 }
 
-div.container-1-4 {
+#container-1-4 {
      grid-column: 1; 
      grid-row: 4;
      align-self: end;
 }
 
-div.container-2 {
+#container-2 {
      grid-column: 2; 
      grid-row: 1 / 4;
      align-self: center;
@@ -63,31 +63,44 @@ div.container-2 {
      min-height: 100px;
 }
 
-div.container-3-1 {
+#container-3-1 {
      grid-column: 3; 
      grid-row: 1;
 }
 
-div.container-3-2 {
+#container-3-2 {
      grid-column: 3; 
      grid-row: 2;
 }
 
-div.container-3-3 {
+#container-3-3 {
      grid-column: 3; 
      grid-row: 3;
 }
 
-div.container-3-4 {
+#container-3-4 {
      grid-column: 3; 
      grid-row: 4;
 }
 
-label.label-passwordless {
+#label-passwordless {
     display: flex;
 }
 
-span.span-passwordless {
+#span-passwordless {
     font-size: small; 
     display: contents;
+}
+
+#fingerprint {
+    padding-bottom: 30px; 
+    padding-right: 50px;
+}
+
+#face {
+    padding-bottom: 30px;
+}
+
+#submit_button {
+    margin-top: 80px;
 }
