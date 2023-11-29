@@ -28,7 +28,7 @@
             <p>{{ '{webauthn.webauthn:passwordlessProse}'|trans }}</p>
         </div>
         <div style='grid-column: 1; grid-row: 3; align-self: end;'>
-        <img src='{{ asset('base/icons/fingerprint.png', 'webauthn') }}' width=150 height=180 style='padding-bottom: 30px; padding-right: 50px;'/><img src='{{ asset('base/icons/face.png', 'webauthn') }}' width=140 height=180 style='padding-bottom: 30px;'/>
+            <img src='{{ asset('base/icons/fingerprint.png', 'webauthn') }}' width=150 height=180 style='padding-bottom: 30px; padding-right: 50px;'/><img src='{{ asset('base/icons/face.png', 'webauthn') }}' width=140 height=180 style='padding-bottom: 30px;'/>
             {% if authURL is defined and authURL|length > 0 %}
                 <form id='authform' method='POST' action='{{ authURL|raw }}'>
                     <input type='hidden' id='resp' name='response_id' value='0'/>
@@ -58,8 +58,8 @@
             <p>{{ 'A service has requested you to authenticate yourself. Please enter your username and password in the form below.'|trans }}</p>
         </div>
         <div style='grid-column: 3; grid-row: 3;'>
-            <div class="center-form login-form-start" >
-                <form id="f" class="pure-form pure-form-aligned" action="{{ pushbackURL|raw }}" method="post" name="f" spellcheck="false" >
+            <form id="f" class="pure-form pure-form-aligned" action="{{ pushbackURL|raw }}" method="post" name="f" spellcheck="false" >
+                <div class="center-form login-form-start" >
                     <div class="pure-control-group">
                         <label for="username">{{ 'Username'|trans }}</label>
                         <input id="username" type="text" name="username" class="edge" tabindex="1" autocomplete="username" autofocus  >
@@ -69,15 +69,15 @@
                         <label for="password">{{ 'Password'|trans}}</label>
                         <input id="password" type="password" tabindex="2" name="password" class="edge" autocomplete="current-password" >
                     </div>
-            </div>
-            <div class="pure-control-group center login-form-submit" >
-                <button class="pure-button pure-button-red pure-input-1-2 pure-input-sm-1-1 left" id="submit_button"
-                        type="submit" tabindex="6" data-default="{% trans %}Login{% endtrans %}"
-                        data-processing="{% trans %}Processing...{% endtrans %}" style='margin-top: 80px'>
-                    {% trans %}Login{% endtrans %}
-                </button>
-                </form>            
-            </div>
+                </div>
+                <div class="pure-control-group center login-form-submit" >
+                    <button class="pure-button pure-button-red pure-input-1-2 pure-input-sm-1-1 left" id="submit_button"
+                            type="submit" tabindex="6" data-default="{% trans %}Login{% endtrans %}"
+                            data-processing="{% trans %}Processing...{% endtrans %}" style='margin-top: 80px'>
+                        {% trans %}Login{% endtrans %}
+                    </button>
+                </div>
+            </form>            
         </div>
         <div style='grid-column: 3; grid-row: 4;'>
             {% if loginpage_links is defined -%}
