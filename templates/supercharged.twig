@@ -28,7 +28,7 @@
             <p>{{ '{webauthn.webauthn:passwordlessProse}'|trans }}</p>
         </div>
         <div style='grid-column: 1; grid-row: 3; align-self: end;'>
-            <img src='{{ asset('base/icons/fingerprint.png', 'webauthn') }}' width=150 height=180 style='padding-bottom: 30px; padding-right: 50px;'/><img src='{{ asset('base/icons/face.png', 'webauthn') }}' width=140 height=180 style='padding-bottom: 30px;'/>
+            <img src='{{ asset('base/icons/fingerprint.png', 'webauthn') }}' alt='fingerprint' width=150 height=180 style='padding-bottom: 30px; padding-right: 50px;'/><img src='{{ asset('base/icons/face.png', 'webauthn') }}' alt='face recognition' width=140 height=180 style='padding-bottom: 30px;'/>
             {% if authURL is defined and authURL|length > 0 %}
                 <form id='authform' method='POST' action='{{ authURL|raw }}'>
                     <input type='hidden' id='resp' name='response_id' value='0'/>
