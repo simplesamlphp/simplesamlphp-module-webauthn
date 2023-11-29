@@ -45,8 +45,8 @@
                 value='{{ '{webauthn:webauthn:newTokenDefaultName}'|trans }} {{ "now"|date('Y-m-d') }}' /><br/>
             <input type='checkbox' id='passwordless' name='passwordless' value='on' />
             
-            <label for='passwordless' style='display: flex;'>{{ '{webauthn:webauthn:registerPasswordless}'|trans }}<br/>
-                <span style='font-size: small; display: contents;'>{{  '{webauthn:webauthn:registerPasswordlessExplanations}'|trans }}</span></label>
+            <label for='passwordless' id='label-passwordless'>{{ '{webauthn:webauthn:registerPasswordless}'|trans }}<br/>
+                <span id='span-passwordless'>{{  '{webauthn:webauthn:registerPasswordlessExplanations}'|trans }}</span></label>
             <button type='button' id='regformSubmit'>{{ '{webauthn:webauthn:newTokenButton}'|trans }}</button>
         </form>
         </div>

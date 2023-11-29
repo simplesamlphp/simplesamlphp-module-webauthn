@@ -20,14 +20,14 @@
             {% trans %}You are now accessing a pre-production system. This authentication setup is for testing and pre-production verification only. If someone sent you a link that pointed you here, and you are not <i>a tester</i> you probably got the wrong link, and should <b>not be here</b>.{% endtrans %}
         </div>
     {% endif -%}
-    <div class='choicecontainer' style='display: grid; grid-template-columns: repeat(3, 45% 10% 45%); gap: 20px;'>
-        <div class='choice' style='grid-column: 1; grid-row: 1;'>
+    <div class='choicecontainer' id="containerbase">
+        <div class='choice' id="container-1-1">
             <h1>{{ '{webauthn.webauthn:passwordlessCaption}'|trans }}</h1>
         </div>
-        <div style='grid-column: 1; grid-row: 2;'>
+        <div id="container-1-2">
             <p>{{ '{webauthn.webauthn:passwordlessProse}'|trans }}</p>
         </div>
-        <div style='grid-column: 1; grid-row: 3; align-self: end;'>
+        <div id='container-1-3'>
             <img src='{{ asset('base/icons/fingerprint.png', 'webauthn') }}' alt='fingerprint' width=150 height=180 style='padding-bottom: 30px; padding-right: 50px;'/><img src='{{ asset('base/icons/face.png', 'webauthn') }}' alt='face recognition' width=140 height=180 style='padding-bottom: 30px;'/>
             {% if authURL is defined and authURL|length > 0 %}
                 <form id='authform' method='POST' action='{{ authURL|raw }}'>
@@ -40,24 +40,24 @@
                     <input type='hidden' id='type' name='type' value='something'/>
                     <input type='hidden' id='clientext' name='clientext' value=''/>
                     <input type='hidden' id='operation' name='operation' value='AUTH'/>
-                    <button type='button' id='authformSubmit'>{{ '{webauthn:webauthn:authTokenButton}'|trans }}</button>
+                    <button type='button' class='pure-button pure-button-red pure-input-1-2 pure-input-sm-1-1 left' id='authformSubmit'>{{ '{webauthn:webauthn:authTokenButton}'|trans }}</button>
                 </form>
             {%- endif %}
         </div>
-        <div class="pure-form-message" style='grid-column: 1; grid-row: 4; align-self: end;'>
+        <div class="pure-form-message" id='container-1-4'>
             <strong>{{ '{webauthn.webauthn:dedicatedManagementPageHeading}'|trans }}</strong>
             <p>{{ '{webauthn.webauthn:dedicatedManagementPageHint}'|trans }} <a href='registration'>{{ '{webauthn.webauthn:dedicatedManagementPageText}'|trans }}</a></p>
         </div>
-        <div style='align-self: center; grid-column: 2; grid-row: 1 / 4; min-width: 20px; min-height: 100px;'>
+        <div id='container-2'>
             {{ '{webauthn.webauthn:superchargeChoice}'|trans }}
         </div>
-        <div class='choice' style='grid-column: 3; grid-row: 1;'>
+        <div class='choice' id='container-3-1'>
             <h1>{{ 'Enter your username and password'|trans }}</h1>
         </div>
-        <div style='grid-column: 3; grid-row: 2;'>
+        <div id='container-3-2'>
             <p>{{ 'A service has requested you to authenticate yourself. Please enter your username and password in the form below.'|trans }}</p>
         </div>
-        <div style='grid-column: 3; grid-row: 3;'>
+        <div id='container-3-3'>
             <form id="f" class="pure-form pure-form-aligned" action="{{ pushbackURL|raw }}" method="post" name="f" spellcheck="false" >
                 <div class="center-form login-form-start" >
                     <div class="pure-control-group">
@@ -79,7 +79,7 @@
                 </div>
             </form>            
         </div>
-        <div style='grid-column: 3; grid-row: 4;'>
+        <div id='container-3-4'>
             {% if loginpage_links is defined -%}
                 <ul>
                     {% for link in loginpage_links -%}
