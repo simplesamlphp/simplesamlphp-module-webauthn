@@ -6,8 +6,8 @@ namespace SimpleSAML\Module\webauthn\WebAuthn;
 
 use CBOR\Decoder;
 use CBOR\OtherObject;
-use CBOR\Tag;
 use CBOR\StringStream;
+use CBOR\Tag;
 use SimpleSAML\Utils\HTTP as HTTPHelper;
 
 /**

@@ -9,11 +9,11 @@ use SimpleSAML\Configuration;
 use SimpleSAML\Error;
 use SimpleSAML\Logger;
 use SimpleSAML\Module;
+use SimpleSAML\Module\webauthn\Store;
 use SimpleSAML\Session;
 use SimpleSAML\Utils;
 use SimpleSAML\XHTML\Template;
 use Symfony\Component\HttpFoundation\Request;
-use SimpleSAML\Module\webauthn\Store;
 
 /**
  * Controller class for the webauthn module.

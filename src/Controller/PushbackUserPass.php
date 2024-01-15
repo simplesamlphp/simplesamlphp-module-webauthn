@@ -4,23 +4,15 @@ declare(strict_types=1);
 
 namespace SimpleSAML\Module\webauthn\Controller;
 
-use DateTime;
 use Exception;
 use SimpleSAML\Auth;
 use SimpleSAML\Auth\Source;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error;
-use SimpleSAML\HTTP\RunnableResponse;
 use SimpleSAML\Logger;
-use SimpleSAML\Module;
 use SimpleSAML\Module\webauthn\Auth\Source\AuthSourceOverloader;
-use SimpleSAML\Module\webauthn\WebAuthn\WebAuthnAbstractEvent;
-use SimpleSAML\Module\webauthn\WebAuthn\WebAuthnAuthenticationEvent;
 use SimpleSAML\Session;
-use SimpleSAML\Utils;
-use SimpleSAML\XHTML\Template;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**

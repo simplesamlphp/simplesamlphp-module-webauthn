@@ -8,13 +8,9 @@ use Exception;
 use PHPUnit\Framework\TestCase;
 use SimpleSAML\Auth\State;
 use SimpleSAML\Configuration;
-use SimpleSAML\Error;
-use SimpleSAML\HTTP\RunnableResponse;
 use SimpleSAML\Logger;
 use SimpleSAML\Module\webauthn\Controller;
 use SimpleSAML\Session;
-use SimpleSAML\Utils;
-use SimpleSAML\XHTML\Template;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -94,7 +90,8 @@ class AuthProcessTest extends TestCase
 
         $this->expectException(Exception::class);
         $this->expectExceptionMessage(
-            "User attempted to authenticate with an unknown credential ID. This should already have been prevented by the browser!"
+            "User attempted to authenticate with an unknown credential ID. This"
+            . " should already have been prevented by the browser!"
         );
         $c->main($request);
     }

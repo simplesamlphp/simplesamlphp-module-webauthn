@@ -10,14 +10,7 @@ declare(strict_types=1);
 
 namespace SimpleSAML\Module\webauthn\Auth\Source;
 
-use SimpleSAML\Assert\Assert;
-use SimpleSAML\Auth\Source;
-use SimpleSAML\Configuration;
-use SimpleSAML\Error;
-use SimpleSAML\Logger;
-use SimpleSAML\Module\webauthn\WebAuthn\StateData;
 use SimpleSAML\Module\webauthn\WebAuthn\StaticProcessHelper;
-use SimpleSAML\Module\webauthn\Controller\WebAuthn;
 
 class Supercharged extends Passwordless
 {

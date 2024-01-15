@@ -10,13 +10,11 @@ use SimpleSAML\Configuration;
 use SimpleSAML\HTTP\RunnableResponse;
 use SimpleSAML\Logger;
 use SimpleSAML\Metadata\MetaDataStorageHandler;
-use SimpleSAML\Module;
+use SimpleSAML\Module\webauthn\Store;
 use SimpleSAML\Module\webauthn\WebAuthn\StateData;
 use SimpleSAML\Module\webauthn\WebAuthn\StaticProcessHelper;
-use SimpleSAML\Module\webauthn\Store;
 use SimpleSAML\Session;
 use SimpleSAML\Utils;
-use SimpleSAML\XHTML\Template;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

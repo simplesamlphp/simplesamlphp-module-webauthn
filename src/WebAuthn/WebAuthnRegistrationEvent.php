@@ -5,14 +5,11 @@ declare(strict_types=1);
 namespace SimpleSAML\Module\webauthn\WebAuthn;
 
 use Cose\Key\Ec2Key;
-use Cose\Key\RsaKey;
 use Exception;
 use SimpleSAML\Error\Error;
 use SimpleSAML\Error\InvalidCredential;
-use SimpleSAML\Logger;
 use SimpleSAML\Module\webauthn\WebAuthn\AAGUID;
 use SimpleSAML\Utils;
-use SimpleSAML\Utils\Config as SSPConfig;
 use SpomkyLabs\Pki\ASN1\Type\UnspecifiedType;
 
 /**
@@ -380,8 +377,13 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
          * §8.2 Step 2 Bullet 1: check signature
          */
         $retCode = openssl_verify($sigdata, $stmtDecoded['sig'], $keyResource, "sha256");
-        if ( $retCode !== 1) {
-            $this->fail("Packed signature mismatch (return code $retCode, for :authdata:".$attestationArray['authData']." - :clientDataHash:".$this->clientDataHash." - :signature:".$stmtDecoded['sig']."), attestation failed.");
+        if ($retCode !== 1) {
+            $this->fail(sprintf(
+                "Packed signature mismatch (return code $retCode, for :authdata:%s - :clientDataHash:%s - :signature:%s), attestation failed.",
+                $attestationArray['authData'],
+                $this->clientDataHash,
+                $stmtDecoded['sig'],
+            ));
         }
         $this->pass("x5c sig check passed.");
     }
@@ -397,7 +399,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
          * §7.1 Step 16: attestation is either done with x5c or ecdaa.
          */
         if (isset($stmtDecoded['x5c'])) {
-        $this->commonX5cSignatureChecks($attestationArray);
+            $this->commonX5cSignatureChecks($attestationArray);
             $this->validateAttestationFormatPackedX5C($attestationArray);
         } elseif (isset($stmtDecoded['ecdaa'])) {
             $this->fail("ecdaa attestation not supported right now.");

@@ -14,16 +14,12 @@ declare(strict_types=1);
 
 namespace SimpleSAML\Module\webauthn\Auth\Process;
 
-use SimpleSAML\Assert\Assert;
 use SimpleSAML\Auth;
 use SimpleSAML\Configuration;
-use SimpleSAML\Error;
 use SimpleSAML\Logger;
 use SimpleSAML\Module;
-use SimpleSAML\Module\webauthn\Store;
 use SimpleSAML\Module\webauthn\WebAuthn\StateData;
 use SimpleSAML\Module\webauthn\WebAuthn\StaticProcessHelper;
-use SimpleSAML\Utils;
 
 class WebAuthn extends Auth\ProcessingFilter
 {
