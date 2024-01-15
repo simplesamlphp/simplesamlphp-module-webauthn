@@ -17,9 +17,8 @@ use SimpleSAML\Module\webauthn\WebAuthn\AAGUID;
 use SimpleSAML\Module\webauthn\WebAuthn\WebAuthnRegistrationEvent;
 use SimpleSAML\Session;
 use SimpleSAML\Utils;
-use SimpleSAML\XHTML\Template;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**

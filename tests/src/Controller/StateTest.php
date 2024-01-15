@@ -5,15 +5,11 @@ declare(strict_types=1);
 namespace SimpleSAML\Test\Module\webauthn\Controller;
 
 use PHPUnit\Framework\TestCase;
-use SimpleSAML\Auth\State;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error;
-use SimpleSAML\HTTP\RunnableResponse;
 use SimpleSAML\Logger;
 use SimpleSAML\Module\webauthn\Controller;
 use SimpleSAML\Session;
-use SimpleSAML\Utils;
-use SimpleSAML\XHTML\Template;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -127,7 +123,7 @@ class StateTest extends TestCase
     /**
      * @return array
      */
-    public function stateTestsProvider(): array
+    public static function stateTestsProvider(): array
     {
         return [
             ['POST', 'authprocess', Controller\AuthProcess::class, 'main'],

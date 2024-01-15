@@ -6,10 +6,8 @@ namespace SimpleSAML\Module\webauthn\WebAuthn;
 
 use Cose\Key\Ec2Key;
 use Cose\Key\RsaKey;
-use SimpleSAML\Logger;
 use SimpleSAML\Module\webauthn\WebAuthn\AAGUID;
 use SimpleSAML\Utils;
-use SimpleSAML\Utils\Config as SSPConfig;
 
 /**
  * FIDO2/WebAuthn Authentication Processing filter

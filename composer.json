@@ -34,7 +34,8 @@
     "config": {
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
-            "simplesamlphp/composer-module-installer": true
+            "simplesamlphp/composer-module-installer": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
     }
 }
