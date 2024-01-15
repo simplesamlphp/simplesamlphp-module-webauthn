@@ -1,5 +1,7 @@
 .phpunit.cache/
+.phpunit.result
 vendor/
 composer.lock
 lib/WebAuthn/restena.php
+phpunit.xml.bak
 nbproject/
