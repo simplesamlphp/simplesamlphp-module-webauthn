@@ -13,6 +13,7 @@ use SimpleSAML\Metadata\MetaDataStorageHandler;
 use SimpleSAML\Module\webauthn\Store;
 use SimpleSAML\Module\webauthn\WebAuthn\StateData;
 use SimpleSAML\Module\webauthn\WebAuthn\StaticProcessHelper;
+use SimpleSAML\Module\webauthn\WebAuthn\WebAuthnRegistrationEvent;
 use SimpleSAML\Session;
 use SimpleSAML\Utils;
 use Symfony\Component\HttpFoundation\Request;
@@ -124,7 +125,7 @@ class Registration
         $state['Attributes'] = $attrs;
 
         $stateData = new StateData();
-        $stateData->requestTokenModel = ($registrationConfig['policy_2fa']['minimum_certification_level'] == Module\webauthn\WebAuthn\WebAuthnRegistrationEvent::CERTIFICATION_NOT_REQUIRED ? false : true);
+        $stateData->requestTokenModel = ($registrationConfig['policy_2fa']['minimum_certification_level'] == WebAuthnRegistrationEvent::CERTIFICATION_NOT_REQUIRED ? false : true);
         $stateData->minCertLevel2FA = $registrationConfig['policy_2fa']['minimum_certification_level'];
         $stateData->aaguidWhitelist2FA = $registrationConfig['policy_2fa']['aaguid_whitelist'] ?? [];
         $stateData->attFmtWhitelist2FA = $registrationConfig['policy_2fa']['attestation_format_whitelist'] ?? [];
