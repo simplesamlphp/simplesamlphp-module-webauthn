@@ -304,6 +304,9 @@ class Database extends Store
         );
 
         while ($row = $st->fetch(PDO::FETCH_NUM)) {
+            if(is_resource($row[1])){
+                $row[1] = stream_get_contents($row[1]);
+            }
             $ret[] = $row;
         }
 
