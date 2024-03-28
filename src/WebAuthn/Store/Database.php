@@ -66,7 +66,7 @@ class Database extends Store
                 CREATE TABLE IF NOT EXISTS credentials (
                     creation_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     user_id VARCHAR(80) NOT NULL,
-                    credentialId VARCHAR(500) NOT NULL,
+                    credentialId VARCHAR(1024) NOT NULL,
                     credential " . ($driver === 'pgsql' ? 'BYTEA' : 'MEDIUMBLOB') . " NOT NULL,
                     algo INT DEFAULT NULL,
                     presenceLevel INT DEFAULT NULL,
