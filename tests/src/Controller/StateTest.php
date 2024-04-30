@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SimpleSAML\Test\Module\webauthn\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error;
@@ -58,14 +59,13 @@ class StateTest extends TestCase
 
 
     /**
-     * @dataProvider stateTestsProvider
-     *
      * @param string $method The method to be used for the test
      * @param string $controllerEndpoint The name of the endpoint of the controller to test
      * @param string $controllerClass The name of the controller class to test
      * @psalm-param class-string $controllerClass
      * @param string $controllerMethod The name of the controller method to test
      */
+    #[DataProvider('stateTestsProvider')]
     public function testMissingState(
         string $method,
         string $controllerEndpoint,
@@ -89,14 +89,13 @@ class StateTest extends TestCase
 
 
     /**
-     * @dataProvider stateTestsProvider
-     *
      * @param string $method The method to be used for the test
      * @param string $controllerEndpoint The name of the endpoint of the controller to test
      * @param string $controllerClass The name of the controller class to test
      * @psalm-param class-string $controllerClass
      * @param string $controllerMethod The name of the controller method to test
      */
+    #[DataProvider('stateTestsProvider')]
     public function testNoState(
         string $method,
         string $controllerEndpoint,
