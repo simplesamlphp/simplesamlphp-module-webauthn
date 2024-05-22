@@ -210,7 +210,7 @@ class RegProcess
             3 => $friendlyName,
             4 => $regObject->getAlgo(),
             5 => $regObject->getPresenceLevel(),
-            6 => $isResidentKey
+            6 => $isResidentKey,
         ];
 
         $id = $this->authState::saveState($state, 'webauthn:request');
