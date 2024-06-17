@@ -138,7 +138,7 @@ abstract class WebAuthnAbstractEvent
         string $challenge,
         string $authData,
         string $clientDataJSON,
-        bool $debugMode = false
+        bool $debugMode = false,
     ) {
         $this->scope = $scope;
         $this->challenge = $challenge;

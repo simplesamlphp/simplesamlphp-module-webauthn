@@ -58,7 +58,7 @@ class AuthProcess
      */
     public function __construct(
         Configuration $config,
-        Session $session
+        Session $session,
     ) {
         $this->config = $config;
         $this->session = $session;
@@ -150,7 +150,7 @@ class AuthProcess
 
         if ($publicKey === false || sizeof($oneToken) == 0) {
             throw new Exception(
-                "User attempted to authenticate with an unknown credential ID. This should already have been prevented by the browser!"
+                "User attempted to authenticate with an unknown credential ID. This should already have been prevented by the browser!",
             );
         }
 
@@ -169,7 +169,7 @@ class AuthProcess
             $oneToken[1],
             (int)$oneToken[4], // algo
             base64_decode($request->request->get('signature')),
-            $debugEnabled
+            $debugEnabled,
         );
 
         /** Custom check: if the token was initially registered with UV, but now
@@ -207,7 +207,7 @@ class AuthProcess
             $store->updateSignCount($oneToken[0], $counter);
         } else {
             throw new Exception(
-                "Signature counter less or equal to a previous authentication! Token cloning likely (old: $previousCounter, new: $counter)."
+                "Signature counter less or equal to a previous authentication! Token cloning likely (old: $previousCounter, new: $counter).",
             );
         }
 
@@ -230,12 +230,12 @@ class AuthProcess
                     echo $authObject->getValidateBuffer();
                     echo "Debug mode, not continuing to " . ($state['FIDO2WantsRegister'] ? "credential registration page." : "destination.");
                 },
-                [$authObject, $state]
+                [$authObject, $state],
             );
         } else {
             if ($state['FIDO2WantsRegister']) {
                 $response = new RedirectResponse(
-                    Module::getModuleURL('webauthn/webauthn?StateId=' . urlencode($stateId))
+                    Module::getModuleURL('webauthn/webauthn?StateId=' . urlencode($stateId)),
                 );
             } else {
                 $response = new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);

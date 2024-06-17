@@ -64,7 +64,7 @@ class Registration
      */
     public function __construct(
         Configuration $config,
-        Session $session
+        Session $session,
     ) {
         $this->config = $config;
         $this->session = $session;
@@ -137,7 +137,7 @@ class Registration
             $stateData->store = Store::parseStoreConfig($moduleConfig->getArray('store'));
         } catch (Exception $e) {
             $this->logger::error(
-                'webauthn: Could not create storage: ' . $e->getMessage()
+                'webauthn: Could not create storage: ' . $e->getMessage(),
             );
         }
 

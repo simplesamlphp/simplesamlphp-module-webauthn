@@ -55,7 +55,7 @@ class ManageToken
      */
     public function __construct(
         Configuration $config,
-        Session $session
+        Session $session,
     ) {
         $this->config = $config;
         $this->session = $session;

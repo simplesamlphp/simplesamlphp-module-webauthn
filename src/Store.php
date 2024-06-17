@@ -52,7 +52,7 @@ abstract class Store
         bool $defaultIfNx,
         bool $useDatabase = true,
         bool $toggle = false,
-        bool $force = true
+        bool $force = true,
     ): bool;
 
     /**
@@ -91,7 +91,7 @@ abstract class Store
         string $friendlyName,
         string $hashedId,
         string $aaguid,
-        string $attLevel
+        string $attLevel,
     ): bool;
 
     /**
@@ -165,7 +165,7 @@ abstract class Store
         $className = Module::resolveClass(
             $config[0],
             'WebAuthn\Store',
-            '\SimpleSAML\Module\webauthn\Store'
+            '\SimpleSAML\Module\webauthn\Store',
         );
 
         /**

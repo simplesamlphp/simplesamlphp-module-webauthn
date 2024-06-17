@@ -42,9 +42,12 @@ class Passwordless extends Source
 
         $this->authSourceConfig = Configuration::loadFromArray(
             $config,
-            'authsources[' . var_export($this->authId, true) . ']'
+            'authsources[' . var_export($this->authId, true) . ']',
         );
-        $this->authnContextClassRef = $this->authSourceConfig->getOptionalString("authncontextclassref", 'urn:rsa:names:tc:SAML:2.0:ac:classes:FIDO');
+        $this->authnContextClassRef = $this->authSourceConfig->getOptionalString(
+            "authncontextclassref",
+            'urn:rsa:names:tc:SAML:2.0:ac:classes:FIDO',
+        );
         $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php')->toArray();
 
         $initialStateData = new StateData();

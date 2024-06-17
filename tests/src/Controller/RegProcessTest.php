@@ -43,7 +43,7 @@ class RegProcessTest extends TestCase
                 'enable.saml20-idp' => true,
             ],
             '[ARRAY]',
-            'simplesaml'
+            'simplesaml',
         );
 
         $this->session = Session::getSessionFromRequest();
@@ -73,7 +73,7 @@ class RegProcessTest extends TestCase
                 'type' => 'public-key',
                 'response_id' => 'abc123',
                 'attestation_client_data_json' => 'test',
-            ]
+            ],
         );
 
 

@@ -61,7 +61,7 @@ class RegProcess
      */
     public function __construct(
         Configuration $config,
-        Session $session
+        Session $session,
     ) {
         $this->config = $config;
         $this->session = $session;
@@ -127,7 +127,7 @@ class RegProcess
             $request->request->get('response_id'),
             $request->request->get('attestation_client_data_json'),
             ($request->request->get('passwordless') == "on" ? $state['authenticatorAcceptabilityPasswordless'] : $state['authenticatorAcceptability2FA']),
-            $debugEnabled
+            $debugEnabled,
         );
         // at this point, we need to talk to the DB
         /**
@@ -199,7 +199,7 @@ class RegProcess
             $friendlyName,
             $username,
             $regObject->getAAGUID(),
-            $regObject->getAttestationLevel()
+            $regObject->getAttestationLevel(),
         );
 
         // make sure $state gets the news, the token is to be displayed to the user on the next page
@@ -223,7 +223,7 @@ class RegProcess
                         Module::getModuleURL('webauthn/webauthn?StateId=' . urlencode($id)) . "'>";
                     echo "<button type='submit'>Return to previous page.</button>";
                 },
-                [$regObject, $id]
+                [$regObject, $id],
             );
         } elseif (array_key_exists('Registration', $state)) {
             $response = new RedirectResponse(Module::getModuleURL('webauthn/webauthn?StateId=' . urlencode($id)));

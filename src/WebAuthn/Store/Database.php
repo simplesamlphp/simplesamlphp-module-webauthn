@@ -142,7 +142,7 @@ class Database extends Store
         bool $defaultIfNx,
         bool $useDatabase = true,
         bool $toggle = false,
-        bool $force = true
+        bool $force = true,
     ): bool {
         if (!$useDatabase) {
             if ($force) {
@@ -160,7 +160,7 @@ class Database extends Store
         } else {
             $st2 = $this->db->read(
                 "SELECT COUNT(*) FROM userstatus WHERE user_id = :userId AND fido2Status = 'FIDO2Disabled'",
-                ['userId' => $userId]
+                ['userId' => $userId],
             );
             $rowCount2 = $st2->fetchColumn();
             if ($rowCount2 === 1 /* explicitly disabled user in DB */) {
@@ -185,7 +185,7 @@ class Database extends Store
     {
         $st = $this->db->read(
             'SELECT COUNT(*) FROM credentials WHERE credentialId = :credentialId',
-            ['credentialId' => $credIdHex]
+            ['credentialId' => $credIdHex],
         );
 
         $rowCount = $st->fetchColumn();
@@ -224,7 +224,7 @@ class Database extends Store
         string $friendlyName,
         string $hashedId,
         string $aaguid,
-        string $attLevel
+        string $attLevel,
     ): bool {
         $this->db->write(
             'INSERT INTO credentials ' .
@@ -242,7 +242,7 @@ class Database extends Store
                 'hashedId' => $hashedId,
                 'aaguid' => $aaguid,
                 'attLevel' => $attLevel,
-            ]
+            ],
         );
 
         return true;
@@ -259,7 +259,7 @@ class Database extends Store
     {
         $this->db->write(
             'DELETE FROM credentials WHERE credentialId = :credentialId',
-            ['credentialId' => $credentialId]
+            ['credentialId' => $credentialId],
         );
 
         Logger::debug('webauthn:Database - DELETED credential.');
@@ -279,7 +279,7 @@ class Database extends Store
     {
         $this->db->write(
             'UPDATE credentials SET signCounter = :signCounter WHERE credentialId = :credentialId',
-            ['signCounter' => $signCounter, 'credentialId' => $credentialId]
+            ['signCounter' => $signCounter, 'credentialId' => $credentialId],
         );
 
         Logger::debug('webauthn:Database - UPDATED signature counter.');
@@ -300,7 +300,7 @@ class Database extends Store
 
         $st = $this->db->read(
             'SELECT credentialId, credential, signCounter, friendlyName, algo, presenceLevel, isResidentKey FROM credentials WHERE user_id = :userId',
-            ['userId' => $userId]
+            ['userId' => $userId],
         );
 
         while ($row = $st->fetch(PDO::FETCH_NUM)) {
@@ -323,7 +323,7 @@ class Database extends Store
     {
         $st = $this->db->read(
             'SELECT user_id FROM credentials WHERE hashedId = :hashId',
-            ['hashId' => $hashedId]
+            ['hashId' => $hashedId],
         );
 
         // return on first match, credential IDs are unique

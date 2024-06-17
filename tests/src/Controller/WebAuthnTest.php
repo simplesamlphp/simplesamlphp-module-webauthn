@@ -46,13 +46,13 @@ class WebAuthnTest extends TestCase
                 'enable.saml20-idp' => true,
             ],
             '[ARRAY]',
-            'simplesaml'
+            'simplesaml',
         );
 
         $this->module_config = Configuration::loadFromArray(
             [
                 'registration' => ['use_inflow_registration' => true],
-            ]
+            ],
         );
 
         $this->session = Session::getSessionFromRequest();
@@ -78,7 +78,7 @@ class WebAuthnTest extends TestCase
         $request = Request::create(
             '/webauthn?StateId=someStateId',
             'POST',
-            []
+            [],
         );
 
 

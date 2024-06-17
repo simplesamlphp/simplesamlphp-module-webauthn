@@ -44,7 +44,7 @@ class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent
         string $publicKey,
         int $algo,
         string $signature,
-        bool $debugMode = false
+        bool $debugMode = false,
     ) {
         $this->eventType = "AUTH";
         $this->credential = $publicKey;

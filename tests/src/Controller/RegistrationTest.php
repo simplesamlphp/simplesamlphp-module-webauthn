@@ -43,7 +43,7 @@ class RegistrationTest extends TestCase
                 'enable.saml20-idp' => true,
             ],
             '[ARRAY]',
-            'simplesaml'
+            'simplesaml',
         );
 
         Configuration::setPreLoadedConfig(
@@ -59,10 +59,10 @@ class RegistrationTest extends TestCase
                     ],
                 ],
                 '[ARRAY]',
-                'simplesaml'
+                'simplesaml',
             ),
             'module_webauthn.php',
-            'simplesaml'
+            'simplesaml',
         );
 
         $this->session = Session::getSessionFromRequest();
@@ -86,7 +86,7 @@ class RegistrationTest extends TestCase
         $request = Request::create(
             '/registration',
             'GET',
-            ['StateId' => 'someStateId']
+            ['StateId' => 'someStateId'],
         );
 
 

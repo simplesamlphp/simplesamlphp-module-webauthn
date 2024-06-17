@@ -44,7 +44,7 @@ class AuthProcessTest extends TestCase
                 'enable.saml20-idp' => true,
             ],
             '[ARRAY]',
-            'simplesaml'
+            'simplesaml',
         );
 
         $this->session = Session::getSessionFromRequest();
@@ -66,7 +66,7 @@ class AuthProcessTest extends TestCase
         $request = Request::create(
             '/authprocess?StateId=someStateId',
             'POST',
-            ['response_id' => 'abc123']
+            ['response_id' => 'abc123'],
         );
 
 
@@ -91,7 +91,7 @@ class AuthProcessTest extends TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessage(
             "User attempted to authenticate with an unknown credential ID. This"
-            . " should already have been prevented by the browser!"
+            . " should already have been prevented by the browser!",
         );
         $c->main($request);
     }

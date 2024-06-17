@@ -55,7 +55,7 @@ class WebAuthn
      */
     public function __construct(
         Configuration $config,
-        Session $session
+        Session $session,
     ) {
         $this->config = $config;
         $this->session = $session;
@@ -192,7 +192,7 @@ class WebAuthn
         $configUtils = new Utils\Config();
         $username = str_split(
             hash('sha512', $state['FIDO2Username'] . '|' . $configUtils->getSecretSalt()),
-            2
+            2,
         );
 
         $challengeEncoded = [];

@@ -54,7 +54,7 @@ class PushbackUserPass
      */
     public function __construct(
         Configuration $config,
-        Session $session
+        Session $session,
     ) {
         $this->config = $config;
         $this->session = $session;
@@ -104,7 +104,7 @@ class PushbackUserPass
         class_alias($classname, '\SimpleSAML\Module\webauthn\Auth\Source\AuthSourceOverloader');
         $overrideSource = new class (
             ['AuthId' => $authsourceString],
-            $authsources[$authsourceString]
+            $authsources[$authsourceString],
         ) extends AuthSourceOverloader
         {
             public function loginOverload(string $username, string $password): array

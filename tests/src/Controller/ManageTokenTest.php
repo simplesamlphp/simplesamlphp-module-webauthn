@@ -47,13 +47,13 @@ class ManageTokenTest extends TestCase
                 'enable.saml20-idp' => true,
             ],
             '[ARRAY]',
-            'simplesaml'
+            'simplesaml',
         );
 
         $this->module_config = Configuration::loadFromArray(
             [
                 'registration' => ['use_inflow_registration' => true],
-            ]
+            ],
         );
 
         Configuration::setPreLoadedConfig($this->config, 'config.php');
@@ -79,7 +79,7 @@ class ManageTokenTest extends TestCase
         $request = Request::create(
             '/managetoken?StateId=someStateId',
             'POST',
-            ['submit' => 'NEVERMIND']
+            ['submit' => 'NEVERMIND'],
         );
 
 
@@ -109,7 +109,7 @@ class ManageTokenTest extends TestCase
         $request = Request::create(
             '/managetoken?StateId=someStateId',
             'POST',
-            ['submit' => 'DELETE']
+            ['submit' => 'DELETE'],
         );
 
 
@@ -140,7 +140,7 @@ class ManageTokenTest extends TestCase
         $request = Request::create(
             '/managetoken?StateId=someStateId',
             'POST',
-            ['submit' => 'submit']
+            ['submit' => 'submit'],
         );
 
 
@@ -172,7 +172,7 @@ class ManageTokenTest extends TestCase
         $request = Request::create(
             '/managetoken?StateId=someStateId',
             'POST',
-            ['submit' => 'submit']
+            ['submit' => 'submit'],
         );
 
 

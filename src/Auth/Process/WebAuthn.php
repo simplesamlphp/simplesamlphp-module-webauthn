@@ -118,7 +118,8 @@ class WebAuthn extends Auth\ProcessingFilter
                 'urn:rsa:names:tc:SAML:2.0:ac:classes:FIDO';
         Logger::debug('webauthn: userid: ' . $state['Attributes'][$this->stateData->usernameAttrib][0]);
 
-        $localToggle = !empty($state['Attributes'][$this->toggleAttrib]) && !empty($state['Attributes'][$this->toggleAttrib][0]);
+        $localToggle = !empty($state['Attributes'][$this->toggleAttrib])
+            && !empty($state['Attributes'][$this->toggleAttrib][0]);
 
         if (
             $this->stateData->store->is2FAEnabled(
@@ -126,12 +127,13 @@ class WebAuthn extends Auth\ProcessingFilter
                 $this->defaultEnabled,
                 $this->useDatabase,
                 $localToggle,
-                $this->force
+                $this->force,
             ) === false
         ) {
             // nothing to be done here, end authprocfilter processing
             return;
         }
+
         if // did we do Passwordless mode successfully before?
         (
             isset($state['Attributes']['internal:FIDO2PasswordlessAuthentication']) &&

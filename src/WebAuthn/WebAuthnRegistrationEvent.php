@@ -83,7 +83,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         string $responseId,
         string $clientDataJSON,
         array $acceptabilityPolicy,
-        bool $debugMode = false
+        bool $debugMode = false,
     ) {
         $this->debugBuffer .= "attestationData raw: " . $attestationData . "<br/>";
         /**
@@ -302,7 +302,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
                 if (openssl_x509_verify($certResource, $signerPubKey) != 1) {
                     $this->fail(sprintf(
                         "Error during root CA validation of the attestation chain certificate, which is %s",
-                        $cryptoUtils->der2pem($runCert)
+                        $cryptoUtils->der2pem($runCert),
                     ));
                 }
             }
@@ -316,7 +316,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
                 . " XXX; PEM equivalent is "
                 . $cryptoUtils->der2pem($stmtDecoded['x5c'][0])
                 . ". OpenSSL error: "
-                . openssl_error_string()
+                . openssl_error_string(),
             );
         }
 
@@ -332,7 +332,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
                 . " XXX; PEM equivalent is "
                 . $keyObject->asPEM()
                 . ". OpenSSL error: "
-                . openssl_error_string()
+                . openssl_error_string(),
             );
         }
 
@@ -349,7 +349,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
                 . $credentialDetails['key']
                 . " - "
                 . $keyDetails['key']
-                . ")"
+                . ")",
             );
         }
         $this->pass("Apple attestation format verification passed.");
@@ -425,11 +425,11 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         $certProps = openssl_x509_parse($this->der2pem($stmtDecoded['x5c'][0]));
         $this->debugBuffer .= "Attestation Certificate:" . /** @scrutinizer ignore-type */ print_r($certProps, true) . "<br/>";
         if (
-                $certProps['version'] !== 2 || /** §8.2.1 Bullet 1 */
-                $certProps['subject']['OU'] !== "Authenticator Attestation" || /** §8.2.1 Bullet 2 [Subject-OU] */
-                !isset($certProps['subject']['CN']) || /** §8.2.1 Bullet 2 [Subject-CN] */
-                !isset($certProps['extensions']['basicConstraints']) ||
-                strstr("CA:FALSE", $certProps['extensions']['basicConstraints']) === false /** §8.2.1 Bullet 4 */
+            $certProps['version'] !== 2 || /** §8.2.1 Bullet 1 */
+            $certProps['subject']['OU'] !== "Authenticator Attestation" || /** §8.2.1 Bullet 2 [Subject-OU] */
+            !isset($certProps['subject']['CN']) || /** §8.2.1 Bullet 2 [Subject-CN] */
+            !isset($certProps['extensions']['basicConstraints']) ||
+            strstr("CA:FALSE", $certProps['extensions']['basicConstraints']) === false /** §8.2.1 Bullet 4 */
         ) {
             $this->fail("Attestation certificate properties are no good.");
         }
@@ -446,10 +446,10 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
              */
             /* if ($token['multi'] === true) { // need to check the OID
                 if (
-                        !isset($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4']) || empty($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4'])
+                    !isset($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4']) || empty($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4'])
                 ) { // §8.2.1 Bullet 3
                     $this->fail(
-                            "This vendor uses one cert for multiple authenticator model attestations, but lacks the AAGUID OID."
+                        "This vendor uses one cert for multiple authenticator model attestations, but lacks the AAGUID OID.",
                     );
                 }
                 /**
@@ -549,8 +549,8 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         // need to go through both software and TEE and check origins and purpose
 
         if (
-                ($softwareEnforced->hasTagged(702) && ($softwareEnforced->getTagged(702)->asExplicit()->asInteger()->intNumber() != array_search("GENERATED", self::ORIGINS_3))) ||
-                ($teeEnforced->hasTagged(702) && ($teeEnforced->getTagged(702)->asExplicit()->asInteger()->intNumber() != array_search("GENERATED", self::ORIGINS_3)))
+            ($softwareEnforced->hasTagged(702) && ($softwareEnforced->getTagged(702)->asExplicit()->asInteger()->intNumber() != array_search("GENERATED", self::ORIGINS_3))) ||
+            ($teeEnforced->hasTagged(702) && ($teeEnforced->getTagged(702)->asExplicit()->asInteger()->intNumber() != array_search("GENERATED", self::ORIGINS_3)))
         ) {
             $this->fail("Incorrect value for ORIGIN!");
         }
@@ -559,7 +559,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
             $purposesSoftware = $softwareEnforced->getTagged(1)->asExplicit()->asSet();
             foreach ($purposesSoftware->elements() as $onePurpose) {
                 if ($onePurpose->asInteger()->intNumber() != array_search("SIGN", self::PURPOSE_3)) {
-                        $this->fail("Incorrect value for PURPOSE (softwareEnforced)!");
+                    $this->fail("Incorrect value for PURPOSE (softwareEnforced)!");
                 }
             }
         }
@@ -567,7 +567,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
             $purposesTee = $teeEnforced->getTagged(1)->asExplicit()->asSet();
             foreach ($purposesTee->elements() as $onePurpose) {
                 if ($onePurpose->asInteger()->intNumber() != array_search("SIGN", self::PURPOSE_3)) {
-                        $this->fail("Incorrect value for PURPOSE (teeEnforced)!");
+                    $this->fail("Incorrect value for PURPOSE (teeEnforced)!");
                 }
             }
         }
@@ -616,10 +616,10 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
          * §8.6 Verification Step 4: encode the public key in ANSI X9.62 format
          */
         if (
-                isset($this->credential[-2]) &&
-                strlen($this->credential[-2]) === 32 &&
-                isset($this->credential[-3]) &&
-                strlen($this->credential[-3]) === 32
+            isset($this->credential[-2]) &&
+            strlen($this->credential[-2]) === 32 &&
+            isset($this->credential[-3]) &&
+            strlen($this->credential[-3]) === 32
         ) {
             $publicKeyU2F = chr(4) . $this->credential[-2] . $this->credential[-3];
         } else {
@@ -684,7 +684,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         } else {
             $this->fail(
                 "Mismatch of credentialId (" . bin2hex($credId) . ") vs. response ID (" .
-                bin2hex(WebAuthnAbstractEvent::base64urlDecode($responseId)) . ")."
+                bin2hex(WebAuthnAbstractEvent::base64urlDecode($responseId)) . ").",
             );
         }
         // so far so good. Now extract the actual public key from its COSE

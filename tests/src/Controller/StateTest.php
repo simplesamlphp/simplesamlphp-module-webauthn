@@ -44,7 +44,7 @@ class StateTest extends TestCase
                 'enable.saml20-idp' => true,
             ],
             '[ARRAY]',
-            'simplesaml'
+            'simplesaml',
         );
 
         $this->session = Session::getSessionFromRequest();
@@ -70,12 +70,12 @@ class StateTest extends TestCase
         string $method,
         string $controllerEndpoint,
         string $controllerClass,
-        string $controllerMethod
+        string $controllerMethod,
     ): void {
         $_SERVER['REQUEST_URI'] = '/module.php/webauthn/' . $controllerEndpoint;
         $request = Request::create(
             '/' . $controllerEndpoint,
-            $method
+            $method,
         );
 
         $c = new $controllerClass($this->config, $this->session);
@@ -100,13 +100,13 @@ class StateTest extends TestCase
         string $method,
         string $controllerEndpoint,
         string $controllerClass,
-        string $controllerMethod
+        string $controllerMethod,
     ): void {
         $_SERVER['REQUEST_URI'] = '/module.php/webauthn/' . $controllerEndpoint;
         $request = Request::create(
             '/' . $controllerEndpoint . '?StateId=someStateId',
             $method,
-            []
+            [],
         );
 
         $c = new $controllerClass($this->config, $this->session);
