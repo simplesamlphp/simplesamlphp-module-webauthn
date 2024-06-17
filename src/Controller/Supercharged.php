@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace SimpleSAML\Module\webauthn\Controller;
 
-use SimpleSAML\Configuration;
 use SimpleSAML\Error;
 use SimpleSAML\Module;
-use SimpleSAML\Session;
 use SimpleSAML\Utils;
 use SimpleSAML\XHTML\Template;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,23 +19,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class Supercharged extends WebAuthn
 {
-    /**
-     * Controller constructor.
-     *
-     * It initializes the global configuration and session for the controllers implemented here.
-     *
-     * @param \SimpleSAML\Configuration              $config The configuration to use by the controllers.
-     * @param \SimpleSAML\Session                    $session The session to use by the controllers.
-     *
-     * @throws \Exception
-     */
-    public function __construct(
-        Configuration $config,
-        Session $session,
-    ) {
-        parent::__construct($config, $session);
-    }
-
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @return \SimpleSAML\XHTML\Template  A Symfony Response-object.

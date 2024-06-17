@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SimpleSAML\Module\webauthn\Controller;
 
+use DateTime;
 use Exception;
 use SimpleSAML\Auth;
 use SimpleSAML\Auth\Source;
@@ -28,12 +29,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class AuthProcess
 {
-    /** @var \SimpleSAML\Configuration */
-    protected Configuration $config;
-
-    /** @var \SimpleSAML\Session */
-    protected Session $session;
-
     /**
      * @var \SimpleSAML\Auth\State|string
      * @psalm-var \SimpleSAML\Auth\State|class-string
@@ -57,11 +52,9 @@ class AuthProcess
      * @throws \Exception
      */
     public function __construct(
-        Configuration $config,
-        Session $session,
+        protected Configuration $config,
+        protected Session $session,
     ) {
-        $this->config = $config;
-        $this->session = $session;
     }
 
     /**

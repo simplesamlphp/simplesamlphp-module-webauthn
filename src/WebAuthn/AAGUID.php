@@ -15,17 +15,17 @@ use SimpleSAML\Utils\Config as SSPConfig;
 class AAGUID
 {
     /**
+     * The name of the configuration file where we should expect the AAGUID dictionary.
+     */
+    public const AAGUID_CONFIG_FILE = 'webauthn-aaguid.json';
+
+
+    /**
      * The actual dictionary containing all known tokens.
      *
      * @var array
      */
     protected array $dictionary = [];
-
-
-    /**
-     * The name of the configuration file where we should expect the AAGUID dictionary.
-     */
-    public const AAGUID_CONFIG_FILE = 'webauthn-aaguid.json';
 
 
     /**

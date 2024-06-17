@@ -146,13 +146,13 @@ abstract class Store
      * This function parses the configuration for a consent storage method. An exception will be thrown if
      * configuration parsing fails.
      *
-     * @param mixed $config The configuration.
+     * @param string|array $config The configuration.
      *
      * @return \SimpleSAML\Module\webauthn\Store An object which implements the \SimpleSAML\Module\webauthn\Store class.
      *
      * @throws \Exception if the configuration is invalid.
      */
-    public static function parseStoreConfig($config): Store
+    public static function parseStoreConfig(string|array $config): Store
     {
         if (is_string($config)) {
             $arrayUtils = new Utils\Arrays();

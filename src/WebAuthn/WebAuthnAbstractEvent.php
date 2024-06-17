@@ -21,12 +21,9 @@ use SimpleSAML\Utils\HTTP as HTTPHelper;
  */
 abstract class WebAuthnAbstractEvent
 {
-    /**
-     * Scope of the FIDO2 attestation. Can only be in the own domain.
-     *
-     * @var string
-     */
-    private string $scope;
+    public const PRESENCE_LEVEL_PRESENT = 1;
+    public const PRESENCE_LEVEL_VERIFIED = 4;
+    public const PRESENCE_LEVEL_NONE = 0;
 
     /**
      * The SHA256 hash of the clientDataJSON
@@ -34,13 +31,6 @@ abstract class WebAuthnAbstractEvent
      * @var string
      */
     protected string $clientDataHash;
-
-    /**
-     * The challenge that was used to trigger this event
-     *
-     * @var string
-     */
-    private string $challenge;
 
     /**
      * the authenticator's signature counter
@@ -56,21 +46,10 @@ abstract class WebAuthnAbstractEvent
      */
     protected int $algo;
 
-    public const PRESENCE_LEVEL_PRESENT = 1;
-    public const PRESENCE_LEVEL_VERIFIED = 4;
-    public const PRESENCE_LEVEL_NONE = 0;
-
     /**
      * UV or UP bit?
      */
     protected int $presenceLevel;
-
-    /**
-     * extensive debug information collection?
-     *
-     * @var bool
-     */
-    protected bool $debugMode = false;
 
     /**
      * A string buffer to hold debug information in case we need it.
@@ -134,15 +113,12 @@ abstract class WebAuthnAbstractEvent
      */
     public function __construct(
         string $pubkeyCredType,
-        string $scope,
-        string $challenge,
+        protected string $scope,
+        protected string $challenge,
         string $authData,
         string $clientDataJSON,
-        bool $debugMode = false,
+        protected bool $debugMode = false,
     ) {
-        $this->scope = $scope;
-        $this->challenge = $challenge;
-        $this->debugMode = $debugMode;
         $this->presenceLevel = self::PRESENCE_LEVEL_NONE;
         $this->debugBuffer .= "PublicKeyCredential.type: $pubkeyCredType<br/>";
         /**

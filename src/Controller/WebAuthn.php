@@ -10,6 +10,7 @@ use SimpleSAML\Error;
 use SimpleSAML\Logger;
 use SimpleSAML\Module;
 use SimpleSAML\Module\webauthn\Store;
+use SimpleSAML\Module\webauthn\WebAuthn\StateData;
 use SimpleSAML\Session;
 use SimpleSAML\Utils;
 use SimpleSAML\XHTML\Template;
@@ -24,11 +25,9 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class WebAuthn
 {
-    /** @var \SimpleSAML\Configuration */
-    protected Configuration $config;
-
-    /** @var \SimpleSAML\Session */
-    protected Session $session;
+    public const STATE_AUTH_NOMGMT = 1; // just authenticate user
+    public const STATE_AUTH_ALLOWMGMT = 2; // allow to switch to mgmt page
+    public const STATE_MGMT = 4; // show token management page
 
     /**
      * @var \SimpleSAML\Auth\State|string
@@ -54,11 +53,9 @@ class WebAuthn
      * @throws \Exception
      */
     public function __construct(
-        Configuration $config,
-        Session $session,
+        protected Configuration $config,
+        protected Session $session,
     ) {
-        $this->config = $config;
-        $this->session = $session;
     }
 
 
@@ -83,11 +80,7 @@ class WebAuthn
         $this->logger = $logger;
     }
 
-    public const STATE_AUTH_NOMGMT = 1; // just authenticate user
-    public const STATE_AUTH_ALLOWMGMT = 2; // allow to switch to mgmt page
-    public const STATE_MGMT = 4; // show token management page
-
-    public static function workflowStateMachine($state)
+    public static function workflowStateMachine(array $state)
     {
         // if we don't have any credentials yet, allow user to register
         // regardless if in inflow or standalone (redirect to standalone if need
@@ -117,7 +110,7 @@ class WebAuthn
         }
     }
 
-    public static function loadModuleConfig($moduleConfig, &$stateData): void
+    public static function loadModuleConfig(array $moduleConfig, StateData &$stateData): void
     {
         $stateData->store = Store::parseStoreConfig($moduleConfig['store']);
 
