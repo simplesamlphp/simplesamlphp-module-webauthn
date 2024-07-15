@@ -18,10 +18,20 @@ updates:
   - package-ecosystem: "composer"  # See documentation for possible values
     directory: "/"  # Location of package manifests
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    allow:
+      # Allow both direct and indirect updates for all packages
+      - dependency-type: "all"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
-      dev-dependencies:
+      production-dependencies:
+        dependency-type: "production"
+        exclude-patterns:
+          - "symfony/*"
+      development-dependencies:
         dependency-type: "development"
-        update-types:
-          - "minor"
-          - "patch"
+      symfony:
+        patterns:
+          - "symfony/*"
