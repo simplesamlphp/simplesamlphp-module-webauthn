@@ -1,0 +1,46 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Offset 'FIDO2PasswordlessAu…' does not exist on array\\{FIDO2AuthSuccessful\\: mixed, FIDO2WantsRegister\\: bool\\}\\.$#"
+			count: 1
+			path: src/Controller/AuthProcess.php
+
+		-
+			message: "#^Call to an undefined method class@anonymous/Controller/PushbackUserPass\\.php\\:97\\:\\:login\\(\\)\\.$#"
+			count: 1
+			path: src/Controller/PushbackUserPass.php
+
+		-
+			message: "#^Class class@anonymous/Controller/PushbackUserPass\\.php\\:97 does not have a constructor and must be instantiated without any parameters\\.$#"
+			count: 1
+			path: src/Controller/PushbackUserPass.php
+
+		-
+			message: "#^Constructor of class SimpleSAML\\\\Module\\\\webauthn\\\\Store has an unused parameter \\$config\\.$#"
+			count: 1
+			path: src/Store.php
+
+		-
+			message: "#^Method SimpleSAML\\\\Module\\\\webauthn\\\\WebAuthn\\\\AAGUID\\:\\:__construct\\(\\) with return type void returns null but should not return anything\\.$#"
+			count: 1
+			path: src/WebAuthn/AAGUID.php
+
+		-
+			message: "#^Method SimpleSAML\\\\Module\\\\webauthn\\\\WebAuthn\\\\AAGUID\\:\\:getInstance\\(\\) should return static\\(SimpleSAML\\\\Module\\\\webauthn\\\\WebAuthn\\\\AAGUID\\) but returns SimpleSAML\\\\Module\\\\webauthn\\\\WebAuthn\\\\AAGUID\\.$#"
+			count: 1
+			path: src/WebAuthn/AAGUID.php
+
+		-
+			message: "#^Static property SimpleSAML\\\\Module\\\\webauthn\\\\WebAuthn\\\\AAGUID\\:\\:\\$instance \\(static\\(SimpleSAML\\\\Module\\\\webauthn\\\\WebAuthn\\\\AAGUID\\)\\) does not accept SimpleSAML\\\\Module\\\\webauthn\\\\WebAuthn\\\\AAGUID\\.$#"
+			count: 1
+			path: src/WebAuthn/AAGUID.php
+
+		-
+			message: "#^Call to an undefined method CBOR\\\\CBORObject\\:\\:normalize\\(\\)\\.$#"
+			count: 1
+			path: src/WebAuthn/WebAuthnAbstractEvent.php
+
+		-
+			message: "#^Part \\$attestationData \\(array\\) of encapsed string cannot be cast to string\\.$#"
+			count: 1
+			path: src/WebAuthn/WebAuthnRegistrationEvent.php
