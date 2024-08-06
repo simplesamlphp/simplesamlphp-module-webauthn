@@ -27,22 +27,13 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class Registration
 {
-    /**
-     * @var \SimpleSAML\Auth\State|string
-     * @psalm-var \SimpleSAML\Auth\State|class-string
-     */
+    /** @var \SimpleSAML\Auth\State|string */
     protected $authState = Auth\State::class;
 
-    /**
-     * @var \SimpleSAML\Auth\Simple|string
-     * @psalm-var \SimpleSAML\Auth\Simple|class-string
-     */
+    /** @var \SimpleSAML\Auth\Simple|string */
     protected $authSimple = Auth\Simple::class;
 
-    /**
-     * @var \SimpleSAML\Logger|string
-     * @psalm-var \SimpleSAML\Logger|class-string
-     */
+    /** @var \SimpleSAML\Logger|string */
     protected $logger = Logger::class;
 
 
@@ -108,7 +99,7 @@ class Registration
 
         $state = [];
         $state['SPMetadata']['entityid'] = "WEBAUTHN-SP-REGISTRATION";
-        /** @psalm-var class-string $authSimple */
+
         $authSimple = $this->authSimple;
         $as = new $authSimple($registrationAuthSource);
         $as->requireAuth();

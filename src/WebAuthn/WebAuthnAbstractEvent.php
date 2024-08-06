@@ -430,6 +430,7 @@ abstract class WebAuthnAbstractEvent
 
         $decoder = new Decoder($tagManager, $otherObjectManager);
         $stream = new StringStream($rawData);
+
         $object = $decoder->decode($stream);
         $finalData = $object->normalize();
         if ($finalData === null) {

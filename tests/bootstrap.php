@@ -11,3 +11,9 @@ if (file_exists($linkPath) === false) {
     print "Linking '$linkPath' to '$projectRoot'\n";
     symlink($projectRoot, $linkPath);
 }
+
+// Little dirty hack to satisfy PHPstan
+class_alias(
+    \SimpleSAML\Module\core\Auth\Source\AdminPassword::class,
+    '\SimpleSAML\Module\webauthn\Auth\Source\AuthSourceOverloader',
+);

@@ -63,6 +63,7 @@ class RegProcessTest extends TestCase
     {
         $this->markTestSkipped('Breaks testsuite');
 
+        /** @phpstan-ignore deadCode.unreachable */
         $_SERVER['REQUEST_URI'] = '/module.php/webauthn/regprocess';
         $request = Request::create(
             '/regprocess',

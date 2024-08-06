@@ -6,14 +6,13 @@ namespace SimpleSAML\Module\webauthn\Controller;
 
 use Exception;
 use SimpleSAML\Auth;
-use SimpleSAML\Auth\Source;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error;
+use SimpleSAML\HTTP\RunnableResponse;
 use SimpleSAML\Logger;
 use SimpleSAML\Module\webauthn\Auth\Source\AuthSourceOverloader;
 use SimpleSAML\Session;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\{Request, Response};
 
 /**
  * Controller class for the webauthn module.
@@ -24,16 +23,10 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class PushbackUserPass
 {
-    /**
-     * @var \SimpleSAML\Auth\State|string
-     * @psalm-var \SimpleSAML\Auth\State|class-string
-     */
+    /** @var \SimpleSAML\Auth\State|string */
     protected $authState = Auth\State::class;
 
-    /**
-     * @var \SimpleSAML\Logger|string
-     * @psalm-var \SimpleSAML\Logger|class-string
-     */
+    /** @var \SimpleSAML\Logger|string */
     protected $logger = Logger::class;
 
     /**
@@ -92,7 +85,7 @@ class PushbackUserPass
 
         $authsources = Configuration::getConfig('authsources.php')->toArray();
         $authsourceString = $state['pushbackAuthsource'];
-        $classname = get_class(Source::getById($authsourceString));
+        $classname = get_class(Auth\Source::getById($authsourceString));
         class_alias($classname, '\SimpleSAML\Module\webauthn\Auth\Source\AuthSourceOverloader');
         $overrideSource = new class (
             ['AuthId' => $authsourceString],
@@ -117,7 +110,7 @@ class PushbackUserPass
         unset($attribs);
 
         // now properly return our final state to the framework
-        Source::completeAuth($state);
+        return new RunnableResponse([Auth\Source::class, 'completeAuth'], [&$state]);
     }
 
     public function login(string $username, string $password): array

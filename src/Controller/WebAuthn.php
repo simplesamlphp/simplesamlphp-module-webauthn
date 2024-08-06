@@ -29,16 +29,10 @@ class WebAuthn
     public const STATE_AUTH_ALLOWMGMT = 2; // allow to switch to mgmt page
     public const STATE_MGMT = 4; // show token management page
 
-    /**
-     * @var \SimpleSAML\Auth\State|string
-     * @psalm-var \SimpleSAML\Auth\State|class-string
-     */
+    /** @var \SimpleSAML\Auth\State|string */
     protected $authState = Auth\State::class;
 
-    /**
-     * @var \SimpleSAML\Logger|string
-     * @psalm-var \SimpleSAML\Logger|class-string
-     */
+    /** @var \SimpleSAML\Logger|string */
     protected $logger = Logger::class;
 
 

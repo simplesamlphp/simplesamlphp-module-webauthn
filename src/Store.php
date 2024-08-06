@@ -25,6 +25,7 @@ abstract class Store
      * This constructor should always be called first in any class which implements this class.
      *
      * @param array &$config The configuration for this storage handler.
+     * @phpstan-ignore constructor.unusedParameter
      */
     protected function __construct(array &$config)
     {
@@ -168,10 +169,7 @@ abstract class Store
             '\SimpleSAML\Module\webauthn\Store',
         );
 
-        /**
-         * @psalm-suppress InvalidStringClass
-         * @var \SimpleSAML\Module\webauthn\Store
-         */
+        /** @var \SimpleSAML\Module\webauthn\Store */
         return new $className($config);
     }
 }

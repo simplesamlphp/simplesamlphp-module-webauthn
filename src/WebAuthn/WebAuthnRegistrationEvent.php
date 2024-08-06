@@ -628,8 +628,6 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         }
         /**
          * §8.6 Verification Step 5: create verificationData
-         *
-         * @psalm-var string $publicKeyU2F
          */
         $verificationData = chr(0) . $this->rpIdHash . $this->clientDataHash . $this->credentialId . $publicKeyU2F;
         /**

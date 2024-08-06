@@ -29,16 +29,10 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class AuthProcess
 {
-    /**
-     * @var \SimpleSAML\Auth\State|string
-     * @psalm-var \SimpleSAML\Auth\State|class-string
-     */
+    /** @var \SimpleSAML\Auth\State|string */
     protected $authState = Auth\State::class;
 
-    /**
-     * @var \SimpleSAML\Logger|string
-     * @psalm-var \SimpleSAML\Logger|class-string
-     */
+    /** @var \SimpleSAML\Logger|string */
     protected $logger = Logger::class;
 
     /**
@@ -151,7 +145,6 @@ class AuthProcess
             $oneToken[1] = stream_get_contents($oneToken[1]);
         }
 
-        /** @psalm-var array $oneToken */
         $authObject = new WebAuthnAuthenticationEvent(
             $request->request->get('type'),
             ($state['FIDO2Scope'] === null ? $state['FIDO2DerivedScope'] : $state['FIDO2Scope']),

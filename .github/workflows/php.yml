@@ -50,8 +50,7 @@ jobs:
         with:
           # Should be the higest supported version, so we can use the newest tools
           php-version: '8.3'
-          tools: composer, composer-require-checker, composer-unused, phpcs, psalm
-          # optional performance gain for psalm: opcache
+          tools: composer, composer-require-checker, composer-unused, phpcs, phpstan
           extensions: ctype, date, dom, fileinfo, filter, hash, intl, mbstring, opcache, openssl, pcre, spl, xml
 
       - name: Setup problem matchers for PHP
@@ -84,27 +83,13 @@ jobs:
       - name: PHP Code Sniffer
         run: phpcs
 
-      - name: Psalm
-        continue-on-error: true
+      - name: PHPStan
         run: |
-          psalm -c psalm.xml \
-          --show-info=true \
-          --shepherd \
-          --php-version=${{ steps.setup-php.outputs.php-version }}
+          phpstan analyze -c phpstan.neon --debug
 
-      - name: Psalm (testsuite)
+      - name: PHPStan (testsuite)
         run: |
-          psalm -c psalm-dev.xml \
-          --show-info=true \
-          --shepherd \
-          --php-version=${{ steps.setup-php.outputs.php-version }}
-
-      - name: Psalter
-        run: |
-          psalm --alter \
-          --issues=UnnecessaryVarAnnotation \
-          --dry-run \
-          --php-version=${{ steps.setup-php.outputs.php-version }}
+          phpstan analyze -c phpstan-dev.neon --debug
 
   security:
     name: Security checks

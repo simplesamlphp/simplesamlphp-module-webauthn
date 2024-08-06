@@ -62,7 +62,6 @@ class StateTest extends TestCase
      * @param string $method The method to be used for the test
      * @param string $controllerEndpoint The name of the endpoint of the controller to test
      * @param string $controllerClass The name of the controller class to test
-     * @psalm-param class-string $controllerClass
      * @param string $controllerMethod The name of the controller method to test
      */
     #[DataProvider('stateTestsProvider')]
@@ -92,7 +91,6 @@ class StateTest extends TestCase
      * @param string $method The method to be used for the test
      * @param string $controllerEndpoint The name of the endpoint of the controller to test
      * @param string $controllerClass The name of the controller class to test
-     * @psalm-param class-string $controllerClass
      * @param string $controllerMethod The name of the controller method to test
      */
     #[DataProvider('stateTestsProvider')]

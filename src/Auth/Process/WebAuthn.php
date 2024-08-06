@@ -71,10 +71,6 @@ class WebAuthn extends Auth\ProcessingFilter
      */
     public function __construct(array $config, $reserved)
     {
-        /**
-         * Remove annotation + assert as soon as this method can be typehinted (SSP 2.0)
-         * @psalm-suppress RedundantConditionGivenDocblockType
-         */
         parent::__construct($config, $reserved);
 
         $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php')->toArray();

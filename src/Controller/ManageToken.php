@@ -24,16 +24,10 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ManageToken
 {
-    /**
-     * @var \SimpleSAML\Auth\State|string
-     * @psalm-var \SimpleSAML\Auth\State|class-string
-     */
+    /** @var \SimpleSAML\Auth\State|string */
     protected $authState = Auth\State::class;
 
-    /**
-     * @var \SimpleSAML\Logger|string
-     * @psalm-var \SimpleSAML\Logger|class-string
-     */
+    /** @var \SimpleSAML\Logger|string */
     protected $logger = Logger::class;
 
 

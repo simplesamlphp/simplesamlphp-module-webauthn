@@ -31,7 +31,7 @@ class AAGUID
     /**
      * The singleton instance.
      *
-     * @var static
+     * @var \SimpleSAML\Module\webauthn\WebAuthn\AAGUID
      */
     protected static AAGUID $instance;
 
@@ -45,7 +45,7 @@ class AAGUID
         $path = $config->getConfigDir() . '/' . self::AAGUID_CONFIG_FILE;
         if (!file_exists($path)) {
             Logger::warning("Missing AAGUID configuration file ($path). No device will be recognized.");
-            return null;
+            return;
         }
 
         $data = file_get_contents($path);
@@ -62,7 +62,7 @@ class AAGUID
     /**
      * Get the singleton instance of the AAGUID dictionary.
      *
-     * @return static
+     * @return self
      */
     public static function getInstance(): self
     {
