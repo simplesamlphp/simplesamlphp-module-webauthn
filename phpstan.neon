@@ -4,3 +4,5 @@ parameters:
     - src
   bootstrapFiles:
     - tests/bootstrap.php
+includes:
+  - phpstan-baseline.neon

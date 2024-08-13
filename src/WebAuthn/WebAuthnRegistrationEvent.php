@@ -12,6 +12,9 @@ use SimpleSAML\Module\webauthn\WebAuthn\AAGUID;
 use SimpleSAML\Utils;
 use SpomkyLabs\Pki\ASN1\Type\UnspecifiedType;
 
+use function print_r;
+use function sprintf;
+
 /**
  * FIDO2/WebAuthn Authentication Processing filter
  *
@@ -655,7 +658,10 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
      */
     private function validateAttestationFormatAndroidSafetyNet(array $attestationData): void
     {
-        $this->fail("Android SafetyNet attestation is historic and not supported ($attestationData).");
+        $this->fail(sprintf(
+            "Android SafetyNet attestation is historic and not supported (%s).",
+            print_r($attestationData, true),
+        ));
         // be sure to end execution even if the Exception is caught
         exit(1);
     }

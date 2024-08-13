@@ -135,7 +135,7 @@ class AuthProcess
             }
         }
 
-        if ($publicKey === false || sizeof($oneToken) == 0) {
+        if ($publicKey === false || sizeof($oneToken) === 0) {
             throw new Exception(
                 "User attempted to authenticate with an unknown credential ID. This should already have been prevented by the browser!",
             );
@@ -171,13 +171,13 @@ class AuthProcess
         }
 
         // no matter what: if we are passwordless it MUST be presence-verified
-        if ($state['FIDO2PasswordlessAuthMode'] === true && $oneToken[5] != WebAuthnAbstractEvent::PRESENCE_LEVEL_VERIFIED) {
+        if ($state['FIDO2PasswordlessAuthMode'] === true && $oneToken[5] !== WebAuthnAbstractEvent::PRESENCE_LEVEL_VERIFIED) {
             throw new Exception("Attempt to authenticate without User Verification in passwordless mode!");
         }
 
         // if we didn't register the key as resident, do not allow its use in
         // passwordless mode
-        if ($state['FIDO2PasswordlessAuthMode'] === true && $oneToken[6] != 1) {
+        if ($state['FIDO2PasswordlessAuthMode'] === true && $oneToken[6] !== 1) {
             throw new Exception("Attempt to authenticate with a token that is not registered for passwordless mode!");
         }
 
@@ -185,7 +185,7 @@ class AuthProcess
          * §7.2 STEP 18 : detect physical object cloning on the token
          */
         $counter = $authObject->getCounter();
-        if ($previousCounter == 0 && $counter == 0) {
+        if ($previousCounter === 0 && $counter === 0) {
             // no cloning check, it is a brand new token
         } elseif ($counter > $previousCounter) {
             // Signature counter was incremented compared to last time, good
@@ -228,7 +228,7 @@ class AuthProcess
             }
         }
 
-        if ($state['FIDO2PasswordlessAuthMode'] == true) {
+        if ($state['FIDO2PasswordlessAuthMode'] === true) {
             /**
              * But what about SAML attributes? As an authproc, those came in by the
              * first-factor authentication.

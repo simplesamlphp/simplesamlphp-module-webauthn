@@ -1,0 +1,6 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Offset 'FIDO2PasswordlessAu…' does not exist on array\\{FIDO2AuthSuccessful\\: mixed, FIDO2WantsRegister\\: bool\\}\\.$#"
+			count: 1
+			path: src/Controller/AuthProcess.php

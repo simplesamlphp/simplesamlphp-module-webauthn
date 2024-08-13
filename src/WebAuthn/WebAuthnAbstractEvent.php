@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SimpleSAML\Module\webauthn\WebAuthn;
 
 use CBOR\Decoder;
+use CBOR\Normalizable;
 use CBOR\OtherObject;
 use CBOR\StringStream;
 use CBOR\Tag;
@@ -431,8 +432,13 @@ abstract class WebAuthnAbstractEvent
         $decoder = new Decoder($tagManager, $otherObjectManager);
         $stream = new StringStream($rawData);
 
-        $object = $decoder->decode($stream);
-        $finalData = $object->normalize();
+        $finalData = $decoder->decode($stream);
+        if ($finalData instanceof Normalizable) {
+            $finalData = $finalData->normalize();
+        } else {
+            $this->fail("CBOR normalization failed.");
+        }
+
         if ($finalData === null) {
             $this->fail("CBOR data decoding failed.");
         }
