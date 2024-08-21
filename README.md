@@ -1,6 +1,6 @@
 # WebAuthn as Second Factor module
 
-![Build Status](https://github.com/simplesamlphp/simplesamlphp-module-webauthn/workflows/CI/badge.svg?branch=master)
+![Build Status](https://github.com/simplesamlphp/simplesamlphp-module-webauthn/actions/workflows/php.yml/badge.svg)
 [![Coverage Status](https://codecov.io/gh/simplesamlphp/simplesamlphp-module-webauthn/branch/master/graph/badge.svg)](https://codecov.io/gh/simplesamlphp/simplesamlphp-module-webauthn)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/simplesamlphp/simplesamlphp-module-webauthn/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/simplesamlphp/simplesamlphp-module-webauthn/?branch=master)
 [![Type Coverage](https://shepherd.dev/github/simplesamlphp/simplesamlphp-module-webauthn/coverage.svg)](https://shepherd.dev/github/simplesamlphp/simplesamlphp-module-webauthn)
