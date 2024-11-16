@@ -51,7 +51,7 @@ jobs:
         with:
           # Should be the higest supported version, so we can use the newest tools
           php-version: '8.3'
-          tools: composer, composer-require-checker, composer-unused, phpcs, phpstan
+          tools: composer, composer-require-checker, composer-unused, phpcs
           extensions: ctype, date, dom, fileinfo, filter, hash, intl, mbstring, opcache, openssl, pcre, spl, xml
 
       - name: Setup problem matchers for PHP
@@ -86,11 +86,11 @@ jobs:
 
       - name: PHPStan
         run: |
-          phpstan analyze -c phpstan.neon --debug
+          vendor/bin/phpstan analyze -c phpstan.neon --debug
 
       - name: PHPStan (testsuite)
         run: |
-          phpstan analyze -c phpstan-dev.neon --debug
+          vendor/bin/phpstan analyze -c phpstan-dev.neon --debug
 
   security:
     name: Security checks
