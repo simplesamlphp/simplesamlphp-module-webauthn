@@ -1,0 +1,14 @@
+/.github/ export-ignore
+/tools/ export-ignore
+/tests/ export-ignore
+codecov.yml export-ignore
+.editorconfig export-ignore
+.gitattributes export-ignore
+.gitignore export-ignore
+phpcs.xml export-ignore
+phpstan.xml export-ignore
+phpstan-dev.xml export-ignore
+phpunit.xml export-ignore
+.php_cs.dist export-ignore
+.markdownlintignore export-ignore
+.markdownlintrc export-ignore
