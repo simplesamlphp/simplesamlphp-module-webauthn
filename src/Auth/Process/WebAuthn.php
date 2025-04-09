@@ -17,6 +17,7 @@ use SimpleSAML\Auth;
 use SimpleSAML\Configuration;
 use SimpleSAML\Logger;
 use SimpleSAML\Module;
+use SimpleSAML\Session;
 use SimpleSAML\Module\webauthn\WebAuthn\StateData;
 use SimpleSAML\Module\webauthn\WebAuthn\StaticProcessHelper;
 
@@ -152,7 +153,7 @@ class WebAuthn extends Auth\ProcessingFilter {
                 $lastSecondFactor instanceof \DateTime
                 )
         ) {
-            $interval = \DateTime::diff($lastSecondFactor, \DateTime());
+            $interval = $lastSecondFactor->diff( \DateTime());
             if ($interval->invert == 1) {
                 throw new \Exception("We are talking to a future self. Amazing.");
             }
