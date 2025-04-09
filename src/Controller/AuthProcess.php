@@ -231,7 +231,7 @@ class AuthProcess
             // take note of the current timestamp so we know 
             // a) that second-factor was done successfully in the current sesssion
             // b) when that event occured, so as to make regular re-auths configurable
-            $state['Attributes']['LastSuccessfulSecondFactor'] = new \DateTime();
+            $this->session->setData("DateTime", 'LastSuccessfulSecondFactor', new \DateTime());
             $this->authState::saveState($state, 'webauthn:request');
         }
         if ($state['FIDO2PasswordlessAuthMode'] === true) {
