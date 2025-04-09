@@ -227,7 +227,13 @@ class AuthProcess
                 $response = new RunnableResponse([Auth\ProcessingChain::class, 'resumeProcessing'], [$state]);
             }
         }
-
+        if ($state['FIDO2PasswordlessAuthMode'] === false) {
+            // take note of the current timestamp so we know 
+            // a) that second-factor was done successfully in the current sesssion
+            // b) when that event occured, so as to make regular re-auths configurable
+            $state['Attributes']['LastSuccessfulSecondFactor'] = new \DateTime();
+            $this->authState::saveState($state, 'webauthn:request');
+        }
         if ($state['FIDO2PasswordlessAuthMode'] === true) {
             /**
              * But what about SAML attributes? As an authproc, those came in by the
