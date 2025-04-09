@@ -153,7 +153,7 @@ class WebAuthn extends Auth\ProcessingFilter {
                 $lastSecondFactor instanceof \DateTime
                 )
         ) {
-            $interval = $lastSecondFactor->diff( \DateTime());
+            $interval = $lastSecondFactor->diff( new \DateTime());
             if ($interval->invert == 1) {
                 throw new \Exception("We are talking to a future self. Amazing.");
             }
