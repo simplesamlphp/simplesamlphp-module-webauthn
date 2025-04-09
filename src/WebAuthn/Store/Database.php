@@ -59,6 +59,7 @@ class Database extends Store
         $this->config = $config;
         $this->db = SSP_Database::getInstance(Configuration::loadFromArray($config));
         $driver = $this->db->getDriver();
+        // phpcs:disable Generic.Files.LineLength.TooLong
         try {
             $this->db->read("SELECT COUNT(*) FROM credentials");
         } catch (\Exception $e) {
@@ -95,6 +96,7 @@ class Database extends Store
             CONSTRAINT userstatus_user_id_key UNIQUE (user_id)
             )");
         }
+        // phpcs:enable Generic.Files.LineLength.TooLong
     }
 
     /**
@@ -226,6 +228,7 @@ class Database extends Store
         string $aaguid,
         string $attLevel,
     ): bool {
+        // phpcs:disable Generic.Files.LineLength.TooLong
         $this->db->write(
             'INSERT INTO credentials ' .
             '(user_id, credentialId, credential, algo, presenceLevel, isResidentKey, signCounter, friendlyName, hashedId, aaguid, attLevel) VALUES ' .
@@ -244,6 +247,7 @@ class Database extends Store
                 'attLevel' => $attLevel,
             ],
         );
+        // phpcs:enable Generic.Files.LineLength.TooLong
 
         return true;
     }
@@ -299,6 +303,7 @@ class Database extends Store
         $ret = [];
 
         $st = $this->db->read(
+        // phpcs:ignore Generic.Files.LineLength.TooLong
             'SELECT credentialId, credential, signCounter, friendlyName, algo, presenceLevel, isResidentKey FROM credentials WHERE user_id = :userId',
             ['userId' => $userId],
         );

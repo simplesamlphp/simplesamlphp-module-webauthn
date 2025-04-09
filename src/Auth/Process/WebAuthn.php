@@ -9,6 +9,7 @@
  * @author Stefan Winter <stefan.winter@restena.lu>
  * @package SimpleSAMLphp
  */
+
 declare(strict_types=1);
 
 namespace SimpleSAML\Module\webauthn\Auth\Process;
@@ -17,12 +18,12 @@ use SimpleSAML\Auth;
 use SimpleSAML\Configuration;
 use SimpleSAML\Logger;
 use SimpleSAML\Module;
-use SimpleSAML\Session;
 use SimpleSAML\Module\webauthn\WebAuthn\StateData;
 use SimpleSAML\Module\webauthn\WebAuthn\StaticProcessHelper;
+use SimpleSAML\Session;
 
-class WebAuthn extends Auth\ProcessingFilter {
-
+class WebAuthn extends Auth\ProcessingFilter
+{
     /**
      * @var boolean should new users be considered as enabled by default?
      */
@@ -74,7 +75,8 @@ class WebAuthn extends Auth\ProcessingFilter {
      *
      * @throws \SimpleSAML\Error\Exception if the configuration is not valid.
      */
-    public function __construct(array $config, $reserved) {
+    public function __construct(array $config, $reserved)
+    {
         parent::__construct($config, $reserved);
 
         $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php')->toArray();
@@ -107,7 +109,8 @@ class WebAuthn extends Auth\ProcessingFilter {
      *
      * @return void
      */
-    public function process(array &$state): void {
+    public function process(array &$state): void
+    {
         if (!array_key_exists($this->stateData->usernameAttrib, $state['Attributes'])) {
             Logger::warning('webauthn: cannot determine if user needs second factor, missing attribute "' .
                     $this->stateData->usernameAttrib . '".');
@@ -118,15 +121,16 @@ class WebAuthn extends Auth\ProcessingFilter {
                 'urn:rsa:names:tc:SAML:2.0:ac:classes:FIDO';
         Logger::debug('webauthn: userid: ' . $state['Attributes'][$this->stateData->usernameAttrib][0]);
 
-        $localToggle = !empty($state['Attributes'][$this->toggleAttrib]) && !empty($state['Attributes'][$this->toggleAttrib][0]);
+        $localToggle = !empty($state['Attributes'][$this->toggleAttrib]) &&
+            !empty($state['Attributes'][$this->toggleAttrib][0]);
 
         if (
                 $this->stateData->store->is2FAEnabled(
-                        $state['Attributes'][$this->stateData->usernameAttrib][0],
-                        $this->defaultEnabled,
-                        $this->useDatabase,
-                        $localToggle,
-                        $this->force,
+                    $state['Attributes'][$this->stateData->usernameAttrib][0],
+                    $this->defaultEnabled,
+                    $this->useDatabase,
+                    $localToggle,
+                    $this->force,
                 ) === false
         ) {
             // nothing to be done here, end authprocfilter processing
@@ -136,6 +140,7 @@ class WebAuthn extends Auth\ProcessingFilter {
         if // did we do Passwordless mode successfully before?
         (
                 isset($state['Attributes']['internal:FIDO2PasswordlessAuthentication']) &&
+                // phpcs:ignore Generic.Files.LineLength.TooLong
                 $state['Attributes']['internal:FIDO2PasswordlessAuthentication'][0] == $state['Attributes'][$this->stateData->usernameAttrib][0]
         ) {
             // then no need to trigger a second 2-Factor via authproc
@@ -146,17 +151,16 @@ class WebAuthn extends Auth\ProcessingFilter {
         $session = Session::getSessionFromRequest();
         $lastSecondFactor = $session->getData("DateTime", 'LastSuccessfulSecondFactor');
         if // do we need to do secondFactor in interval, or even every time?
-           // we skip only if an interval is configured AND we did successfully authenticate, AND are within the interval
+           // we skip only if an interval is configured AND we did successfully authenticate,
+           // AND are within the interval
         (
-                $this->SecondFactorMaxAge >= 0 && // 
-                (
-                $lastSecondFactor instanceof \DateTime
-                )
+                $this->SecondFactorMaxAge >= 0 && $lastSecondFactor instanceof \DateTime
         ) {
-            $interval = $lastSecondFactor->diff( new \DateTime());
+            $interval = $lastSecondFactor->diff(new \DateTime());
             if ($interval->invert == 1) {
                 throw new \Exception("We are talking to a future self. Amazing.");
             }
+            // phpcs:ignore Generic.Files.LineLength.TooLong
             $totalAge = $interval->s + 60 * $interval->i + 3600 * $interval->h + 86400 * $interval->d + 86400 * 30 * $interval->m + 86400 * 365 * $interval->y;
             if ($totalAge < $this->SecondFactorMaxAge) { // we are within the interval indeed, skip calling the AuthProc
                 return;

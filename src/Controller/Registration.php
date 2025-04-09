@@ -108,6 +108,7 @@ class Registration
         $state['Attributes'] = $attrs;
 
         $stateData = new StateData();
+        // phpcs:disable Generic.Files.LineLength.TooLong
         $stateData->requestTokenModel = ($registrationConfig['policy_2fa']['minimum_certification_level'] == WebAuthnRegistrationEvent::CERTIFICATION_NOT_REQUIRED ? false : true);
         $stateData->minCertLevel2FA = $registrationConfig['policy_2fa']['minimum_certification_level'];
         $stateData->aaguidWhitelist2FA = $registrationConfig['policy_2fa']['aaguid_whitelist'] ?? [];
@@ -115,6 +116,7 @@ class Registration
         $stateData->minCertLevelPasswordless = $registrationConfig['policy_passwordless']['minimum_certification_level'];
         $stateData->aaguidWhitelistPasswordless = $registrationConfig['policy_passwordless']['aaguid_whitelist'] ?? [];
         $stateData->attFmtWhitelistPasswordless = $registrationConfig['policy_passwordless']['attestation_format_whitelist'] ?? [];
+        // phpcs:enable Generic.Files.LineLength.TooLong
 
         try {
             $stateData->store = Store::parseStoreConfig($moduleConfig->getArray('store'));

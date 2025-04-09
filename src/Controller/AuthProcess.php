@@ -137,6 +137,7 @@ class AuthProcess
 
         if ($publicKey === false || sizeof($oneToken) === 0) {
             throw new Exception(
+            // phpcs:ignore Generic.Files.LineLength.TooLong
                 "User attempted to authenticate with an unknown credential ID. This should already have been prevented by the browser!",
             );
         }
@@ -167,11 +168,15 @@ class AuthProcess
          * the lower security level. (level upgrades are of course OK.)
          */
         if ($oneToken[5] > $authObject->getPresenceLevel()) {
+            // phpcs:ignore Generic.Files.LineLength.TooLong
             throw new Exception("Token was initially registered with higher identification guarantees than now authenticated with (was: " . $oneToken[5] . " now " . $authObject->getPresenceLevel() . "!");
         }
 
         // no matter what: if we are passwordless it MUST be presence-verified
-        if ($state['FIDO2PasswordlessAuthMode'] === true && $oneToken[5] !== WebAuthnAbstractEvent::PRESENCE_LEVEL_VERIFIED) {
+        if (
+            $state['FIDO2PasswordlessAuthMode'] === true &&
+            $oneToken[5] !== WebAuthnAbstractEvent::PRESENCE_LEVEL_VERIFIED
+        ) {
             throw new Exception("Attempt to authenticate without User Verification in passwordless mode!");
         }
 
@@ -193,6 +198,7 @@ class AuthProcess
             $store->updateSignCount($oneToken[0], $counter);
         } else {
             throw new Exception(
+            // phpcs:ignore Generic.Files.LineLength.TooLong
                 "Signature counter less or equal to a previous authentication! Token cloning likely (old: $previousCounter, new: $counter).",
             );
         }
@@ -214,7 +220,8 @@ class AuthProcess
                 function (WebAuthnAuthenticationEvent $authObject, array $state) {
                     echo $authObject->getDebugBuffer();
                     echo $authObject->getValidateBuffer();
-                    echo "Debug mode, not continuing to " . ($state['FIDO2WantsRegister'] ? "credential registration page." : "destination.");
+                    echo "Debug mode, not continuing to " . ($state['FIDO2WantsRegister'] ?
+                            "credential registration page." : "destination.");
                 },
                 [$authObject, $state],
             );
@@ -228,7 +235,7 @@ class AuthProcess
             }
         }
         if ($state['FIDO2PasswordlessAuthMode'] === false) {
-            // take note of the current timestamp so we know 
+            // take note of the current timestamp so we know
             // a) that second-factor was done successfully in the current sesssion
             // b) when that event occured, so as to make regular re-auths configurable
             $this->session->setData("DateTime", 'LastSuccessfulSecondFactor', new \DateTime());
