@@ -4,6 +4,7 @@
 declare(strict_types=1);
 
 if (!isset($argv[1])) {
+    // phpcs:ignore Generic.Files.LineLength.TooLong
     echo "First and only argument is the filename of the FIDO Alliance Metadata v3 blob as can be downloaded from: https://mds3.fidoalliance.org/ \n";
     exit(1);
 }

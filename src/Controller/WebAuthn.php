@@ -82,7 +82,10 @@ class WebAuthn
         // OTOH, if we are invoked for passwordless auth, we don't know the
         // username nor whether the user has any credentials. The only thing
         // we can do is authenticate -> final else
-        if ($state['FIDO2PasswordlessAuthMode'] != true && (!isset($state['FIDO2Tokens']) || count($state['FIDO2Tokens']) == 0)) {
+        if (
+            $state['FIDO2PasswordlessAuthMode'] != true &&
+            (!isset($state['FIDO2Tokens']) || count($state['FIDO2Tokens']) == 0)
+        ) {
             return self::STATE_MGMT;
         }
         // from here on we do have a credential to work with
@@ -100,7 +103,8 @@ class WebAuthn
         } else { // in inflow, allow to check the management box; otherwise,
                  // only auth
             $moduleConfig = Configuration::getOptionalConfig('module_webauthn.php')->toArray();
-            return $moduleConfig['registration']['use_inflow_registration'] ? self::STATE_AUTH_ALLOWMGMT : self::STATE_AUTH_NOMGMT;
+            return $moduleConfig['registration']['use_inflow_registration'] ?
+                self::STATE_AUTH_ALLOWMGMT : self::STATE_AUTH_NOMGMT;
         }
     }
 
@@ -124,16 +128,21 @@ class WebAuthn
         if (array_key_exists('identifyingAttribute', $moduleConfig)) {
             $stateData->usernameAttrib = $moduleConfig['identifyingAttribute'];
         } else {
-            throw new Error\CriticalConfigurationError('webauthn: it is required to set identifyingAttribute in config.');
+            throw new Error\CriticalConfigurationError(
+                'webauthn: it is required to set identifyingAttribute in config.',
+            );
         }
 
         if (array_key_exists('attrib_displayname', $moduleConfig)) {
             $stateData->displaynameAttrib = $moduleConfig['attrib_displayname'];
         } else {
-            throw new Error\CriticalConfigurationError('webauthn: it is required to set attrib_displayname in config.');
+            throw new Error\CriticalConfigurationError(
+                'webauthn: it is required to set attrib_displayname in config.',
+            );
         }
 
         if (array_key_exists('minimum_certification_level', $moduleConfig['registration']['policy_2fa'])) {
+            // phpcs:disable Generic.Files.LineLength.TooLong
             $stateData->requestTokenModel = ($moduleConfig['registration']['policy_2fa']['minimum_certification_level'] == Module\webauthn\WebAuthn\WebAuthnRegistrationEvent::CERTIFICATION_NOT_REQUIRED ? false : true);
             $stateData->minCertLevel2FA = $moduleConfig['registration']['policy_2fa']['minimum_certification_level'];
             $stateData->aaguidWhitelist2FA = $moduleConfig['registration']['policy_2fa']['aaguid_whitelist'] ?? [];
@@ -141,6 +150,7 @@ class WebAuthn
             $stateData->minCertLevelPasswordless = $moduleConfig['registration']['policy_passwordless']['minimum_certification_level'];
             $stateData->aaguidWhitelistPasswordless = $moduleConfig['registration']['policy_passwordless']['aaguid_whitelist'] ?? [];
             $stateData->attFmtWhitelistPasswordless = $moduleConfig['registration']['policy_passwordless']['attestation_format_whitelist'] ?? [];
+            // phpcs:enable Generic.Files.LineLength.TooLong
         } else {
             $stateData->requestTokenModel = false;
         }
@@ -223,7 +233,8 @@ class WebAuthn
 
         $t->data['authForm'] = "";
         if (
-            $this->workflowStateMachine($state) == self::STATE_AUTH_ALLOWMGMT || $this->workflowStateMachine($state) == self::STATE_AUTH_NOMGMT
+            $this->workflowStateMachine($state) == self::STATE_AUTH_ALLOWMGMT ||
+            $this->workflowStateMachine($state) == self::STATE_AUTH_NOMGMT
         ) {
             $t->data['authURL'] = Module::getModuleURL('webauthn/authprocess?StateId=' . urlencode($stateId));
             $t->data['delURL'] = Module::getModuleURL('webauthn/managetoken?StateId=' . urlencode($stateId));

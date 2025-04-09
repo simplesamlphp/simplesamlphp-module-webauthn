@@ -112,7 +112,8 @@ class RegProcess
             base64_decode($request->request->get('attestation_object')),
             $request->request->get('response_id'),
             $request->request->get('attestation_client_data_json'),
-            ($request->request->get('passwordless') == "on" ? $state['authenticatorAcceptabilityPasswordless'] : $state['authenticatorAcceptability2FA']),
+            ($request->request->get('passwordless') == "on" ?
+                    $state['authenticatorAcceptabilityPasswordless'] : $state['authenticatorAcceptability2FA']),
             $debugEnabled,
         );
         // at this point, we need to talk to the DB
@@ -160,7 +161,10 @@ class RegProcess
 
         // did we get any client extensions?
         $isResidentKey = 0;
-        if (strlen($request->request->get('clientext')) > 0 && count(json_decode($request->request->get('clientext'), true)) > 0) {
+        if (
+            strlen($request->request->get('clientext')) > 0 &&
+            count(json_decode($request->request->get('clientext'), true)) > 0
+        ) {
             $extensions = json_decode($request->request->get('clientext'), true);
             if ($extensions['credProps']['rk'] === true) {
                 $isResidentKey = 1;

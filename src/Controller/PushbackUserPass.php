@@ -98,7 +98,10 @@ class PushbackUserPass
             }
         };
 
-        $attribs = $overrideSource->loginOverload($request->request->get("username"), $request->request->get("password"));
+        $attribs = $overrideSource->loginOverload(
+            $request->request->get("username"),
+            $request->request->get("password"),
+        );
 
         // this is the confirmed username, we store it just like the Passwordless
         // one would have been

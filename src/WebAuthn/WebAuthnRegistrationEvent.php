@@ -129,12 +129,15 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
 
         $aaguidDb = AAGUID::getInstance();
         if (!$aaguidDb->hasToken($this->AAGUID)) {
-            throw new Exception("Authenticator with AAGUID " . $this->AAGUID . " is not known to the FIDO MDS3 database.");
+            throw new Exception("Authenticator with AAGUID " .
+                $this->AAGUID .
+                " is not known to the FIDO MDS3 database.");
         }
         $authenticatorData = $aaguidDb->get($this->AAGUID);
         $certification = $authenticatorData['statusReports'][0]['status'];
 
         if ($certification == self::FIDO_REVOKED) {
+            // phpcs:ignore Generic.Files.LineLength.TooLong
             throw new InvalidCredential("FIDO Alliance has REVOKED certification of this device. It cannot be registered.");
         }
 
@@ -166,7 +169,8 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
                 }
                 throw new Error("FIDO_CERTIFICATION_TOO_LOW");
             default:
-                throw new Exception("Configuration error: unknown minimum certification level " . $acceptabilityPolicy['minCertLevel']);
+                throw new Exception("Configuration error: unknown minimum certification level " .
+                    $acceptabilityPolicy['minCertLevel']);
         }
     }
 
@@ -259,9 +263,11 @@ MGQCMFrZ+9DsJ1PW9hfNdBywZDsWDbWFp28it1d/5w2RPkRX3Bbn/UbDTNLx7Jr3
 jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
 1bWeT0vT
 -----END CERTIFICATE-----";
-        // § 8.8 Bullet 1 of the draft spec at https://pr-preview.s3.amazonaws.com/alanwaketan/webauthn/pull/1491.html#sctn-apple-anonymous-attestation
+        // § 8.8 Bullet 1 of the draft spec at
+        // https://pr-preview.s3.amazonaws.com/alanwaketan/webauthn/pull/1491.html#sctn-apple-anonymous-attestation
         // draft implemented in state of 11 Feb 2021
-        // I can't help but notice that the verification procedure does NOTHING with CA certs from the chain, nor is there a root to validate to!
+        // I can't help but notice that the verification procedure does NOTHING with CA certs from the chain,
+        // nor is there a root to validate to!
         // Found the root CA with Google, see above, and will perform chain validation even if the spec doesn't say so.
         // first, clear the openssl error backlog. We might need error data in case things go sideways.
         while (openssl_error_string() !== false);
@@ -294,6 +300,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
                 $certResource = openssl_x509_read($cryptoUtils->der2pem($runCert));
                 $signerPubKey = openssl_pkey_get_public($cryptoUtils->der2pem($stmtDecoded['x5c'][$runIndex + 1]));
                 if (openssl_x509_verify($certResource, $signerPubKey) != 1) {
+                    // phpcs:ignore Generic.Files.LineLength.TooLong
                     $this->fail("Error during chain validation of the attestation certificate (while validating cert #$runIndex, which is "
                             . $cryptoUtils->der2pem($runCert)
                             . "; next cert was "
@@ -314,6 +321,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         $keyResource = openssl_pkey_get_public($cryptoUtils->der2pem($stmtDecoded['x5c'][0]));
         if ($keyResource === false) {
             $this->fail(
+            // phpcs:ignore Generic.Files.LineLength.TooLong
                 "Did not get a parseable X.509 structure out of the Apple attestation statement - x5c nr. 0 statement was: XXX "
                 . $stmtDecoded['x5c'][0]
                 . " XXX; PEM equivalent is "
@@ -382,6 +390,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         $retCode = openssl_verify($sigdata, $stmtDecoded['sig'], $keyResource, "sha256");
         if ($retCode !== 1) {
             $this->fail(sprintf(
+            // phpcs:ignore Generic.Files.LineLength.TooLong
                 "Packed signature mismatch (return code $retCode, for :authdata:%s - :clientDataHash:%s - :signature:%s), attestation failed.",
                 $attestationArray['authData'],
                 $this->clientDataHash,
@@ -426,7 +435,8 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
          * §8.2 Step 2 Bullet 2: check certificate properties listed in §8.2.1
          */
         $certProps = openssl_x509_parse($this->der2pem($stmtDecoded['x5c'][0]));
-        $this->debugBuffer .= "Attestation Certificate:" . /** @scrutinizer ignore-type */ print_r($certProps, true) . "<br/>";
+        $this->debugBuffer .= "Attestation Certificate:" .
+            /** @scrutinizer ignore-type */ print_r($certProps, true) . "<br/>";
         if (
             $certProps['version'] !== 2 || /** §8.2.1 Bullet 1 */
             $certProps['subject']['OU'] !== "Authenticator Attestation" || /** §8.2.1 Bullet 2 [Subject-OU] */
@@ -449,9 +459,11 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
              */
             /* if ($token['multi'] === true) { // need to check the OID
                 if (
-                    !isset($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4']) || empty($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4'])
+                    !isset($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4']) ||
+                     empty($certProps['extensions']['1.3.6.1.4.1.45724.1.1.4'])
                 ) { // §8.2.1 Bullet 3
                     $this->fail(
+                        // phpcs:ignore Generic.Files.LineLength.TooLong
                         "This vendor uses one cert for multiple authenticator model attestations, but lacks the AAGUID OID.",
                     );
                 }
@@ -528,7 +540,11 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         if (
             $statementKeyData['x'] != $certPubkey[-2] || $statementKeyData['y'] != $certPubkey[-3]
         ) {
-            $this->fail("Certificate public key does not match credentialPublicKey in authenticatorData (" . /** @scrutinizer ignore-type */ print_r($certPubkey, true) . "###" . /** @scrutinizer ignore-type */ print_r($statementKeyData, true) . ").");
+            $this->fail("Certificate public key does not match credentialPublicKey in authenticatorData (" .
+                /** @scrutinizer ignore-type */ print_r($certPubkey, true) .
+                "###" .
+                /** @scrutinizer ignore-type */ print_r($statementKeyData, true) .
+                ").");
         }
         // throw new Exception(print_r($certProps, true));
         $rawAsn1Oid = $certProps['extensions']['1.3.6.1.4.1.11129.2.1.17'];
@@ -543,7 +559,9 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         }
 
         if ($attestationVersion < self::MIN_SUPPORTED_KEYMASTER_VERSION) {
-            $this->fail("Attestation versions below " . self::MIN_SUPPORTED_KEYMASTER_VERSION . " not supported, found $attestationVersion.");
+            $this->fail("Attestation versions below " .
+                self::MIN_SUPPORTED_KEYMASTER_VERSION .
+                " not supported, found $attestationVersion.");
         }
 
         if ($softwareEnforced->hasTagged(600) || $teeEnforced->hasTagged(600)) {
@@ -551,12 +569,14 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         }
         // need to go through both software and TEE and check origins and purpose
 
+        // phpcs:disable Generic.Files.LineLength.TooLong
         if (
             ($softwareEnforced->hasTagged(702) && ($softwareEnforced->getTagged(702)->asExplicit()->asInteger()->intNumber() != array_search("GENERATED", self::ORIGINS_3))) ||
             ($teeEnforced->hasTagged(702) && ($teeEnforced->getTagged(702)->asExplicit()->asInteger()->intNumber() != array_search("GENERATED", self::ORIGINS_3)))
         ) {
             $this->fail("Incorrect value for ORIGIN!");
         }
+        // phpcs:enable Generic.Files.LineLength.TooLong
 
         if ($softwareEnforced->hasTagged(1)) {
             $purposesSoftware = $softwareEnforced->getTagged(1)->asExplicit()->asSet();
@@ -701,13 +721,17 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         // silently ignores trailing extensions (if any)
         $pubKeyCBOR = substr($attData, 18 + $credIdLen);
         $arrayPK = $this->cborDecode($pubKeyCBOR);
-        $this->debugBuffer .= "pubKey in canonical form: <pre>" . /** @scrutinizer ignore-type */ print_r($arrayPK, true) . "</pre>";
+        $this->debugBuffer .= "pubKey in canonical form: <pre>" .
+            /** @scrutinizer ignore-type */ print_r($arrayPK, true) .
+            "</pre>";
         /**
          * STEP 13 of the validation procedure in § 7.1 of the spec: is the algorithm the expected one?
          */
         if (in_array($arrayPK['3'], self::PK_ALGORITHM)) { // we requested -7 or -257, so want to see it here
             $this->algo = (int)$arrayPK['3'];
-            $this->pass("Public Key Algorithm is expected (" . implode(' or ', WebAuthnRegistrationEvent::PK_ALGORITHM) . ").");
+            $this->pass("Public Key Algorithm is expected (" .
+                implode(' or ', WebAuthnRegistrationEvent::PK_ALGORITHM) .
+                ").");
         } else {
             $this->fail("Public Key Algorithm mismatch!");
         }
@@ -730,7 +754,9 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         }
         $extensions = substr($attData, 18 + $credIdLen + $credentialLength);
         if (strlen($extensions) !== 0) {
-            $this->pass("Found the following extensions (" . strlen($extensions) . " bytes) during registration ceremony: ");
+            $this->pass("Found the following extensions (" .
+                strlen($extensions) .
+                " bytes) during registration ceremony: ");
         }
     }
 
