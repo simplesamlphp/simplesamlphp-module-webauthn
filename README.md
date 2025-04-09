@@ -94,6 +94,23 @@ will be forced into 2FA.
      */
 
     // 'authncontextclassref' => 'https://refeds.org/profile/mfa',
+
+    /**
+     * Earlier versions of the Authproc filter required the second factor
+     * every time a new SP requested user auth, even if the user was already
+     * (first-factor) authenticated at the IdP.
+     * This can be seen as an inconvenience or a security feature, as it
+     * mitigates even unlikely scenarios such as a session cookie theft.
+     * 
+     * This new option makes the behaviour configurable. 
+     *
+     * If set to null (default) or unset, the old behaviour is maintained.
+     * 
+     * If set to an amount of seconds (i.e. integer value), second-factor auth
+     * is requested only on initial authentication and if the last second-factor
+     * was more than this amount of seconds ago.
+     */
+     // 'secondfactormaxage' => NULL,
 ],
 ```
 
