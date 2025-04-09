@@ -104,13 +104,13 @@ will be forced into 2FA.
      * 
      * This new option makes the behaviour configurable. 
      *
-     * If set to null (default) or unset, the old behaviour is maintained.
+     * If set to any negative number or unset, the old behaviour is maintained.
      * 
      * If set to an amount of seconds (i.e. integer value), second-factor auth
      * is requested only on initial authentication and if the last second-factor
      * was more than this amount of seconds ago.
      */
-     // 'secondfactormaxage' => NULL,
+     // 'secondfactormaxage' => -1,
 ],
 ```
 

@@ -87,7 +87,7 @@ class WebAuthn extends Auth\ProcessingFilter {
         $this->useDatabase = $config['use_database'] ?? true;
         $this->defaultEnabled = $config['default_enable'] ?? false;
         $this->authnContextClassRef = $config['authncontextclassref'] ?? null;
-        $this->SecondFactorMaxAge = $config['secondfactormaxage'] ?? null;
+        $this->SecondFactorMaxAge = $config['secondfactormaxage'] ?? -1;
 
         if (array_key_exists('use_inflow_registration', $moduleConfig['registration'])) {
             $this->stateData->useInflowRegistration = $moduleConfig['registration']['use_inflow_registration'];
@@ -146,7 +146,7 @@ class WebAuthn extends Auth\ProcessingFilter {
         if // do we need to do secondFactor in interval, or even every time?
            // we skip only if an interval is configured AND we did successfully authenticate, AND are within the interval
         (
-                $this->SecondFactorMaxAge !== null && // 
+                $this->SecondFactorMaxAge >= 0 && // 
                 (
                 isset($state['Attributes']['LastSuccessfulSecondFactor']) &&
                 $state['Attributes']['LastSuccessfulSecondFactor'] instanceof \DateTime
