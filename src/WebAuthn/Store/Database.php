@@ -80,6 +80,8 @@ class Database extends Store
                         ? "attLevel VARCHAR(6) NOT NULL DEFAULT 'None' CHECK (attLevel IN ('None','Basic','Self','AttCA')),"
                         : "attLevel ENUM('None','Basic','Self','AttCA') NOT NULL DEFAULT 'None',")
                     . "
+                    lastUsedTime TIMESTAMP DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(),
+                    lastUsedIp VARCHAR(64) DEFAULT NULL,
                     CONSTRAINT credentials_user_id_credentialId_key UNIQUE (user_id, credentialId)
                 )
             ");

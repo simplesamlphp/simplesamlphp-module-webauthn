@@ -42,3 +42,20 @@ deployment at hand:
 minimum_certification_level = "0" means the authenticator model is not important
 and corresponds to request_tokenmodel = false. Every other setting will trigger
 behaviour matching the previous request_tokenmodel = true.
+
+## Upgrade from 2.1.x to 2.2.x
+
+There are minor schema changes. The following two columns MUST be added before
+upgrading:
+
+ALTER TABLE credentials ADD COLUMN lastUsedTime TIMESTAMP DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP() AFTER `attLevel`;
+ALTER TABLE credentials ADD COLUMN lastUsedIp VARCHAR(64) DEFAULT NULL AFTER `lastUsedTime`;
+
+For consistency with new deployments, the following changes SHOULD be executed
+to align table definitions to new deployments. The module will not break
+if the old definition remains in place, but you may encounter issue #76 then.
+
+When using MySQL or MariaDB:
+
+ALTER TABLE credentials MODIFY COLUMN credentialId varchar(1024) CHARACTER SET 'binary' NOT NULL;
+
