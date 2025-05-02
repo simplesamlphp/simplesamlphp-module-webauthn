@@ -166,7 +166,7 @@ class RegProcess
             count(json_decode($request->request->get('clientext'), true)) > 0
         ) {
             $extensions = json_decode($request->request->get('clientext'), true);
-            if ($extensions['credProps']['rk'] === true) {
+            if (isset($extensions['credProps']['rk']) && $extensions['credProps']['rk'] === true) {
                 $isResidentKey = 1;
             }
         }
