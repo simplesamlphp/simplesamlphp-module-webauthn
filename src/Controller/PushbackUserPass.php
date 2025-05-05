@@ -85,7 +85,11 @@ class PushbackUserPass
 
         $authsources = Configuration::getConfig('authsources.php')->toArray();
         $authsourceString = $state['pushbackAuthsource'];
-        $classname = get_class(Auth\Source::getById($authsourceString));
+        $authsourceClass = Auth\Source::getById($authsourceString);
+        if (is_null($authsourceClass)) {
+            throw new Exception("password authsource not found");
+        }
+        $classname = get_class($authsourceClass);
         class_alias($classname, '\SimpleSAML\Module\webauthn\Auth\Source\AuthSourceOverloader');
         $overrideSource = new class (
             ['AuthId' => $authsourceString],
