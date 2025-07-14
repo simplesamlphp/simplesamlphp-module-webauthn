@@ -107,6 +107,7 @@ class ManageToken
                     foreach ($state['FIDO2Tokens'] as $key => $value) {
                         if ($state['FIDO2Tokens'][$key][0] == $credId) {
                             unset($state['FIDO2Tokens'][$key]);
+                            $state['FIDO2Tokens'] = array_values($state['FIDO2Tokens']);
                             break;
                         }
                     }
