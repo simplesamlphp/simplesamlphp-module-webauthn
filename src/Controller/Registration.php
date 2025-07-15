@@ -152,7 +152,10 @@ class Registration
 
         $state['Registration'] = true;
         $state['FIDO2WantsRegister'] = true;
-
+        if (isset($state['Attributes']['FIDO2AuthSuccessful']) && is_array($state['Attributes']['FIDO2AuthSuccessful']) && count($state['Attributes']['FIDO2AuthSuccessful']) > 0) {
+            $state['FIDO2AuthSuccessful'] = $state['Attributes']['FIDO2AuthSuccessful'][0];
+        }
+        
         return new RunnableResponse([StaticProcessHelper::class, 'saveStateAndRedirect'], [&$state]);
     }
 }
