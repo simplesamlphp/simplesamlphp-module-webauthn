@@ -1,8 +1,7 @@
 .phpunit.cache/
-.phpunit.result
+.phpunit.result.cache
 vendor/
 composer.lock
 lib/WebAuthn/restena.php
 phpunit.xml.bak
 nbproject/
-/super-linter-output/
