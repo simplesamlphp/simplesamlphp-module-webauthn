@@ -26,8 +26,11 @@ use Symfony\Component\HttpFoundation\Request;
 class WebAuthn
 {
     public const STATE_AUTH_NOMGMT = 1; // just authenticate user
+
     public const STATE_AUTH_ALLOWMGMT = 2; // allow to switch to mgmt page
+
     public const STATE_MGMT = 4; // show token management page
+
 
     /** @var \SimpleSAML\Auth\State|string */
     protected $authState = Auth\State::class;
@@ -74,6 +77,7 @@ class WebAuthn
         $this->logger = $logger;
     }
 
+
     public static function workflowStateMachine(array $state)
     {
         // if we don't have any credentials yet, allow user to register
@@ -107,6 +111,7 @@ class WebAuthn
                 self::STATE_AUTH_ALLOWMGMT : self::STATE_AUTH_NOMGMT;
         }
     }
+
 
     public static function loadModuleConfig(array $moduleConfig, StateData &$stateData): void
     {

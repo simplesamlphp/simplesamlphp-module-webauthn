@@ -27,7 +27,6 @@ class AAGUID
      */
     protected array $dictionary = [];
 
-
     /**
      * The singleton instance.
      *

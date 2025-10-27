@@ -19,6 +19,7 @@ class StaticProcessHelper
         $httpUtils->redirectTrustedURL($url, ['StateId' => $id]);
     }
 
+
     public static function saveStateAndRedirectSupercharged(array &$state): void
     {
         $id = Auth\State::saveState($state, 'webauthn:request');
@@ -26,6 +27,7 @@ class StaticProcessHelper
         $httpUtils = new Utils\HTTP();
         $httpUtils->redirectTrustedURL($url, ['StateId' => $id]);
     }
+
 
     public static function prepareState(StateData $stateData, array &$state): void
     {
@@ -52,6 +54,7 @@ class StaticProcessHelper
         $state['FIDO2AuthSuccessful'] = false;
         $state['FIDO2PasswordlessAuthMode'] = false;
     }
+
 
     public static function prepareStatePasswordlessAuth(StateData $stateData, array &$state): void
     {

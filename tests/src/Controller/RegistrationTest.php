@@ -98,6 +98,8 @@ class RegistrationTest extends TestCase
             public function requireAuth(array $params = []): void
             {
             }
+
+
             public function getAttributes(): array
             {
                 return ['uid' => ['dduck'], 'displayName' => ['Donald Duck']];

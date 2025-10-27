@@ -21,12 +21,14 @@ class Supercharged extends Passwordless
      */
     private $pushbackAuthsource;
 
+
     public function __construct(array $info, array $config)
     {
         parent::__construct($info, $config);
 
         $this->pushbackAuthsource = $this->authSourceConfig->getString("password_authsource");
     }
+
 
     public function authenticate(array &$state): void
     {

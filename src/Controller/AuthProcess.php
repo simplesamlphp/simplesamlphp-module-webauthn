@@ -35,6 +35,7 @@ class AuthProcess
     /** @var \SimpleSAML\Logger|string */
     protected $logger = Logger::class;
 
+
     /**
      * Controller constructor.
      *
@@ -51,6 +52,7 @@ class AuthProcess
     ) {
     }
 
+
     /**
      * Inject the \SimpleSAML\Auth\State dependency.
      *
@@ -61,6 +63,7 @@ class AuthProcess
         $this->authState = $authState;
     }
 
+
     /**
      * Inject the \SimpleSAML\Logger dependency.
      *
@@ -70,6 +73,7 @@ class AuthProcess
     {
         $this->logger = $logger;
     }
+
 
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request

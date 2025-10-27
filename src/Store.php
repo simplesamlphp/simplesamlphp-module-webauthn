@@ -31,6 +31,7 @@ abstract class Store
     {
     }
 
+
     /**
      * is the user subject to 2nd factor at all?
      *
@@ -56,6 +57,7 @@ abstract class Store
         bool $force = true,
     ): bool;
 
+
     /**
      * does a given credentialID already exist?
      *
@@ -66,6 +68,7 @@ abstract class Store
      * @return bool True if the credential exists, false if not
      */
     abstract public function doesCredentialExist(string $credIdHex): bool;
+
 
     /**
      * store newly enrolled token data
@@ -95,6 +98,7 @@ abstract class Store
         string $attLevel,
     ): bool;
 
+
     /**
      * remove an existing credential from the database
      *
@@ -102,6 +106,7 @@ abstract class Store
      * @return true
      */
     abstract public function deleteTokenData(string $credentialId): bool;
+
 
     /**
      * increment the signature counter after a successful authentication
@@ -112,6 +117,7 @@ abstract class Store
      */
     abstract public function updateSignCount(string $credentialId, int $signCounter): bool;
 
+
     /**
      * Retrieve existing token data
      *
@@ -120,6 +126,7 @@ abstract class Store
      */
     abstract public function getTokenData(string $userId): array;
 
+
     /**
      * Retrieve username, given a credential ID
      *
@@ -127,6 +134,7 @@ abstract class Store
      * @return string the username, if found (otherwise, empty string)
      */
     abstract public function getUsernameByHashedId(string $hashedId): string;
+
 
     /**
      * Get statistics for all consent given in the consent store

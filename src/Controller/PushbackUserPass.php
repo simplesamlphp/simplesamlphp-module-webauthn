@@ -12,7 +12,8 @@ use SimpleSAML\HTTP\RunnableResponse;
 use SimpleSAML\Logger;
 use SimpleSAML\Module\webauthn\Auth\Source\AuthSourceOverloader;
 use SimpleSAML\Session;
-use Symfony\Component\HttpFoundation\{Request, Response};
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Controller class for the webauthn module.
@@ -28,6 +29,7 @@ class PushbackUserPass
 
     /** @var \SimpleSAML\Logger|string */
     protected $logger = Logger::class;
+
 
     /**
      * Controller constructor.
@@ -45,6 +47,7 @@ class PushbackUserPass
     ) {
     }
 
+
     /**
      * Inject the \SimpleSAML\Auth\State dependency.
      *
@@ -55,6 +58,7 @@ class PushbackUserPass
         $this->authState = $authState;
     }
 
+
     /**
      * Inject the \SimpleSAML\Logger dependency.
      *
@@ -64,6 +68,7 @@ class PushbackUserPass
     {
         $this->logger = $logger;
     }
+
 
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
@@ -119,6 +124,7 @@ class PushbackUserPass
         // now properly return our final state to the framework
         return new RunnableResponse([Auth\Source::class, 'completeAuth'], [&$state]);
     }
+
 
     public function login(string $username, string $password): array
     {
