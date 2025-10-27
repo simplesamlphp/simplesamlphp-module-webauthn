@@ -86,7 +86,7 @@ class ManageTokenTest extends TestCase
         $c = new Controller\ManageToken($this->config, $this->session);
         $c->setLogger($this->logger);
         $c->setAuthState(new class () extends State {
-            public static function loadState(string $id, string $stage, bool $allowMissing = false): ?array
+            public static function loadState(string $id, string $stage, bool $allowMissing = false): array
             {
                 return [
                     'FIDO2AuthSuccessful' => true,
@@ -147,7 +147,7 @@ class ManageTokenTest extends TestCase
         $c = new Controller\ManageToken($this->config, $this->session);
         $c->setLogger($this->logger);
         $c->setAuthState(new class () extends State {
-            public static function loadState(string $id, string $stage, bool $allowMissing = false): ?array
+            public static function loadState(string $id, string $stage, bool $allowMissing = false): array
             {
                 return [
                     'FIDO2AuthSuccessful' => true,
@@ -179,7 +179,7 @@ class ManageTokenTest extends TestCase
         $c = new Controller\ManageToken($this->config, $this->session);
         $c->setLogger($this->logger);
         $c->setAuthState(new class () extends State {
-            public static function loadState(string $id, string $stage, bool $allowMissing = false): ?array
+            public static function loadState(string $id, string $stage, bool $allowMissing = false): array
             {
                 return [
                     'FIDO2AuthSuccessful' => false,
