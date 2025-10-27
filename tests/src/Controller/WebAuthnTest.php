@@ -85,7 +85,7 @@ class WebAuthnTest extends TestCase
         $c = new Controller\WebAuthn($this->config, $this->session);
         $c->setLogger($this->logger);
         $c->setAuthState(new class () extends State {
-            public static function loadState(string $id, string $stage, bool $allowMissing = false): ?array
+            public static function loadState(string $id, string $stage, bool $allowMissing = false): array
             {
                 return [
                     'UseInflowRegistration' => true,

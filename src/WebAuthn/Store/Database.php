@@ -35,7 +35,6 @@ class Database extends Store
      */
     private SSP_Database $db;
 
-
     /**
      * The configuration for our database store.
      *
@@ -100,6 +99,7 @@ class Database extends Store
         }
         // phpcs:enable Generic.Files.LineLength.TooLong
     }
+
 
     /**
      * Called before serialization.
@@ -319,6 +319,7 @@ class Database extends Store
 
         return $ret;
     }
+
 
     /**
      * Retrieve username, given a credential ID

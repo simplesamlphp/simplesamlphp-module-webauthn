@@ -50,11 +50,15 @@ class StateData
     public bool $requestTokenModel;
 
     public string $minCertLevel2FA;
+
     public array $aaguidWhitelist2FA;
+
     public array $attFmtWhitelist2FA;
 
     public string $minCertLevelPasswordless;
+
     public array $aaguidWhitelistPasswordless;
+
     public array $attFmtWhitelistPasswordless;
 
     /**

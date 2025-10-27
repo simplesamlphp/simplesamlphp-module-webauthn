@@ -31,9 +31,10 @@ class Passwordless extends Source
     protected ?string $authnContextClassRef = null;
 
     /**
-     * @var Configuration $authSourceConfig
+     * @var \SimpleSAML\Configuration $authSourceConfig
      */
     protected Configuration $authSourceConfig;
+
 
     public function __construct(array $info, array $config)
     {
@@ -54,6 +55,7 @@ class Passwordless extends Source
         WebAuthn::loadModuleConfig($moduleConfig, $initialStateData);
         $this->stateData = $initialStateData;
     }
+
 
     public function authenticate(array &$state): void
     {

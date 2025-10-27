@@ -56,7 +56,7 @@ class WebAuthn extends Auth\ProcessingFilter
     /**
      * An object with all the parameters that will be needed in the process
      *
-     * @var Module\webauthn\WebAuthn\StateData
+     * @var \SimpleSAML\Module\webauthn\WebAuthn\StateData
      */
     private StateData $stateData;
 
@@ -64,6 +64,7 @@ class WebAuthn extends Auth\ProcessingFilter
      * Maximum age of second-factor authentication in authproc
      */
     private int $SecondFactorMaxAge;
+
 
     /**
      * Initialize filter.
@@ -98,6 +99,7 @@ class WebAuthn extends Auth\ProcessingFilter
             $this->stateData->useInflowRegistration = true;
         }
     }
+
 
     /**
      * Process a authentication response

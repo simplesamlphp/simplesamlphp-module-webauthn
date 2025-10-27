@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['8.1', '8.2', '8.3', '8.4']
+        php-version: ['8.2', '8.3', '8.4', '8.5']
 
     uses: simplesamlphp/simplesamlphp-test-framework/.github/workflows/reusable_phplinter.yml@v1.10.3
     with:
@@ -45,7 +45,7 @@ jobs:
       fail-fast: false
       matrix:
         operating-system: [ubuntu-latest]
-        php-versions: ['8.1', '8.2', '8.3', '8.4']
+        php-versions: ['8.2', '8.3', '8.4', '8.5']
 
     steps:
       - name: Setup PHP, with composer and extensions
@@ -85,15 +85,15 @@ jobs:
         run: composer install --no-progress --prefer-dist --optimize-autoloader
 
       - name: Run unit tests with coverage
-        if: ${{ matrix.php-versions == '8.4' }}
+        if: ${{ matrix.php-versions == '8.5' }}
         run: vendor/bin/phpunit
 
       - name: Run unit tests (no coverage)
-        if: ${{ matrix.php-versions != '8.4' }}
+        if: ${{ matrix.php-versions != '8.5' }}
         run: vendor/bin/phpunit --no-coverage
 
       - name: Save coverage data
-        if: ${{ matrix.php-versions == '8.4' }}
+        if: ${{ matrix.php-versions == '8.5' }}
         uses: actions/upload-artifact@v5
         with:
           name: coverage-data
@@ -107,7 +107,7 @@ jobs:
       fail-fast: true
       matrix:
         operating-system: [windows-latest]
-        php-versions: ['8.1', '8.2', '8.3', '8.4']
+        php-versions: ['8.2', '8.3', '8.4', '8.5']
 
     steps:
       - name: Setup PHP, with composer and extensions
@@ -115,7 +115,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          extensions: ctype, date, dom, fileinfo, filter, hash, intl, mbstring, openssl, pdo, pcre, spl, xml
+          extensions: ctype, date, dom, fileinfo, filter, hash, intl, mbstring, openssl, pdo, pcre, spl, xml, zip
           tools: composer
           ini-values: error_reporting=E_ALL
           coverage: none
@@ -161,8 +161,8 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           # Should be the higest supported version, so we can use the newest tools
-          php-version: '8.3'
-          tools: composer, composer-require-checker, composer-unused, phpcs
+          php-version: '8.5'
+          tools: composer, composer-require-checker, composer-unused
           extensions: ctype, date, dom, fileinfo, filter, hash, intl, mbstring, opcache, openssl, pcre, spl, xml
 
       - name: Setup problem matchers for PHP
@@ -193,7 +193,7 @@ jobs:
         run: composer-unused
 
       - name: PHP Code Sniffer
-        run: phpcs
+        run: vendor/bin/phpcs
 
       - name: PHPStan
         run: |
@@ -213,7 +213,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           # Should be the lowest supported version
-          php-version: '8.1'
+          php-version: '8.2'
           extensions: ctype, date, dom, fileinfo, filter, hash, intl, mbstring, openssl, pcre, spl, xml
           tools: composer
           coverage: none

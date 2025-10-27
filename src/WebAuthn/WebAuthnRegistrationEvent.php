@@ -30,21 +30,54 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * Public key algorithm supported. This is -7 - ECDSA with curve P-256, or -275 (RS256)
      */
     public const PK_ALGORITHM_ECDSA = "-7";
+
     public const PK_ALGORITHM_RSA = "-257";
+
     public const PK_ALGORITHM = [self::PK_ALGORITHM_ECDSA, self::PK_ALGORITHM_RSA];
+
     public const AAGUID_ASSURANCE_LEVEL_NONE = 'None';
+
     public const AAGUID_ASSURANCE_LEVEL_SELF = 'Self';
+
     public const AAGUID_ASSURANCE_LEVEL_BASIC = 'Basic';
+
     public const AAGUID_ASSURANCE_LEVEL_ATTCA = 'AttCA';
 
     // nomenclature from the MDS3 spec
     public const FIDO_REVOKED = "REVOKED";
+
     public const CERTIFICATION_NOT_REQUIRED = "CERTIFICATION_NOT_REQUIRED";
+
     public const FIDO_CERTIFIED_L1 = "FIDO_CERTIFIED_L1";
+
     public const FIDO_CERTIFIED_L1PLUS = "FIDO_CERTIFIED_L1plus";
+
     public const FIDO_CERTIFIED_L2 = "FIDO_CERTIFIED_L2";
+
     public const FIDO_CERTIFIED_L3 = "FIDO_CERTIFIED_L3";
+
     public const FIDO_CERTIFIED_L3PLUS = "FIDO_CERTIFIED_L3plus";
+
+    // Keymaster 3 - KeyMint ???
+    private const ORIGINS_3 = [ // https://source.android.com/docs/security/features/keystore/tags#origin
+        0 => "GENERATED",
+        1 => "DERIVED",
+        2 => "IMPORTED",
+        3 => "UNKNOWN",
+    ];
+
+    private const PURPOSE_3 = [
+        0 => "ENCRYPT",
+        1 => "DECRYPT",
+        2 => "SIGN",
+        3 => "VERIFY",
+        4 => "DERIVE_KEY",
+        5 => "WRAP_KEY",
+    ];
+
+    private const MIN_SUPPORTED_KEYMASTER_VERSION = 3;
+
+
     /**
      * the AAGUID of the newly registered authenticator
      * @var string
@@ -63,7 +96,9 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
      * @var \SimpleSAML\Module\webauthn\WebAuthn\AAGUID
      */
     protected AAGUID $AAGUIDDictionary;
+
     protected string $AttFmt;
+
 
     /**
      * Initialize the event object.
@@ -108,6 +143,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         // now check if the authenticator is acceptable as per policy
         $this->verifyAcceptability($acceptabilityPolicy);
     }
+
 
     private function verifyAcceptability($acceptabilityPolicy)
     {
@@ -174,6 +210,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         }
     }
 
+
     /**
      * Validate the incoming attestation data CBOR blob and return the embedded authData
      * @param string $attestationData
@@ -222,6 +259,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         $this->AttFmt = $attestationArray['fmt'];
     }
 
+
     /**
      * @param array $attestationArray
      * @return void
@@ -241,6 +279,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
             $this->fail("Non-empty attestation authorities are not expected with 'attestationFormat = none'.");
         }
     }
+
 
     /**
      * @param array $attestationArray
@@ -367,6 +406,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         return;
     }
 
+
     private function commonX5cSignatureChecks(array $attestationArray): void
     {
         $stmtDecoded = $attestationArray['attStmt'];
@@ -400,6 +440,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         $this->pass("x5c sig check passed.");
     }
 
+
     /**
      * @param array $attestationArray
      */
@@ -422,6 +463,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
             $this->AAGUIDAssurance = self::AAGUID_ASSURANCE_LEVEL_SELF;
         }
     }
+
 
     /**
      * @param array $attestationArray
@@ -498,23 +540,6 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         return;
     }
 
-    // Keymaster 3 - KeyMint ???
-    private const ORIGINS_3 = [ // https://source.android.com/docs/security/features/keystore/tags#origin
-        0 => "GENERATED",
-        1 => "DERIVED",
-        2 => "IMPORTED",
-        3 => "UNKNOWN",
-        ];
-    private const PURPOSE_3 = [
-        0 => "ENCRYPT",
-        1 => "DECRYPT",
-        2 => "SIGN",
-        3 => "VERIFY",
-        4 => "DERIVE_KEY",
-        5 => "WRAP_KEY",
-    ];
-
-    private const MIN_SUPPORTED_KEYMASTER_VERSION = 3;
 
     private function validateAttestationFormatAndroidKey(array $attestationArray): void
     {
@@ -599,6 +624,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         $this->AAGUIDAssurance = self::AAGUID_ASSURANCE_LEVEL_BASIC;
     }
 
+
     /**
      * support legacy U2F tokens
      *
@@ -670,6 +696,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         $this->AAGUIDAssurance = self::AAGUID_ASSURANCE_LEVEL_BASIC;
     }
 
+
     /**
      * support Android authenticators (fingerprint etc.)
      *
@@ -685,6 +712,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         // be sure to end execution even if the Exception is caught
         exit(1);
     }
+
 
     /**
      * The registration contains the actual credential. This function parses it.
@@ -760,6 +788,7 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         }
     }
 
+
     /**
      * transform DER formatted certificate to PEM format
      *
@@ -773,18 +802,20 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
         return $pem;
     }
 
-    /**
-     * @return string
-     */
-    public function getAAGUID()
-    {
-        return $this->AAGUID;
-    }
 
     /**
      * @return string
      */
-    public function getAttestationLevel()
+    public function getAAGUID(): string
+    {
+        return $this->AAGUID;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getAttestationLevel(): string
     {
         return $this->AAGUIDAssurance;
     }
