@@ -147,7 +147,7 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
 
 
     /**
-     * @var array $acceptabilityPolicy
+     * @param array $acceptabilityPolicy
      */
     private function verifyAcceptability($acceptabilityPolicy)
     {

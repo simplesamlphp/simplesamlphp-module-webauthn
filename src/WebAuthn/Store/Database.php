@@ -33,7 +33,7 @@ class Database extends Store
      *
      * This variable can't be serialized.
      *
-     * @var \SimpleSAML\Datadata
+     * @var \SimpleSAML\Database
      */
     private SSP_Database $db;
 
