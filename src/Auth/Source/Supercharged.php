@@ -16,10 +16,8 @@ class Supercharged extends Passwordless
 {
     /**
      * The AuthSource to use when someone enters a username/password
-     *
-     * @var string
      */
-    private $pushbackAuthsource;
+    private string $pushbackAuthsource;
 
 
     public function __construct(array $info, array $config)

@@ -29,44 +29,47 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
     /**
      * Public key algorithm supported. This is -7 - ECDSA with curve P-256, or -275 (RS256)
      */
-    public const PK_ALGORITHM_ECDSA = "-7";
+    public const string PK_ALGORITHM_ECDSA = "-7";
 
-    public const PK_ALGORITHM_RSA = "-257";
+    public const string PK_ALGORITHM_RSA = "-257";
 
-    public const PK_ALGORITHM = [self::PK_ALGORITHM_ECDSA, self::PK_ALGORITHM_RSA];
+    /** @var string[] */
+    public const array PK_ALGORITHM = [self::PK_ALGORITHM_ECDSA, self::PK_ALGORITHM_RSA];
 
-    public const AAGUID_ASSURANCE_LEVEL_NONE = 'None';
+    public const string AAGUID_ASSURANCE_LEVEL_NONE = 'None';
 
-    public const AAGUID_ASSURANCE_LEVEL_SELF = 'Self';
+    public const string AAGUID_ASSURANCE_LEVEL_SELF = 'Self';
 
-    public const AAGUID_ASSURANCE_LEVEL_BASIC = 'Basic';
+    public const string AAGUID_ASSURANCE_LEVEL_BASIC = 'Basic';
 
-    public const AAGUID_ASSURANCE_LEVEL_ATTCA = 'AttCA';
+    public const string AAGUID_ASSURANCE_LEVEL_ATTCA = 'AttCA';
 
     // nomenclature from the MDS3 spec
-    public const FIDO_REVOKED = "REVOKED";
+    public const string FIDO_REVOKED = "REVOKED";
 
-    public const CERTIFICATION_NOT_REQUIRED = "CERTIFICATION_NOT_REQUIRED";
+    public const string CERTIFICATION_NOT_REQUIRED = "CERTIFICATION_NOT_REQUIRED";
 
-    public const FIDO_CERTIFIED_L1 = "FIDO_CERTIFIED_L1";
+    public const string FIDO_CERTIFIED_L1 = "FIDO_CERTIFIED_L1";
 
-    public const FIDO_CERTIFIED_L1PLUS = "FIDO_CERTIFIED_L1plus";
+    public const string FIDO_CERTIFIED_L1PLUS = "FIDO_CERTIFIED_L1plus";
 
-    public const FIDO_CERTIFIED_L2 = "FIDO_CERTIFIED_L2";
+    public const string FIDO_CERTIFIED_L2 = "FIDO_CERTIFIED_L2";
 
-    public const FIDO_CERTIFIED_L3 = "FIDO_CERTIFIED_L3";
+    public const string FIDO_CERTIFIED_L3 = "FIDO_CERTIFIED_L3";
 
-    public const FIDO_CERTIFIED_L3PLUS = "FIDO_CERTIFIED_L3plus";
+    public const string FIDO_CERTIFIED_L3PLUS = "FIDO_CERTIFIED_L3plus";
 
     // Keymaster 3 - KeyMint ???
-    private const ORIGINS_3 = [ // https://source.android.com/docs/security/features/keystore/tags#origin
+    /** @var array<int, string> */
+    private const array ORIGINS_3 = [ // https://source.android.com/docs/security/features/keystore/tags#origin
         0 => "GENERATED",
         1 => "DERIVED",
         2 => "IMPORTED",
         3 => "UNKNOWN",
     ];
 
-    private const PURPOSE_3 = [
+    /** @var array<int, string> */
+    private const array PURPOSE_3 = [
         0 => "ENCRYPT",
         1 => "DECRYPT",
         2 => "SIGN",
@@ -75,18 +78,16 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
         5 => "WRAP_KEY",
     ];
 
-    private const MIN_SUPPORTED_KEYMASTER_VERSION = 3;
+    private const int MIN_SUPPORTED_KEYMASTER_VERSION = 3;
 
 
     /**
      * the AAGUID of the newly registered authenticator
-     * @var string
      */
     protected string $AAGUID;
 
     /**
      * how sure are we about the AAGUID?
-     * @var string
      */
     protected string $AAGUIDAssurance;
 
@@ -145,6 +146,9 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
     }
 
 
+    /**
+     * @var array $acceptabilityPolicy
+     */
     private function verifyAcceptability($acceptabilityPolicy)
     {
         if ($acceptabilityPolicy['minCertLevel'] == self::CERTIFICATION_NOT_REQUIRED) { // all is accepted
@@ -213,8 +217,6 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
 
     /**
      * Validate the incoming attestation data CBOR blob and return the embedded authData
-     * @param string $attestationData
-     * @return void
      */
     private function validateAttestationData(string $attestationData): void
     {
@@ -262,7 +264,6 @@ class WebAuthnRegistrationEvent extends WebAuthnAbstractEvent
 
     /**
      * @param array $attestationArray
-     * @return void
      */
     private function validateAttestationFormatNone(array $attestationArray): void
     {
@@ -407,6 +408,9 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
     }
 
 
+    /**
+     * @param array $attestationArray
+     */
     private function commonX5cSignatureChecks(array $attestationArray): void
     {
         $stmtDecoded = $attestationArray['attStmt'];
@@ -467,7 +471,6 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
 
     /**
      * @param array $attestationArray
-     * @return void
      */
     private function validateAttestationFormatPackedX5C(array $attestationArray): void
     {
@@ -541,6 +544,9 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
     }
 
 
+    /**
+     * @param array $attestationArray
+     */
     private function validateAttestationFormatAndroidKey(array $attestationArray): void
     {
         $stmtDecoded = $attestationArray['attStmt'];
@@ -629,7 +635,6 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
      * support legacy U2F tokens
      *
      * @param array $attestationData the incoming attestation data
-     * @return void
      */
     private function validateAttestationFormatFidoU2F(array $attestationData): void
     {
@@ -701,7 +706,6 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
      * support Android authenticators (fingerprint etc.)
      *
      * @param array $attestationData the incoming attestation data
-     * @return void
      */
     private function validateAttestationFormatAndroidSafetyNet(array $attestationData): void
     {
@@ -718,7 +722,6 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
      * The registration contains the actual credential. This function parses it.
      * @param string $attData    the attestation data binary blob
      * @param string $responseId the response ID
-     * @return void
      */
     private function validateAttestedCredentialData(string $attData, string $responseId): void
     {
@@ -804,7 +807,6 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
 
 
     /**
-     * @return string
      */
     public function getAAGUID(): string
     {
@@ -813,7 +815,6 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
 
 
     /**
-     * @return string
      */
     public function getAttestationLevel(): string
     {

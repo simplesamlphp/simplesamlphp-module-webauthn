@@ -25,6 +25,7 @@ abstract class Store
      * This constructor should always be called first in any class which implements this class.
      *
      * @param array &$config The configuration for this storage handler.
+     *
      * @phpstan-ignore constructor.unusedParameter
      */
     protected function __construct(array &$config)
@@ -81,8 +82,6 @@ abstract class Store
      * @param int    $signCounter   The signature counter for this credential.
      * @param string $friendlyName  A user-supplied name for this token.
      * @param string $hashedId      hashed ID of the user
-     *
-     * @return bool
      */
     abstract public function storeTokenData(
         string $userId,
@@ -96,16 +95,15 @@ abstract class Store
         string $hashedId,
         string $aaguid,
         string $attLevel,
-    ): bool;
+    ): true;
 
 
     /**
      * remove an existing credential from the database
      *
      * @param string $credentialId the credential
-     * @return true
      */
-    abstract public function deleteTokenData(string $credentialId): bool;
+    abstract public function deleteTokenData(string $credentialId): true;
 
 
     /**
@@ -113,9 +111,8 @@ abstract class Store
      *
      * @param string $credentialId the credential
      * @param int    $signCounter  the new counter value
-     * @return true
      */
-    abstract public function updateSignCount(string $credentialId, int $signCounter): bool;
+    abstract public function updateSignCount(string $credentialId, int $signCounter): true;
 
 
     /**
@@ -156,7 +153,6 @@ abstract class Store
      * configuration parsing fails.
      *
      * @param string|array $config The configuration.
-     *
      * @return \SimpleSAML\Module\webauthn\Store An object which implements the \SimpleSAML\Module\webauthn\Store class.
      *
      * @throws \Exception if the configuration is invalid.

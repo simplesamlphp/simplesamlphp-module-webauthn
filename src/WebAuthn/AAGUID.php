@@ -17,7 +17,7 @@ class AAGUID
     /**
      * The name of the configuration file where we should expect the AAGUID dictionary.
      */
-    public const AAGUID_CONFIG_FILE = 'webauthn-aaguid.json';
+    public const string AAGUID_CONFIG_FILE = 'webauthn-aaguid.json';
 
 
     /**
@@ -60,8 +60,6 @@ class AAGUID
 
     /**
      * Get the singleton instance of the AAGUID dictionary.
-     *
-     * @return self
      */
     public static function getInstance(): self
     {
@@ -76,7 +74,6 @@ class AAGUID
      * Determine if an AAGUID is known
      *
      * @param string $aaguid The AAGUID that we want to check.
-     *
      * @return bool True if we know about this token, false otherwise.
      */
     public function hasToken(string $aaguid): bool
@@ -95,7 +92,6 @@ class AAGUID
      * Get the information for a given AAGUID.
      *
      * @param string $aaguid The AAGUID we want to get.
-     *
      * @return array An array containing information about the given AAGUID, or an empty array if that AAGUID is
      * unknown.
      */

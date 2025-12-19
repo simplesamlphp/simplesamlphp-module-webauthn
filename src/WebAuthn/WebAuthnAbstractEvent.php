@@ -9,6 +9,7 @@ use CBOR\Normalizable;
 use CBOR\OtherObject;
 use CBOR\StringStream;
 use CBOR\Tag;
+use Exception;
 use SimpleSAML\Utils\HTTP as HTTPHelper;
 
 /**
@@ -22,31 +23,25 @@ use SimpleSAML\Utils\HTTP as HTTPHelper;
  */
 abstract class WebAuthnAbstractEvent
 {
-    public const PRESENCE_LEVEL_PRESENT = 1;
+    public const int PRESENCE_LEVEL_PRESENT = 1;
 
-    public const PRESENCE_LEVEL_VERIFIED = 4;
+    public const int PRESENCE_LEVEL_VERIFIED = 4;
 
-    public const PRESENCE_LEVEL_NONE = 0;
+    public const int PRESENCE_LEVEL_NONE = 0;
 
 
     /**
      * The SHA256 hash of the clientDataJSON
-     *
-     * @var string
      */
     protected string $clientDataHash;
 
     /**
      * the authenticator's signature counter
-     *
-     * @var int
      */
     protected int $counter;
 
     /**
      * the authenticator's signature algorithm
-     *
-     * @var int
      */
     protected int $algo;
 
@@ -57,23 +52,17 @@ abstract class WebAuthnAbstractEvent
 
     /**
      * A string buffer to hold debug information in case we need it.
-     *
-     * @var string
      */
     protected string $debugBuffer = '';
 
     /**
      * A string buffer to hold raw validation data in case we want to look at it.
-     *
-     * @var string
      */
     protected string $validateBuffer = '';
 
     /**
      * the type of event requested. This is to be set in child class constructors
      * before calling the parent's.
-     *
-     * @var string
      */
     protected string $eventType;
 
@@ -87,8 +76,6 @@ abstract class WebAuthnAbstractEvent
      * the one that gets used to authenticate)
      *
      * To be set by the constructors of the child classes.
-     *
-     * @var string
      */
     protected string $credentialId;
 
@@ -97,8 +84,6 @@ abstract class WebAuthnAbstractEvent
      * registered, or the one that gets used to authenticate)
      *
      * To be set by the constructors of the child classes.
-     *
-     * @var string
      */
     protected string $credential;
 
@@ -151,7 +136,6 @@ abstract class WebAuthnAbstractEvent
 
 
     /**
-     * @return int
      */
     public function getCounter(): int
     {
@@ -160,7 +144,6 @@ abstract class WebAuthnAbstractEvent
 
 
     /**
-     * @return string
      */
     public function getCredential(): string
     {
@@ -169,7 +152,6 @@ abstract class WebAuthnAbstractEvent
 
 
     /**
-     * @return int
      */
     public function getAlgo(): int
     {
@@ -178,7 +160,6 @@ abstract class WebAuthnAbstractEvent
 
 
     /**
-     * @return int
      */
     public function getPresenceLevel(): int
     {
@@ -187,7 +168,6 @@ abstract class WebAuthnAbstractEvent
 
 
     /**
-     * @return string
      */
     public function getCredentialId(): string
     {
@@ -196,7 +176,6 @@ abstract class WebAuthnAbstractEvent
 
 
     /**
-     * @return string
      */
     public function getDebugBuffer(): string
     {
@@ -205,7 +184,6 @@ abstract class WebAuthnAbstractEvent
 
 
     /**
-     * @return string
      */
     public function getValidateBuffer(): string
     {
@@ -238,8 +216,6 @@ abstract class WebAuthnAbstractEvent
      *     - the parts of step 15 that relate to clientDataJSON
      *
      * @param string $clientDataJSON the incoming data
-     *
-     * @return string
      */
     private function verifyClientDataJSON(string $clientDataJSON): string
     {
@@ -329,7 +305,6 @@ abstract class WebAuthnAbstractEvent
      *     - the parts of step 15 that relate to authData
      *
      * @param string $authData           the authData / authenticatorData binary blob
-     *
      * @return int the current counter value of the authenticator
      */
     private function validateAuthData(string $authData): int
@@ -461,8 +436,6 @@ abstract class WebAuthnAbstractEvent
 
 
     /**
-     * @param string $text
-     * @return void
      */
     protected function warn(string $text): void
     {
@@ -471,9 +444,7 @@ abstract class WebAuthnAbstractEvent
 
 
     /**
-     * @param string $text
      * @throws \Exception
-     * @return void
      */
     protected function fail(string $text): void
     {
@@ -482,13 +453,11 @@ abstract class WebAuthnAbstractEvent
             echo $this->debugBuffer;
             echo $this->validateBuffer;
         }
-        throw new \Exception($text);
+        throw new Exception($text);
     }
 
 
     /**
-     * @param string $text
-     * @return void
      */
     protected function pass(string $text): void
     {
@@ -497,8 +466,6 @@ abstract class WebAuthnAbstractEvent
 
 
     /**
-     * @param string $text
-     * @return void
      */
     protected function ignore(string $text): void
     {

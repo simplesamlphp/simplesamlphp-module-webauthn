@@ -32,6 +32,8 @@ class Database extends Store
      * Database handle.
      *
      * This variable can't be serialized.
+     *
+     * @var \SimpleSAML\Datadata
      */
     private SSP_Database $db;
 
@@ -116,7 +118,6 @@ class Database extends Store
 
     /**
      * Called after unserialization.
-     * @return void
      */
     public function __wakeup(): void
     {
@@ -214,8 +215,6 @@ class Database extends Store
      * @param int    $signCounter   The signature counter for this credential.
      * @param string $friendlyName  A user-supplied name for this token.
      * @param string $hashedId      hashed user ID
-     *
-     * @return true
      */
     public function storeTokenData(
         string $userId,
@@ -229,7 +228,7 @@ class Database extends Store
         string $hashedId,
         string $aaguid,
         string $attLevel,
-    ): bool {
+    ): true {
         // phpcs:disable Generic.Files.LineLength.TooLong
         $this->db->write(
             'INSERT INTO credentials ' .
@@ -259,9 +258,8 @@ class Database extends Store
      * remove an existing credential from the database
      *
      * @param string $credentialId the credential
-     * @return true
      */
-    public function deleteTokenData(string $credentialId): bool
+    public function deleteTokenData(string $credentialId): true
     {
         $this->db->write(
             'DELETE FROM credentials WHERE credentialId = :credentialId',
@@ -279,9 +277,8 @@ class Database extends Store
      *
      * @param string $credentialId the credential
      * @param int    $signCounter  the new counter value
-     * @return true
      */
-    public function updateSignCount(string $credentialId, int $signCounter): bool
+    public function updateSignCount(string $credentialId, int $signCounter): true
     {
         $this->db->write(
             'UPDATE credentials SET signCounter = :signCounter WHERE credentialId = :credentialId',

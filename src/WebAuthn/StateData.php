@@ -17,36 +17,25 @@ class StateData
 
     /**
      * Scope of the FIDO2 attestation. Can only be in the own domain.
-     *
-     * @var string|null
      */
     public ?string $scope = null;
 
     /**
      * The scope derived from the SimpleSAMLphp configuration;
      * can be null due to misconfiguration, in case we cannot warn the administrator on a mismatching scope
-     *
-     * @var string|null
      */
     public ?string $derivedScope = null;
 
     /**
      * attribute to use as username for the FIDO2 attestation.
-     *
-     * @var string
      */
     public string $usernameAttrib;
 
     /**
      * attribute to use as display name for the FIDO2 attestation.
-     *
-     * @var string
      */
     public string $displaynameAttrib;
 
-    /**
-     * @var boolean
-     */
     public bool $requestTokenModel;
 
     public string $minCertLevel2FA;

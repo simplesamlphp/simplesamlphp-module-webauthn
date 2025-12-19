@@ -56,9 +56,6 @@ class WebAuthnAuthenticationEvent extends WebAuthnAbstractEvent
 
 
     /**
-     * @param string $sigData
-     * @param string $signature
-     * @return void
      */
     private function validateSignature(string $sigData, string $signature): void
     {

@@ -108,8 +108,6 @@ class WebAuthn extends Auth\ProcessingFilter
      * the user can register or authenticate with his token.
      *
      * @param array &$state The state of the response.
-     *
-     * @return void
      */
     public function process(array &$state): void
     {

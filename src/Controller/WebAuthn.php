@@ -25,11 +25,11 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class WebAuthn
 {
-    public const STATE_AUTH_NOMGMT = 1; // just authenticate user
+    public const int STATE_AUTH_NOMGMT = 1; // just authenticate user
 
-    public const STATE_AUTH_ALLOWMGMT = 2; // allow to switch to mgmt page
+    public const int STATE_AUTH_ALLOWMGMT = 2; // allow to switch to mgmt page
 
-    public const STATE_MGMT = 4; // show token management page
+    public const int STATE_MGMT = 4; // show token management page
 
 
     /** @var \SimpleSAML\Auth\State|string */
