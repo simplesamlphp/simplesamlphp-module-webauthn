@@ -78,7 +78,7 @@ jobs:
       - name: Cache composer dependencies
         uses: actions/cache@v5
         with:
-          path: $COMPOSER_CACHE
+          path: ${{ env.COMPOSER_CACHE }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
@@ -141,7 +141,7 @@ jobs:
       - name: Cache composer dependencies
         uses: actions/cache@v5
         with:
-          path: $COMPOSER_CACHE
+          path: ${{ env.COMPOSER_CACHE }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
@@ -179,7 +179,7 @@ jobs:
       - name: Cache composer dependencies
         uses: actions/cache@v5
         with:
-          path: $COMPOSER_CACHE
+          path: ${{ env.COMPOSER_CACHE }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
@@ -233,7 +233,7 @@ jobs:
       - name: Cache composer dependencies
         uses: actions/cache@v5
         with:
-          path: $COMPOSER_CACHE
+          path: ${{ env.COMPOSER_CACHE }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
