@@ -16,21 +16,21 @@
         }
     },
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "ext-date": "*",
         "ext-hash": "*",
         "ext-openssl": "*",
         "ext-pdo": "*",
 
-        "simplesamlphp/assert": "~1.9.1",
-        "simplesamlphp/simplesamlphp": "^2.4.0",
-        "spomky-labs/cbor-php": "~3.2.0",
-        "spomky-labs/pki-framework": "~1.4.0",
-        "symfony/http-foundation": "^6.4 || ^7.3",
-        "web-auth/cose-lib": "~4.4.0"
+        "simplesamlphp/assert": "~1.9",
+        "simplesamlphp/simplesamlphp": "~2.5@RC",
+        "spomky-labs/cbor-php": "~3.2",
+        "spomky-labs/pki-framework": "~1.4",
+        "symfony/http-foundation": "~7.4",
+        "web-auth/cose-lib": "~4.4"
     },
     "require-dev": {
-        "simplesamlphp/simplesamlphp-test-framework": "~1.10.3"
+        "simplesamlphp/simplesamlphp-test-framework": "~1.11"
     },
     "config": {
         "allow-plugins": {
