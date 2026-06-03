@@ -6,6 +6,7 @@
 [![Type Coverage](https://shepherd.dev/github/simplesamlphp/simplesamlphp-module-webauthn/coverage.svg)](https://shepherd.dev/github/simplesamlphp/simplesamlphp-module-webauthn)
 [![Psalm Level](https://shepherd.dev/github/simplesamlphp/simplesamlphp-module-webauthn/level.svg)](https://shepherd.dev/github/simplesamlphp/simplesamlphp-module-webauthn)
 
+
 <!-- {{TOC}} -->
 
 The module is implemented as an Authentication Processing Filter. That
