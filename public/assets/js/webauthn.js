@@ -212,10 +212,10 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     let authform = document.getElementById('authform');
     if (authform !== null) {
-        if (frontendData['FIDO2PasswordlessAuthMode'] === false) {
-            document.getElementById('authformSubmit').addEventListener('click', authButtonClick);
-        } else {
+        if (frontendData['FIDO2PasswordlessAuthMode'] === true) {
             document.getElementById('authformSubmit').addEventListener('click', passwordlessAuthButtonClick);
+        } else {
+            document.getElementById('authformSubmit').addEventListener('click', authButtonClick);
         }
         authform.addEventListener('submit', () => false);
     }
