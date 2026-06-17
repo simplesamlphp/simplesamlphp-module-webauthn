@@ -148,8 +148,7 @@ class WebAuthn extends Auth\ProcessingFilter
             unset($state['Attributes']['internal:FIDO2PasswordlessAuthentication']);
             return;
         }
-        $session = Session::getSessionFromRequest();
-        $lastSecondFactor = $session->getData("DateTime", 'LastSuccessfulSecondFactor');
+        $lastSecondFactor = $state['LastSuccessfulSecondFactor'];
         if // do we need to do secondFactor in interval, or even every time?
            // we skip only if an interval is configured AND we did successfully authenticate,
            // AND are within the interval
