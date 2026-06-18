@@ -153,9 +153,9 @@ class WebAuthn extends Auth\ProcessingFilter
            // we skip only if an interval is configured AND we did successfully authenticate,
            // AND are within the interval
         (
-                $this->SecondFactorMaxAge >= 0 && $lastSecondFactor instanceof \DateTime
+                $this->SecondFactorMaxAge >= 0 && $lastSecondFactor instanceof \DateTimeImmutable
         ) {
-            $interval = $lastSecondFactor->diff(new \DateTime());
+            $interval = $lastSecondFactor->diff(new \DateTimeImmutable());
             if ($interval->invert == 1) {
                 throw new \Exception("We are talking to a future self. Amazing.");
             }
