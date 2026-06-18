@@ -21,6 +21,7 @@ use SimpleSAML\Module;
 use SimpleSAML\Module\webauthn\WebAuthn\StateData;
 use SimpleSAML\Module\webauthn\WebAuthn\StaticProcessHelper;
 use SimpleSAML\Session;
+use DateTimeImmutable;
 
 class WebAuthn extends Auth\ProcessingFilter
 {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SimpleSAML\Module\webauthn\Controller;
 
-use DateTime;
+use DateTimeImmutable;
 use Exception;
 use SimpleSAML\Auth;
 use SimpleSAML\Auth\Source;
