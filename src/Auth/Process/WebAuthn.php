@@ -21,6 +21,7 @@ use SimpleSAML\Module;
 use SimpleSAML\Module\webauthn\WebAuthn\StateData;
 use SimpleSAML\Module\webauthn\WebAuthn\StaticProcessHelper;
 use SimpleSAML\Session;
+use DateTimeImmutable;
 
 class WebAuthn extends Auth\ProcessingFilter
 {
@@ -148,15 +149,14 @@ class WebAuthn extends Auth\ProcessingFilter
             unset($state['Attributes']['internal:FIDO2PasswordlessAuthentication']);
             return;
         }
-        $session = Session::getSessionFromRequest();
-        $lastSecondFactor = $session->getData("DateTime", 'LastSuccessfulSecondFactor');
+        $lastSecondFactor = $state['LastSuccessfulSecondFactor'];
         if // do we need to do secondFactor in interval, or even every time?
            // we skip only if an interval is configured AND we did successfully authenticate,
            // AND are within the interval
         (
-                $this->SecondFactorMaxAge >= 0 && $lastSecondFactor instanceof \DateTime
+                $this->SecondFactorMaxAge >= 0 && $lastSecondFactor instanceof \DateTimeImmutable
         ) {
-            $interval = $lastSecondFactor->diff(new \DateTime());
+            $interval = $lastSecondFactor->diff(new \DateTimeImmutable());
             if ($interval->invert == 1) {
                 throw new \Exception("We are talking to a future self. Amazing.");
             }
